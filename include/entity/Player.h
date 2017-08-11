@@ -25,7 +25,7 @@ typedef struct {
 
 	float breakPlaceTimeout;
 
-	bool debugButton;
+	Block blockInHand;
 
 	Raycast_Result viewRayCast;
 	bool blockInSeight, blockInActionRange;

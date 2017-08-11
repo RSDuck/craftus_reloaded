@@ -12,6 +12,9 @@ typedef struct {
 
 	KeyCombo placeBlock, breakBlock;
 	KeyCombo jump;
+
+	KeyCombo switchBlockLeft;
+	KeyCombo switchBlockRight;
 } PlayerControlScheme;
 typedef struct {
 	Player* player;

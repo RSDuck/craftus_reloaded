@@ -29,7 +29,7 @@ void Player_Init(Player* player) {
 
 	player->breakPlaceTimeout = 0.f;
 
-	player->debugButton = false;
+	player->blockInHand = Block_Stone;
 }
 
 void Player_Spawn(Player* player, World* world) { player->world = world; }

@@ -2,6 +2,8 @@
 
 #include <misc/NumberUtils.h>
 
+#include <gui/DebugUI.h>
+
 #ifdef _3DS
 #include <3ds.h>
 #define PLATFORM_BUTTONS 17
@@ -34,7 +36,9 @@ const PlayerControlScheme platform_default_scheme = {.forward = K3DS_X,
 						     .lookDown = K3DS_CPAD_DOWN,
 						     .placeBlock = K3DS_A,
 						     .breakBlock = K3DS_Y,
-						     .jump = K3DS_DUP};
+						     .jump = K3DS_DUP,
+						     .switchBlockLeft = K3DS_DLEFT,
+						     .switchBlockRight = K3DS_DRIGHT};
 static void convertPlatformInput(InputData* input, float ctrls[], bool keysdown[], bool keysup[]) {
 #define reg_bin_key(i, k)                                                         \
 	ctrls[(i)] = (float)((input->keysdown & (k)) || (input->keysheld & (k))); \
@@ -131,14 +135,18 @@ void PlayerController_Update(PlayerController* ctrl, InputData input, float dt) 
 
 	float placeBlock = IsKeyDown(ctrl->controlScheme.placeBlock, &agnosticInput);
 	float breakBlock = IsKeyDown(ctrl->controlScheme.breakBlock, &agnosticInput);
-	if (placeBlock > 0.f) Player_PlaceBlock(player, Block_Stone);
+	if (placeBlock > 0.f) Player_PlaceBlock(player, player->blockInHand);
 	if (breakBlock > 0.f) Player_BreakBlock(player);
 
 	float jump = IsKeyDown(ctrl->controlScheme.jump, &agnosticInput);
 	if (jump > 0.f) Player_Jump(player, movement);
 
-	player->debugButton = false;
-	if (input.keysdown & KEY_DLEFT) player->debugButton = true;
+	bool switchBlockLeft = WasKeyReleased(ctrl->controlScheme.switchBlockLeft, &agnosticInput);
+	bool switchBlockRight = WasKeyReleased(ctrl->controlScheme.switchBlockRight, &agnosticInput);
+	if (switchBlockLeft && --player->blockInHand == 0) player->blockInHand = Blocks_Count - 1;
+	if (switchBlockRight && ++player->blockInHand == Blocks_Count) player->blockInHand = 1;
+
+	DebugUI_Text("%s", BlockNames[player->blockInHand]);
 
 	Player_Move(player, dt, movement);
 	Player_Update(player);

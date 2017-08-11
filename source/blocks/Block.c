@@ -67,5 +67,27 @@ void Block_GetTexture(Block block, Direction direction, int16_t* out_uv) {
 					out_uv[1] = icon.grass_side.v;
 					return;
 			}
+		case Block_Cobblestone:
+			out_uv[0] = icon.cobblestone.u;
+			out_uv[1] = icon.cobblestone.v;
+			return;
+		case Block_Log:
+			switch (direction) {
+				case Direction_Bottom:
+				case Direction_Top:
+					out_uv[0] = icon.oaklog_top.u;
+					out_uv[1] = icon.oaklog_top.v;
+					return;
+				default:
+					out_uv[0] = icon.oaklog_side.u;
+					out_uv[1] = icon.oaklog_side.v;
+					return;
+			}
+		case Block_Sand:
+			out_uv[0] = icon.sand.u;
+			out_uv[1] = icon.sand.v;
+			return;
 	}
 }
+
+const char* BlockNames[Blocks_Count] = {"Air", "Stone", "Dirt", "Grass", "Cobblestone", "Sand", "Log"};
