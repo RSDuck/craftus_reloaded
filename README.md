@@ -21,3 +21,4 @@ It's been a while since I started developing this version of Craftus. I started 
     * Finc for citro3d
 * XSShepp, for the textures, taken from his [resourcepack](http://www.minecraftforum.net/forums/mapping-and-modding/resource-packs/1242533-pixel-perfection-now-with-polar-bears-1-11) which is licensed under [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/)
 * Tommaso Checchi, for his [culling algorithm](https://tomcc.github.io/2014/08/31/visibility-1.html), orginally developed for the use in MC PE
+* All people who worked on the libraries Craftus is depending on(see the dependencies folder)
