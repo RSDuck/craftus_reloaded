@@ -1,6 +1,6 @@
 *.3dsx
 *.elf
-.smdh
+*.smdh
 build
 .vscode/*
 .vs
