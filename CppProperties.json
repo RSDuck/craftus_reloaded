@@ -1,0 +1,20 @@
+{
+  "projectName": "Craftus",
+  "configurations": [
+    {
+      "name": "3DS",
+      "intelliSenseMode": "msvc-x86",
+      "defines": [ "_3DS", "__GNUC__=5" ],
+
+      "includePath": [
+        "${workspaceRoot}\\include",
+        "${workspaceRoot}\\dependencies",
+        "${workspaceRoot}\\build"/*,
+        "C:\\devkitPro\\libctru\\include",
+        "C:\\devkitPro\\devkitARM\\arm-none-eabi\\include",
+        "C:\\devkitPro\\devkitARM\\lib\\gcc\\arm-none-eabi\\7.1.0\\include-fixed",
+        "C:\\devkitPro\\devkitARM\\lib\\gcc\\arm-none-eabi\\7.1.0\\include"*/
+      ]
+    }
+  ]
+}
