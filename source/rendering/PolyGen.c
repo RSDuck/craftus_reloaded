@@ -1,8 +1,10 @@
 #include <rendering/PolyGen.h>
 
+#include <gui/DebugUI.h>
 #include <rendering/VBOCache.h>
 #include <world/Direction.h>
-#include <gui/DebugUI.h>
+
+#include <entity/Player.h>
 
 #include <stdbool.h>
 #include <vec/vec.h>
@@ -92,6 +94,7 @@ static inline Block fastBlockFetch(World* world, Chunk* chunk, Cluster* cluster,
 }
 
 static World* world;
+static Player* player;
 
 typedef struct { int8_t x, y, z; } QueueElement;
 
@@ -99,12 +102,10 @@ static vec_t(QueueElement) floodfill_queue;
 
 static LightLock updateLock;
 
-void PolyGen_Init(World* world_) {
+void PolyGen_Init(World* world_, Player* player_) {
 	world = world_;
-	/*for (int i = 0; i < CLUSTER_PER_CHUNK; i++) {
-		translationBuffers[i] = malloc(MAX_FACES_PER_CLUSTER * 6 * sizeof(Vertex));
-		translationBufferVertices[i] = -1;
-	}*/
+	player = player_;
+
 	VBOCache_Init();
 
 	vec_init(&floodfill_queue);
@@ -268,6 +269,13 @@ void PolyGen_GeneratePolygons(WorkQueue* queue, WorkerItem item, void* this) {
 						}
 					}
 				}
+			}
+			int px = FastFloor(player->position.x);
+			int py = FastFloor(player->position.y);
+			int pz = FastFloor(player->position.z);
+			if (WorldToChunkCoord(px) == item.chunk->x && WorldToChunkCoord(pz) == item.chunk->z && WorldToChunkCoord(py) == i) {
+				floodFill(cluster, WorldToLocalCoord(px), WorldToLocalCoord(py), WorldToLocalCoord(pz), Direction_Invalid, Direction_Invalid,
+					  Direction_Invalid);
 			}
 
 			// if (!currentFace) continue;

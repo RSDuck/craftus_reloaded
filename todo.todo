@@ -1,10 +1,10 @@
 Speichern/Weltenformat:
     ✔ Spezifikation festlegen @done (9.8.2017, 13:30:33)
     ✔ Zusätzlich noch eine ForceVBOUpdate Flag einbauen, damit die Revision die tatsächliche Revision ist @done (10.8.2017, 16:08:12)
-    ☐ Spieler und Welt bis zum letzten Moment auseinander halten´
+    ☐ Spieler und Welt bis zum letzten Moment auseinander halten @0.2
     ✔ Superchunks implementieren @done (11.8.2017, 15:05:55)
-    ☐ Flag für leere Cluster einbauen um Speicher zu sparen
-    ☐ Heightmaps für Chunks generieren
+    ☐ Flag für leere Cluster einbauen um Speicher zu sparen @0.2
+    ☐ Heightmaps für Chunks generieren @0.2
 GUI:
     ✔ Ordentliche Sortierung @critical @done (31.7.2017, 14:32:48)
     ✔ Schriften mit dynamischer Breite @done (31.7.2017, 15:30:17)
@@ -15,22 +15,23 @@ GUI:
 
 Alles mögliche:
     ☐ Ordentlichen Crashreport anzeigen
-    ☐ Funktion hinzufügen, mit der die Färbefarbe zurückgibt(z.B. für Gras)
+    ☐ Funktion hinzufügen, mit der die Färbefarbe zurückgibt(z.B. für Gras) @0.2
+    ☐ Hand
 
 Weltgeneration:
-    ☐ Nicht Superflach Welten
+    ☐ Nicht Superflach Welten @0.2
     ☐ Bäume(benötigt entsprechende Blöcke)
 
 Gameplay:
-    ☐ Mehr Blöcke überhaupt
-    ☐ Zufallsticks
+    ☐ Mehr Blöcke überhaupt(Glas und Blätter fehlen noch) @0.2
+    ☐ Zufallsticks @0.2
 
 Rendering:
-    ☐ Transparente Blöcke korrekt rendern
+    ☐ Transparente Blöcke korrekt rendern @0.2
 
 PC Port:
     ☐ Rendering Code portabler machen
 
 Bugs:
-    ☐ Wenn man sich einbaut, werden die Vertexe um einen nicht generiert @critical
+    ✔ Wenn man sich einbaut, werden die Vertexe um einen nicht generiert @critical @0.2 @done (12.8.2017, 18:09:17)
     

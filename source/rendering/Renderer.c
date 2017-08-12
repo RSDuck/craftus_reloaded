@@ -59,7 +59,7 @@ void Renderer_Init(World* world_, Player* player_, WorkQueue* queue) {
 	AttrInfo_AddLoader(attrInfo, 0, GPU_SHORT, 3);
 	AttrInfo_AddLoader(attrInfo, 1, GPU_SHORT, 3);
 
-	PolyGen_Init(world);
+	PolyGen_Init(world, player_);
 
 	WorldRenderer_Init(player, world, workqueue, world_shader_uLocProjection);
 
