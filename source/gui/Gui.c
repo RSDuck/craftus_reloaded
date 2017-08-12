@@ -17,7 +17,8 @@ typedef struct {
 	C3D_Tex* texture;
 	union {
 		struct {
-			int16_t x0, y0, x1, y1;
+			int16_t x0, y0, x1, y1;  // top left, right
+			int16_t x2, y2, x3, y3;  // bottom left, right
 			int16_t u0, v0, u1, v1;
 			int16_t color;
 		} pushQuad;
@@ -102,9 +103,35 @@ void Gui_PushSingleColorQuad(int x, int y, int z, int w, int h, int16_t color) {
 void Gui_PushQuad(int x, int y, int z, int w, int h, int rx, int ry, int rw, int rh) { Gui_PushQuadColor(x, y, z, w, h, rx, ry, rw, rh, INT16_MAX); }
 void Gui_PushQuadColor(int x, int y, int z, int w, int h, int rx, int ry, int rw, int rh, int16_t color) {
 	vec_push(&cmdList, ((GuiCmd){GuiCmd_PushQuad, z, currentTexture,
-				     .pushQuad = {x * guiScale, y * guiScale, (x + w) * guiScale, (y + h) * guiScale, rx, ry, rx + rw, ry + rh, color}}));
+				     .pushQuad = {x * guiScale, y * guiScale, (x + w) * guiScale, y * guiScale, x * guiScale, (y + h) * guiScale,
+						  (x + w) * guiScale, (y + h) * guiScale, rx, ry, rx + rw, ry + rh, color}}));
 }
-void Gui_PushBlock(Block block, int x, int y, int z, int size) { vec_push(&cmdList, ((GuiCmd){GuiCmd_PushIcon, z, .pushIcon = {block, x, y, size}})); }
+void Gui_PushIcon(Block block, int x, int y, int z) {
+	int16_t uvs[2];
+	C3D_Tex* texture = Block_GetTextureMap();
+	Block_GetTexture(block, Direction_Top, uvs);
+	int16_t u = uvs[0] / 256;
+	int16_t v = uvs[1] / 256;
+	vec_push(&cmdList, ((GuiCmd){GuiCmd_PushQuad, z, texture,
+				     .pushQuad = {(2 + x) * guiScale, (7 + y) * guiScale, (16 + x) * guiScale, (1 + y) * guiScale, (16 + x) * guiScale,
+						  (14 + y) * guiScale, (30 + x) * guiScale, (7 + y) * guiScale, u, v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE,
+						  v, INT16_MAX}}));
+	Block_GetTexture(block, Direction_North, uvs);
+	u = uvs[0] / 256;
+	v = uvs[1] / 256;
+	vec_push(&cmdList, ((GuiCmd){GuiCmd_PushQuad, z, texture,
+				     .pushQuad = {(2 + x) * guiScale, (7 + y) * guiScale, (16 + x) * guiScale, (14 + y) * guiScale, (2 + x) * guiScale,
+						  (25 + y) * guiScale, (16 + x) * guiScale, (31 + y) * guiScale, u, v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE,
+						  v, SHADER_RGB(24, 24, 24)}}));
+
+	Block_GetTexture(block, Direction_East, uvs);
+	u = uvs[0] / 256;
+	v = uvs[1] / 256;
+	vec_push(&cmdList, ((GuiCmd){GuiCmd_PushQuad, z, texture,
+				     .pushQuad = {(16 + x) * guiScale, (14 + y) * guiScale, (30 + x) * guiScale, (7 + y) * guiScale, (16 + x) * guiScale,
+						  (31 + y) * guiScale, (30 + x) * guiScale, (25 + y) * guiScale, u, v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE,
+						  v, SHADER_RGB(16, 16, 16)}}));
+}
 
 int Gui_PushText(int x, int y, int z, int16_t color, bool shadow, int wrap, int* ySize, const char* fmt, ...) {
 	va_list arg;
@@ -256,13 +283,13 @@ void Gui_Render(gfxScreen_t screen) {
 				int16_t u0 = (int16_t)((float)cmd.pushQuad.u0 * divW), v0 = (int16_t)((float)cmd.pushQuad.v0 * divH);
 				int16_t u1 = (int16_t)((float)cmd.pushQuad.u1 * divW), v1 = (int16_t)((float)cmd.pushQuad.v1 * divH);
 
-				usedVertexList[vtx++] = (Vertex){{cmd.pushQuad.x1, cmd.pushQuad.y1, 0}, {u1, v1, color}};
-				usedVertexList[vtx++] = (Vertex){{cmd.pushQuad.x1, cmd.pushQuad.y0, 0}, {u1, v0, color}};
+				usedVertexList[vtx++] = (Vertex){{cmd.pushQuad.x3, cmd.pushQuad.y3, 0}, {u1, v1, color}};
+				usedVertexList[vtx++] = (Vertex){{cmd.pushQuad.x1, cmd.pushQuad.y1, 0}, {u1, v0, color}};
 				usedVertexList[vtx++] = (Vertex){{cmd.pushQuad.x0, cmd.pushQuad.y0, 0}, {u0, v0, color}};
 
 				usedVertexList[vtx++] = (Vertex){{cmd.pushQuad.x0, cmd.pushQuad.y0, 0}, {u0, v0, color}};
-				usedVertexList[vtx++] = (Vertex){{cmd.pushQuad.x0, cmd.pushQuad.y1, 0}, {u0, v1, color}};
-				usedVertexList[vtx++] = (Vertex){{cmd.pushQuad.x1, cmd.pushQuad.y1, 0}, {u1, v1, color}};
+				usedVertexList[vtx++] = (Vertex){{cmd.pushQuad.x2, cmd.pushQuad.y2, 0}, {u0, v1, color}};
+				usedVertexList[vtx++] = (Vertex){{cmd.pushQuad.x3, cmd.pushQuad.y3, 0}, {u1, v1, color}};
 			}
 
 			C3D_TexBind(0, texture);

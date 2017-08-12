@@ -1,18 +1,21 @@
-Speichern:
+Speichern/Weltenformat:
     ✔ Spezifikation festlegen @done (9.8.2017, 13:30:33)
     ✔ Zusätzlich noch eine ForceVBOUpdate Flag einbauen, damit die Revision die tatsächliche Revision ist @done (10.8.2017, 16:08:12)
     ☐ Spieler und Welt bis zum letzten Moment auseinander halten´
     ✔ Superchunks implementieren @done (11.8.2017, 15:05:55)
     ☐ Flag für leere Cluster einbauen um Speicher zu sparen
+    ☐ Heightmaps für Chunks generieren
 GUI:
     ✔ Ordentliche Sortierung @critical @done (31.7.2017, 14:32:48)
     ✔ Schriften mit dynamischer Breite @done (31.7.2017, 15:30:17)
     ✔ Debug Interface machen, seperat von der Oberfläche @done (7.8.2017, 15:16:20)
     ✔ FontLoader in den Ordner Gui bewegen @done (31.7.2017, 20:18:29)
     ✔ Buttons @done (31.7.2017, 16:42:30)
+    ✔ Blockicons @done (12.8.2017, 15:42:49)
 
 Alles mögliche:
     ☐ Ordentlichen Crashreport anzeigen
+    ☐ Funktion hinzufügen, mit der die Färbefarbe zurückgibt(z.B. für Gras)
 
 Weltgeneration:
     ☐ Nicht Superflach Welten
@@ -29,3 +32,5 @@ PC Port:
     ☐ Rendering Code portabler machen
 
 Bugs:
+    ☐ Wenn man sich einbaut, werden die Vertexe um einen nicht generiert @critical
+    

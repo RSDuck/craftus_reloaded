@@ -1,8 +1,8 @@
 #include <rendering/Renderer.h>
 
 #include <blocks/Block.h>
-#include <gui/Gui.h>
 #include <gui/DebugUI.h>
+#include <gui/Gui.h>
 #include <rendering/Camera.h>
 #include <rendering/Cursor.h>
 #include <rendering/PolyGen.h>
@@ -96,7 +96,7 @@ void Renderer_Render() {
 		C3D_FrameDrawOn(renderTargets[i]);
 
 		C3D_TexBind(0, Block_GetTextureMap());
-		
+
 		WorldRenderer_Render(!i ? -iod : iod);
 
 		C3D_TexEnv* env = C3D_GetTexEnv(0);
@@ -115,6 +115,9 @@ void Renderer_Render() {
 	C3D_FrameDrawOn(lowerScreen);
 
 	DebugUI_Draw();
+
+	Gui_SetScale(2);
+	Gui_PushIcon(player->blockInHand, 160 - 32, 60 - 16, 20);
 
 	Gui_Render(GFX_BOTTOM);
 

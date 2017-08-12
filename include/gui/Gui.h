@@ -22,7 +22,7 @@ void Gui_BindTexture(C3D_Tex* texture);
 void Gui_PushSingleColorQuad(int x, int y, int z, int w, int h, int16_t color);
 void Gui_PushQuadColor(int x, int y, int z, int w, int h, int rx, int ry, int rw, int rh, int16_t color);
 void Gui_PushQuad(int x, int y, int z, int w, int h, int rx, int ry, int rw, int rh);
-void Gui_PushIcon(Block block, int x, int y, int z, int size);
+void Gui_PushIcon(Block block, int x, int y, int z);
 
 #define CHAR_HEIGHT 8
 int Gui_PushTextVargs(int x, int y, int z, int16_t color, bool shadow, int wrap, int* ySize, const char* fmt, va_list arg);
