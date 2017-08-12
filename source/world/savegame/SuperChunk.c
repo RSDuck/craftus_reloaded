@@ -160,18 +160,25 @@ void SuperChunk_SaveChunk(SuperChunk* superchunk, Chunk* chunk) {
 		mpack_writer_t writer;
 		mpack_writer_init(&writer, decompressBuffer, decompressBufferSize);
 
-		mpack_start_map(&writer, 2);
+		mpack_start_map(&writer, 3);
 
 		mpack_write_cstr(&writer, "clusters");
 		mpack_start_array(&writer, CLUSTER_PER_CHUNK);
 		for (int i = 0; i < CLUSTER_PER_CHUNK; i++) {
-			mpack_start_map(&writer, 2);
+			bool empty = Cluster_IsEmpty(&chunk->clusters[i]);
 
-			mpack_write_cstr(&writer, "blocks");
-			mpack_write_bin(&writer, (char*)chunk->clusters[i].blocks, sizeof(chunk->clusters[i].blocks));
+			mpack_start_map(&writer, empty ? 2 : 3);
+
+			if (!empty) {
+				mpack_write_cstr(&writer, "blocks");
+				mpack_write_bin(&writer, (char*)chunk->clusters[i].blocks, sizeof(chunk->clusters[i].blocks));
+			}
 
 			mpack_write_cstr(&writer, "revision");
 			mpack_write_u32(&writer, chunk->clusters[i].revision);
+
+			mpack_write_cstr(&writer, "empty");
+			mpack_write_bool(&writer, empty);
 
 			mpack_finish_map(&writer);
 		}
@@ -179,6 +186,9 @@ void SuperChunk_SaveChunk(SuperChunk* superchunk, Chunk* chunk) {
 
 		mpack_write_cstr(&writer, "genProgress");
 		mpack_write_int(&writer, chunk->genProgress);
+
+		mpack_write_cstr(&writer, "heightmap");
+		mpack_write_bin(&writer, (char*)chunk->heightmap, sizeof(chunk->heightmap));
 
 		mpack_finish_map(&writer);
 		mpack_error_t err = mpack_writer_destroy(&writer);
@@ -222,12 +232,19 @@ void SuperChunk_LoadChunk(SuperChunk* superchunk, Chunk* chunk) {
 			for (int i = 0; i < CLUSTER_PER_CHUNK; i++) {
 				mpack_node_t cluster = mpack_node_array_at(clusters, i);
 
-				memcpy(chunk->clusters[i].blocks, mpack_node_data(mpack_node_map_cstr(cluster, "blocks")), sizeof(chunk->clusters[i].blocks));
+				bool empty = mpack_node_bool(mpack_node_map_cstr(cluster, "empty"));
+				if (!empty)
+					memcpy(chunk->clusters[i].blocks, mpack_node_data(mpack_node_map_cstr(cluster, "blocks")),
+					       sizeof(chunk->clusters[i].blocks));
 
 				chunk->clusters[i].revision = mpack_node_u32(mpack_node_map_cstr(cluster, "revision"));
+				chunk->clusters[i].emptyRevision = chunk->clusters[i].revision;
 			}
 
 			chunk->genProgress = mpack_node_int(mpack_node_map_cstr(root, "genProgress"));
+
+			memcpy(chunk->heightmap, mpack_node_data(mpack_node_map_cstr(root, "heightmap")), sizeof(chunk->heightmap));
+			chunk->heightmapRevision = chunkInfo.revision;
 
 			if (mpack_tree_destroy(&tree) != mpack_ok) {
 				exit(1);

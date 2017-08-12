@@ -21,6 +21,9 @@ typedef struct {
 
 	uint16_t seeThrough;
 
+	bool empty;
+	uint32_t emptyRevision;
+
 	VBO_Block vbo;
 	size_t vertices;
 	uint32_t vboRevision;
@@ -48,6 +51,9 @@ typedef struct {
 	int x, z;
 	Cluster clusters[CLUSTER_PER_CHUNK];
 
+	uint8_t heightmap[CHUNK_SIZE][CHUNK_SIZE];
+	uint32_t heightmapRevision;
+
 	size_t revision;
 
 	uint32_t displayRevision;
@@ -67,6 +73,7 @@ inline void Chunk_Init(Chunk* chunk, int x, int z) {
 	for (int i = 0; i < CLUSTER_PER_CHUNK; i++) {
 		chunk->clusters[i].y = i;
 		chunk->clusters[i].seeThrough = UINT16_MAX;
+		chunk->clusters[i].empty = true;
 	}
 	chunk->usage = ChunkUsage_InUse;
 	chunk->uuid = Xorshift32_Next(&uuidGenerator);
@@ -77,6 +84,12 @@ inline void Chunk_RequestGraphicsUpdate(Chunk* chunk, int cluster) {
 	chunk->forceVBOUpdate = true;
 }
 
+void Chunk_GenerateHeightmap(Chunk* chunk);
+inline uint8_t Chunk_GetHeightMap(Chunk* chunk, int x, int z) {
+	Chunk_GenerateHeightmap(chunk);
+	return chunk->heightmap[x][z];
+}
+
 inline Block Chunk_GetBlock(Chunk* chunk, int x, int y, int z) { return chunk->clusters[y / CHUNK_SIZE].blocks[x][y - (y / CHUNK_SIZE * CHUNK_SIZE)][z]; }
 inline void Chunk_SetBlock(Chunk* chunk, int x, int y, int z, Block block) {
 	Cluster* cluster = &chunk->clusters[y / CHUNK_SIZE];
@@ -84,3 +97,4 @@ inline void Chunk_SetBlock(Chunk* chunk, int x, int y, int z, Block block) {
 	++cluster->revision;
 	++chunk->revision;
 }
+bool Cluster_IsEmpty(Cluster* cluster);

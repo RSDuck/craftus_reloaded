@@ -3,8 +3,8 @@ Speichern/Weltenformat:
     ✔ Zusätzlich noch eine ForceVBOUpdate Flag einbauen, damit die Revision die tatsächliche Revision ist @done (10.8.2017, 16:08:12)
     ☐ Spieler und Welt bis zum letzten Moment auseinander halten @0.2
     ✔ Superchunks implementieren @done (11.8.2017, 15:05:55)
-    ☐ Flag für leere Cluster einbauen um Speicher zu sparen @0.2
-    ☐ Heightmaps für Chunks generieren @0.2
+    ✔ Flag für leere Cluster einbauen um Speicher zu sparen @0.2 @done (12.8.2017, 19:21:31)
+    ✔ Heightmaps für Chunks generieren @0.2 @done (12.8.2017, 19:21:34)
 GUI:
     ✔ Ordentliche Sortierung @critical @done (31.7.2017, 14:32:48)
     ✔ Schriften mit dynamischer Breite @done (31.7.2017, 15:30:17)
@@ -23,11 +23,12 @@ Weltgeneration:
     ☐ Bäume(benötigt entsprechende Blöcke)
 
 Gameplay:
-    ☐ Mehr Blöcke überhaupt(Glas und Blätter fehlen noch) @0.2
+    ☐ Mehr Blöcke überhaupt(Ziegelstein, Steinziegel, Glas und Blätter fehlen noch) @0.2
     ☐ Zufallsticks @0.2
 
 Rendering:
     ☐ Transparente Blöcke korrekt rendern @0.2
+    ☐ Beleuchtung
 
 PC Port:
     ☐ Rendering Code portabler machen
