@@ -35,12 +35,12 @@ Chunk* World_LoadChunk(World* world, int x, int z) {
 			break;
 		}
 	}
-	WorkQueue_AddItem(world->workqueue, (WorkerItem){WorkerItemType_Load, result, result->uuid});
+	WorkQueue_AddItem(world->workqueue, (WorkerItem){WorkerItemType_Load, result});
 	return result;
 }
 void World_UnloadChunk(World* world, Chunk* chunk) {
 	chunk->usage = ChunkUsage_Undead;
-	WorkQueue_AddItem(world->workqueue, (WorkerItem){WorkerItemType_Save, chunk, chunk->uuid});
+	WorkQueue_AddItem(world->workqueue, (WorkerItem){WorkerItemType_Save, chunk});
 }
 
 Chunk* World_GetChunk(World* world, int x, int z) {

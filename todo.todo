@@ -35,4 +35,6 @@ PC Port:
 
 Bugs:
     ✔ Wenn man sich einbaut, werden die Vertexe um einen nicht generiert @critical @0.2 @done (12.8.2017, 18:09:17)
-    
+    ✔ Den Bug mit dem nicht aktualisierenden Chunk fixen @critical @0.2 @done (12.8.2017, 21:52:53)
+    ✔ Frustum Culling funktioniert doch immer noch nicht ganz so wie es soll @critical  @0.2 @done (12.8.2017, 22:43:14)
+    ☐ Load Chunk Funktion kann zu doppelten Chunks führen

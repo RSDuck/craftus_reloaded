@@ -29,6 +29,7 @@ superchunk-x-y-data.mpack
 Auf je 4kb Sektoren sind die Chunkdaten verteilt, wie in superchunk-x-y-index.mpack beschrieben
 Chunk
 |--/list    cluster:    Cluster des Chunks
-    |--/byte    blocks: Blöcke, im Chunk
+    |--/bin blocks: Blöcke, im Chunk
 |--/int     genProgress:    Fortschritt in der Weltgenerierung
 |--/int     revision:       Version vom Chunk
+|--/

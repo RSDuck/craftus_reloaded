@@ -37,7 +37,7 @@ void ChunkWorker_Deinit(ChunkWorker* chunkworker) {
 void ChunkWorker_AddHandler(ChunkWorker* chunkworker, WorkerItemType type, WorkerFuncObj obj) { vec_push(&chunkworker->handler[type], obj); }
 
 void ChunkWorker_Mainloop(void* _this) {
-	//printf("ChunkWorker_Mainloop\n");
+	// printf("ChunkWorker_Mainloop\n");
 	ChunkWorker* chunkworker = (ChunkWorker*)_this;
 	while (workerToStop != chunkworker || !WorkQueue_Empty(&chunkworker->queue)) {
 		WorkQueue_ToggleQueue(&chunkworker->queue);
@@ -46,13 +46,9 @@ void ChunkWorker_Mainloop(void* _this) {
 
 			if (item.uuid == item.chunk->uuid && (workerToStop == chunkworker ? item.type == WorkerItemType_Save : true)) {
 				for (int i = 0; i < chunkworker->handler[item.type].length; i++) {
-					//printf("Calling a handler(%d) %p\n", item.type, chunkworker->handler[item.type].data[i]);
 					chunkworker->handler[item.type].data[i].func(&chunkworker->queue, item, chunkworker->handler[item.type].data[i].this);
 					svcSleepThread(300);
 				}
-
-				--item.chunk->tasksRunning;
-				if (item.type == WorkerItemType_PolyGen) --item.chunk->graphicalTasksRunning;
 
 				switch (item.type) {
 					case WorkerItemType_BaseGen:
@@ -66,6 +62,9 @@ void ChunkWorker_Mainloop(void* _this) {
 				}
 				svcSleepThread(1000);
 			}
+
+			--item.chunk->tasksRunning;
+			if (item.type == WorkerItemType_PolyGen) --item.chunk->graphicalTasksRunning;
 		} else
 			svcSleepThread(25000);
 	}

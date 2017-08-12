@@ -42,8 +42,12 @@ void Camera_Update(Camera* cam, Player* player, float iod) {
 	cam->frustumPlanes[Frustum_Far] = FVec4_Normalize(FVec4_Add(rowW, rowZ));
 
 	float3 forward = player->view;
-	float3 right = f3_crs(f3_new(0, 1, 0), f3_new(-sinf(player->yaw), 0.f, -cosf(player->yaw)));
+	float3 right = f3_crs(f3_new(0, 1, 0), f3_new(sinf(player->yaw), 0.f, cosf(player->yaw)));
 	float3 up = f3_crs(forward, right);
+
+	DebugUI_Text("F: %f %f %f", f3_unpack(forward));
+	DebugUI_Text("R: %f %f %f", f3_unpack(right));
+	DebugUI_Text("U: %f %f %f", f3_unpack(up));
 
 	float ar = 400.f / 240.f;
 
@@ -111,6 +115,7 @@ bool Camera_IsAABBVisible(Camera* cam, C3D_FVec orgin, C3D_FVec size) {
 	out = 0;
 	for (int i = 0; i < 8; i++) out += ((cam->frustumCorners[i].z < min.z));
 	if (out == 8) return false;
+
 
 	return true;
 }
