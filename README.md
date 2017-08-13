@@ -6,12 +6,12 @@ It's been a while since I started developing this version of Craftus. I started 
 
 * An infinte world(in theory)
 * An awesome flat world
-* One single block which can be placed down
+* ~~One single block which can be placed down~~ Multiple blocks you can place down
 * Saving and loading the world
 
 ## Known bugs
 
-* I experienced once, that blocks, which are newly placed in a specific chunk weren't rendered anymore, but blocks placed in another chunk were, but I couldn't reproduce this bug. Maybe it's related to old savefiles
+* ~~I experienced once, that blocks, which are newly placed in a specific chunk weren't rendered anymore, but blocks placed in another chunk were, but I couldn't reproduce this bug. Maybe it's related to old savefiles~~ I think
 * Making a screenshot with Luma Rosalina menu leads to crash
 
 ## Credits

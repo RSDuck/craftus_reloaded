@@ -22,21 +22,21 @@ void World_Init(World* world, WorkQueue* workqueue) {
 }
 
 Chunk* World_LoadChunk(World* world, int x, int z) {
-	Chunk* result = NULL;
+	for (int i = 0; i < CHUNKPOOL_SIZE; i++) {
+		Chunk* chunk = &world->chunkPool[i];
+		if (chunk->usage >= ChunkUsage_Undead && chunk->x == x && chunk->z == z) {
+			chunk->usage = ChunkUsage_InUse;
+			return chunk;
+		}
+	}
 	for (int i = 0; i < CHUNKPOOL_SIZE; i++) {
 		Chunk* chunk = &world->chunkPool[i];
 		if (chunk->usage == ChunkUsage_NotInUse) {
 			Chunk_Init(chunk, x, z);
-			result = chunk;
-			break;
-		} else if (chunk->usage >= ChunkUsage_Undead && chunk->x == x && chunk->z == z) {
-			chunk->usage = ChunkUsage_InUse;
-			result = chunk;
-			break;
+			WorkQueue_AddItem(world->workqueue, (WorkerItem){WorkerItemType_Load, chunk});
+			return chunk;
 		}
 	}
-	WorkQueue_AddItem(world->workqueue, (WorkerItem){WorkerItemType_Load, result});
-	return result;
 }
 void World_UnloadChunk(World* world, Chunk* chunk) {
 	chunk->usage = ChunkUsage_Undead;
@@ -69,9 +69,9 @@ void World_SetBlock(World* world, int x, int y, int z, Block block) {
 		int lZ = WorldToLocalCoord(z);
 		Chunk_SetBlock(chunk, lX, y, lZ, block);
 
-#define NOTIFY_NEIGHTBOR(axis, comp, xDiff, zDiff)                                       \
-	if (axis == comp) {                                                              \
-		Chunk* neightborChunk = World_GetChunk(world, cX + xDiff, cZ + zDiff);   \
+#define NOTIFY_NEIGHTBOR(axis, comp, xDiff, zDiff)                                               \
+	if (axis == comp) {                                                                      \
+		Chunk* neightborChunk = World_GetChunk(world, cX + xDiff, cZ + zDiff);           \
 		if (neightborChunk) Chunk_RequestGraphicsUpdate(neightborChunk, y / CHUNK_SIZE); \
 	}
 		NOTIFY_NEIGHTBOR(lX, 0, -1, 0)
