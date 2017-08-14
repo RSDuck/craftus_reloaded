@@ -61,10 +61,10 @@ void ChunkWorker_Mainloop(void* _this) {
 						break;
 				}
 				svcSleepThread(1000);
-			}
 
-			--item.chunk->tasksRunning;
-			if (item.type == WorkerItemType_PolyGen) --item.chunk->graphicalTasksRunning;
+				--item.chunk->tasksRunning;
+				if (item.type == WorkerItemType_PolyGen) --item.chunk->graphicalTasksRunning;
+			}
 		} else
 			svcSleepThread(25000);
 	}

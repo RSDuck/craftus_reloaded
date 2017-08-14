@@ -30,8 +30,6 @@ typedef struct {
 	bool forceVBOUpdate;
 } Cluster;
 
-typedef enum { ChunkUsage_NotInUse, ChunkUsage_InUse, ChunkUsage_Undead, ChunkUsage_DeaderThanDead = ChunkUsage_Undead + 3 } ChunkMemoryUsage;
-
 typedef enum {
 	ChunkGen_Empty,  //
 	ChunkGen_Terrain,
@@ -45,7 +43,6 @@ typedef struct {
 
 	uint32_t uuid;
 
-	ChunkMemoryUsage usage;
 	ChunkGenProgress genProgress;
 
 	int x, z;
@@ -75,7 +72,6 @@ inline void Chunk_Init(Chunk* chunk, int x, int z) {
 		chunk->clusters[i].seeThrough = UINT16_MAX;
 		chunk->clusters[i].empty = true;
 	}
-	chunk->usage = ChunkUsage_InUse;
 	chunk->uuid = Xorshift32_Next(&uuidGenerator);
 }
 

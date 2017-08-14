@@ -5,7 +5,8 @@ Speichern/Weltenformat:
     ✔ Superchunks implementieren @done (11.8.2017, 15:05:55)
     ✔ Flag für leere Cluster einbauen um Speicher zu sparen @0.2 @done (12.8.2017, 19:21:31)
     ✔ Heightmaps für Chunks generieren @0.2 @done (12.8.2017, 19:21:34)
-    ☐ Altes Speicherformat kompatibel machen
+    ☐ Altes Speicherformat kompatibel machen @0.2
+    ✔ Undead Chunks Geschichte komplett ausbauen und stattdessen einfach eine Liste haben, wo die ältesten Chunks runtergenommen werden @done (14.8.2017, 15:48:40)
 GUI:
     ✔ Ordentliche Sortierung @critical @done (31.7.2017, 14:32:48)
     ✔ Schriften mit dynamischer Breite @done (31.7.2017, 15:30:17)
@@ -38,4 +39,4 @@ Bugs:
     ✔ Wenn man sich einbaut, werden die Vertexe um einen nicht generiert @critical @0.2 @done (12.8.2017, 18:09:17)
     ✔ Den Bug mit dem nicht aktualisierenden Chunk fixen @critical @0.2 @done (12.8.2017, 21:52:53)
     ✔ Frustum Culling funktioniert doch immer noch nicht ganz so wie es soll @critical  @0.2 @done (12.8.2017, 22:43:14)
-    ✔ Load Chunk Funktion kann zu doppelten Chunks führen @done (13.8.2017, 13:26:22)
+    ✔ Load Chunk Funktion kann zu doppelten Chunks führen @done (13.8.2017, 13:26:22) 

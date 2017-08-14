@@ -167,3 +167,12 @@ void Player_BreakBlock(Player* player) {
 		player->breakPlaceTimeout = BreakPlace_Timout;
 	}
 }
+
+void Player_Teleport(Player* player, float x, float y, float z) {
+	player->position.x = x;
+	player->position.y = y;
+	player->position.z = z;
+
+	player->velocity = f3_new(0, 0, 0);
+	Player_Update(player);
+}

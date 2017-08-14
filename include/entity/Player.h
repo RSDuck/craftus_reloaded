@@ -42,3 +42,5 @@ void Player_PlaceBlock(Player* player, Block block);
 void Player_BreakBlock(Player* player);
 
 void Player_Jump(Player* player, float3 accl);
+
+void Player_Teleport(Player* player, float x, float y, float z);

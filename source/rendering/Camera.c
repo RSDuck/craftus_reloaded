@@ -45,10 +45,6 @@ void Camera_Update(Camera* cam, Player* player, float iod) {
 	float3 right = f3_crs(f3_new(0, 1, 0), f3_new(sinf(player->yaw), 0.f, cosf(player->yaw)));
 	float3 up = f3_crs(forward, right);
 
-	DebugUI_Text("F: %f %f %f", f3_unpack(forward));
-	DebugUI_Text("R: %f %f %f", f3_unpack(right));
-	DebugUI_Text("U: %f %f %f", f3_unpack(up));
-
 	float ar = 400.f / 240.f;
 
 	float tan2halffov = 2.f * tanf(cam->fov / 2.f);

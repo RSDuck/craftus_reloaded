@@ -1,6 +1,8 @@
 #include <entity/PlayerController.h>
 
+#include <misc/CommandLine.h>
 #include <misc/NumberUtils.h>
+
 
 #include <gui/DebugUI.h>
 
@@ -38,7 +40,8 @@ const PlayerControlScheme platform_default_scheme = {.forward = K3DS_X,
 						     .breakBlock = K3DS_Y,
 						     .jump = K3DS_DUP,
 						     .switchBlockLeft = K3DS_DLEFT,
-						     .switchBlockRight = K3DS_DRIGHT};
+						     .switchBlockRight = K3DS_DRIGHT,
+						     .openCmd = K3DS_SELECT};
 static void convertPlatformInput(InputData* input, float ctrls[], bool keysdown[], bool keysup[]) {
 #define reg_bin_key(i, k)                                                         \
 	ctrls[(i)] = (float)((input->keysdown & (k)) || (input->keysheld & (k))); \
@@ -146,7 +149,8 @@ void PlayerController_Update(PlayerController* ctrl, InputData input, float dt) 
 	if (switchBlockLeft && --player->blockInHand == 0) player->blockInHand = Blocks_Count - 1;
 	if (switchBlockRight && ++player->blockInHand == Blocks_Count) player->blockInHand = 1;
 
-	DebugUI_Text("%s", BlockNames[player->blockInHand]);
+	float cmdLine = WasKeyReleased(ctrl->controlScheme.openCmd, &agnosticInput);
+	if (cmdLine) CommandLine_Activate(player->world, player);
 
 	Player_Move(player, dt, movement);
 	Player_Update(player);

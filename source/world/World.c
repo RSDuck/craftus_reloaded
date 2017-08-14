@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include <assert.h>
+#include <limits.h>
+#include <stdint.h>
 
 void World_Init(World* world, WorkQueue* workqueue) {
 	strcpy(world->name, "TestWelt");
@@ -15,32 +17,43 @@ void World_Init(World* world, WorkQueue* workqueue) {
 	world->cacheTranslationX = 0;
 	world->cacheTranslationZ = 0;
 
-	for (int i = 0; i < CHUNKPOOL_SIZE; i++) world->chunkPool[i].usage = ChunkUsage_NotInUse;
-
+	vec_init(&world->freeChunks);
+	for (size_t i = 0; i < CHUNKPOOL_SIZE; i++) {
+		world->chunkPool[i].x = INT_MAX;
+		world->chunkPool[i].z = INT_MAX;
+		vec_push(&world->freeChunks, &world->chunkPool[i]);
+	}
 	/*for (int x = 0; x < CHUNKCACHE_SIZE; x++)
 		for (int z = 0; z < CHUNKCACHE_SIZE; z++) world->chunkCache[x][z] = World_LoadChunk(world, x - CHUNKCACHE_SIZE / 2, z - CHUNKCACHE_SIZE / 2);*/
 }
 
 Chunk* World_LoadChunk(World* world, int x, int z) {
-	for (int i = 0; i < CHUNKPOOL_SIZE; i++) {
-		Chunk* chunk = &world->chunkPool[i];
-		if (chunk->usage >= ChunkUsage_Undead && chunk->x == x && chunk->z == z) {
-			chunk->usage = ChunkUsage_InUse;
+	for (int i = 0; i < world->freeChunks.length; i++) {
+		if (world->freeChunks.data[i]->x == x && world->freeChunks.data[i]->z == z) {
+			Chunk* chunk = world->freeChunks.data[i];
+			vec_splice(&world->freeChunks, i, 1);
+
 			return chunk;
 		}
 	}
-	for (int i = 0; i < CHUNKPOOL_SIZE; i++) {
-		Chunk* chunk = &world->chunkPool[i];
-		if (chunk->usage == ChunkUsage_NotInUse) {
+
+	for (int i = 0; i < world->freeChunks.length; i++) {
+		if (!world->freeChunks.data[i]->tasksRunning) {
+			Chunk* chunk = world->freeChunks.data[i];
+			vec_splice(&world->freeChunks, i, 1);
+
 			Chunk_Init(chunk, x, z);
 			WorkQueue_AddItem(world->workqueue, (WorkerItem){WorkerItemType_Load, chunk});
+
 			return chunk;
 		}
 	}
+
+	return NULL;
 }
 void World_UnloadChunk(World* world, Chunk* chunk) {
-	chunk->usage = ChunkUsage_Undead;
 	WorkQueue_AddItem(world->workqueue, (WorkerItem){WorkerItemType_Save, chunk});
+	vec_push(&world->freeChunks, chunk);
 }
 
 Chunk* World_GetChunk(World* world, int x, int z) {
@@ -84,58 +97,39 @@ void World_SetBlock(World* world, int x, int y, int z, Block block) {
 	}
 }
 
-static void World_ClearUndeadChunks(World* world) {
-	for (int i = 0; i < CHUNKPOOL_SIZE; i++)
-		if (world->chunkPool[i].usage >= ChunkUsage_Undead && ++world->chunkPool[i].usage >= ChunkUsage_DeaderThanDead) {
-			world->chunkPool[i].usage = ChunkUsage_NotInUse;
-			printf("Deleted chunk\n");
-		}
-}
-
 void World_UpdateChunkCache(World* world, int orginX, int orginZ) {
 	if (orginX != world->cacheTranslationX || orginZ != world->cacheTranslationZ) {
-		World_ClearUndeadChunks(world);
+		Chunk* tmpBuffer[CHUNKCACHE_SIZE][CHUNKCACHE_SIZE];
+		memcpy(tmpBuffer, world->chunkCache, sizeof(tmpBuffer));
+
+		int oldBufferStartX = world->cacheTranslationX - CHUNKCACHE_SIZE / 2;
+		int oldBufferStartZ = world->cacheTranslationZ - CHUNKCACHE_SIZE / 2;
 
 		int diffX = orginX - world->cacheTranslationX;
 		int diffZ = orginZ - world->cacheTranslationZ;
 
-		int axis = 0;
-
-#define CACHE_AXIS world->chunkCache[!axis ? i : j][!axis ? j : i]
-
-		// Tick
-		int delta = diffX;
-		do {
-			if (delta != 0) {
-				if (delta > 0) {
-					for (int i = 0; i < CHUNKCACHE_SIZE; i++) {
-						for (int j = 0; j < CHUNKCACHE_SIZE; j++) {
-							if (i == 0) World_UnloadChunk(world, CACHE_AXIS);
-							if (i + delta >= CHUNKCACHE_SIZE)
-								CACHE_AXIS = World_LoadChunk(world, CACHE_AXIS->x + (!axis ? delta : 0),
-											     CACHE_AXIS->z + (!axis ? 0 : delta));
-							else
-								CACHE_AXIS = world->chunkCache[!axis ? (i + delta) : j][!axis ? j : (i + delta)];
-						}
-					}
+		for (int i = 0; i < CHUNKCACHE_SIZE; i++) {
+			for (int j = 0; j < CHUNKCACHE_SIZE; j++) {
+				int wx = orginX + (i - CHUNKCACHE_SIZE / 2);
+				int wz = orginZ + (j - CHUNKCACHE_SIZE / 2);
+				if (wx >= oldBufferStartX && wx < oldBufferStartX + CHUNKCACHE_SIZE && wz >= oldBufferStartZ &&
+				    wz < oldBufferStartZ + CHUNKCACHE_SIZE) {
+					world->chunkCache[i][j] = tmpBuffer[i + diffX][j + diffZ];
+					tmpBuffer[i + diffX][j + diffZ] = NULL;
 				} else {
-					for (int i = CHUNKCACHE_SIZE - 1; i >= 0; i--) {
-						for (int j = 0; j < CHUNKCACHE_SIZE; j++) {
-							if (i == CHUNKCACHE_SIZE - 1) World_UnloadChunk(world, CACHE_AXIS);
-							if (i + delta < 0)
-								CACHE_AXIS = World_LoadChunk(world, CACHE_AXIS->x + (!axis ? delta : 0),
-											     CACHE_AXIS->z + (!axis ? 0 : delta));
-							else
-								CACHE_AXIS = world->chunkCache[!axis ? (i + delta) : j][!axis ? j : (i + delta)];
-						}
-					}
+					world->chunkCache[i][j] = World_LoadChunk(world, wx, wz);
 				}
 			}
-			// Tock
-			delta = diffZ;
-		} while (++axis < 2);
+		}
 
-#undef CACHE_AXIS
+		for (int i = 0; i < CHUNKCACHE_SIZE; i++) {
+			for (int j = 0; j < CHUNKCACHE_SIZE; j++) {
+				if (tmpBuffer[i][j] != NULL) {
+					World_UnloadChunk(world, tmpBuffer[i][j]);
+				}
+			}
+		}
+
 		world->cacheTranslationX = orginX;
 		world->cacheTranslationZ = orginZ;
 	}
