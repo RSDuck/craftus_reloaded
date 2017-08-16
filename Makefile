@@ -28,11 +28,21 @@ include $(DEVKITARM)/3ds_rules
 #     - <libctru folder>/default_icon.png
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
-BUILD		:=	build
 SOURCES		:=	source source/misc source/world/worldgen source/blocks source/rendering source/gui source/world source/world/savegame source/entity source/savegame dependencies/mpack dependencies/vec dependencies/sino dependencies/lodepng dependencies/miniz
 DATA		:=	data
 INCLUDES	:=	dependencies include
 ROMFS		:=	romfs
+
+DEBUG		?=	0
+ifeq ($(DEBUG), 0)
+BUILD		:=	build
+CFLAGS_ADD	:=	-fomit-frame-pointer -O2
+LIBS	:= -lcitro3d -lctru -lm
+else
+BUILD		:=	debug_build
+CFLAGS_ADD	:=	-Og
+LIBS	:= -lcitro3dd -lctrud -lm
+endif
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -40,8 +50,8 @@ ROMFS		:=	romfs
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
 CFLAGS	:=	-g -Wall -mword-relocations \
-			 -ffunction-sections -fomit-frame-pointer -O2 \
-			$(ARCH)
+			 -ffunction-sections $(CFLAGS_ADD)\
+			$(ARCH) -save-temps
 
 CFLAGS	+=	$(INCLUDE) -DARM11 -D_3DS
 
@@ -49,8 +59,6 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
-
-LIBS	:= -lcitro3d -lctru -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

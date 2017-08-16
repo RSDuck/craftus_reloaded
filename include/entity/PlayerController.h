@@ -23,6 +23,7 @@ typedef struct {
 	PlayerControlScheme controlScheme;
 
 	float breakPlaceTimeout;
+	bool openedCmd;
 } PlayerController;
 
 void PlayerController_Init(PlayerController* ctrl, Player* player);

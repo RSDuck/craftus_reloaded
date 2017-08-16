@@ -88,7 +88,7 @@ int main() {
 		}
 	}
 
-	while (chunkWorker.queue.queue[0].length > 0 || chunkWorker.queue.queue[1].length > 0) {
+	while (chunkWorker.working) {
 		svcSleepThread(4800000);
 	}
 

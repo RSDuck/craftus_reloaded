@@ -19,6 +19,8 @@ void ChunkWorker_Init(ChunkWorker* chunkworker) {
 		printf("Couldn't create worker thread\n");
 		exit(EXIT_FAILURE);
 	}
+
+	chunkworker->working = false;
 }
 
 static volatile ChunkWorker* workerToStop = NULL;
@@ -37,12 +39,24 @@ void ChunkWorker_Deinit(ChunkWorker* chunkworker) {
 void ChunkWorker_AddHandler(ChunkWorker* chunkworker, WorkerItemType type, WorkerFuncObj obj) { vec_push(&chunkworker->handler[type], obj); }
 
 void ChunkWorker_Mainloop(void* _this) {
-	// printf("ChunkWorker_Mainloop\n");
+	vec_t(WorkerItem) privateQueue;
+	vec_init(&privateQueue);
 	ChunkWorker* chunkworker = (ChunkWorker*)_this;
-	while (workerToStop != chunkworker || !WorkQueue_Empty(&chunkworker->queue)) {
-		WorkQueue_ToggleQueue(&chunkworker->queue);
-		if (WorkQueue_HasItem(&chunkworker->queue)) {
-			WorkerItem item = WorkQueue_PopItem(&chunkworker->queue);
+	while (workerToStop != chunkworker || chunkworker->queue.queue.length > 0) {
+		chunkworker->working = false;
+
+		LightEvent_Wait(&chunkworker->queue.itemAddedEvent);
+		LightEvent_Clear(&chunkworker->queue.itemAddedEvent);
+
+		chunkworker->working = true;
+
+		LightLock_Lock(&chunkworker->queue.listInUse);
+		vec_pusharr(&privateQueue, chunkworker->queue.queue.data, chunkworker->queue.queue.length);
+		vec_clear(&chunkworker->queue.queue);
+		LightLock_Unlock(&chunkworker->queue.listInUse);
+
+		while (privateQueue.length > 0) {
+			WorkerItem item = vec_pop(&privateQueue);
 
 			if (item.uuid == item.chunk->uuid && (workerToStop == chunkworker ? item.type == WorkerItemType_Save : true)) {
 				for (int i = 0; i < chunkworker->handler[item.type].length; i++) {
@@ -65,9 +79,7 @@ void ChunkWorker_Mainloop(void* _this) {
 				--item.chunk->tasksRunning;
 				if (item.type == WorkerItemType_PolyGen) --item.chunk->graphicalTasksRunning;
 			}
-		} else
-			svcSleepThread(25000);
+		}
 	}
-
-	printf("ChunkWorker_Mainloop End");
+	vec_deinit(&privateQueue);
 }

@@ -3,6 +3,7 @@
 #include <world/Chunk.h>
 #include <world/WorkQueue.h>
 
+#include <misc/Xorshift.h>
 #include <misc/NumberUtils.h>
 #include <vec/vec.h>
 
@@ -35,6 +36,8 @@ typedef struct {
 	vec_t(Chunk*) freeChunks;
 
 	WorkQueue* workqueue;
+
+	Xorshift32 randomTickGen;
 } World;
 
 inline static int WorldToChunkCoord(int x) { return (x + (int)(x < 0)) / CHUNK_SIZE - (int)(x < 0); }

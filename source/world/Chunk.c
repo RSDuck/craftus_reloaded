@@ -1,6 +1,6 @@
 #include <world/Chunk.h>
 
-Xorshift32 uuidGenerator = (Xorshift32)42434243;
+Xorshift32 uuidGenerator = (Xorshift32)314159265;
 
 const uint8_t _seethroughTable[6][6] = {
     // W E B T N S
@@ -36,4 +36,5 @@ bool Cluster_IsEmpty(Cluster* cluster) {
 		if (((uint32_t*)cluster->blocks)[i] != 0) return false;
 	}
 	cluster->empty = true;
+	return true;
 }

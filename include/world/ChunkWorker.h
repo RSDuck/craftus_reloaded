@@ -18,6 +18,8 @@ typedef struct {
 	WorkQueue queue;
 
 	vec_t(WorkerFuncObj) handler[WorkerItemTypes_Count];
+
+	volatile bool working;
 } ChunkWorker;
 
 void ChunkWorker_Init(ChunkWorker* chunkworker);

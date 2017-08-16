@@ -1,5 +1,7 @@
 #include <world/World.h>
 
+#include <blocks/BlockEvents.h>
+
 #include <string.h>
 
 #include <assert.h>
@@ -23,8 +25,8 @@ void World_Init(World* world, WorkQueue* workqueue) {
 		world->chunkPool[i].z = INT_MAX;
 		vec_push(&world->freeChunks, &world->chunkPool[i]);
 	}
-	/*for (int x = 0; x < CHUNKCACHE_SIZE; x++)
-		for (int z = 0; z < CHUNKCACHE_SIZE; z++) world->chunkCache[x][z] = World_LoadChunk(world, x - CHUNKCACHE_SIZE / 2, z - CHUNKCACHE_SIZE / 2);*/
+
+	world->randomTickGen = Xorshift32_New();
 }
 
 Chunk* World_LoadChunk(World* world, int x, int z) {
@@ -33,6 +35,7 @@ Chunk* World_LoadChunk(World* world, int x, int z) {
 			Chunk* chunk = world->freeChunks.data[i];
 			vec_splice(&world->freeChunks, i, 1);
 
+			chunk->references++;
 			return chunk;
 		}
 	}
@@ -45,6 +48,7 @@ Chunk* World_LoadChunk(World* world, int x, int z) {
 			Chunk_Init(chunk, x, z);
 			WorkQueue_AddItem(world->workqueue, (WorkerItem){WorkerItemType_Load, chunk});
 
+			chunk->references++;
 			return chunk;
 		}
 	}
@@ -54,6 +58,7 @@ Chunk* World_LoadChunk(World* world, int x, int z) {
 void World_UnloadChunk(World* world, Chunk* chunk) {
 	WorkQueue_AddItem(world->workqueue, (WorkerItem){WorkerItemType_Save, chunk});
 	vec_push(&world->freeChunks, chunk);
+	chunk->references--;
 }
 
 Chunk* World_GetChunk(World* world, int x, int z) {
@@ -152,6 +157,16 @@ void World_Tick(World* world) {
 						if (borderChunk->genProgress == ChunkGen_Empty || !borderChunk->tasksRunning) clear = false;
 					}
 				if (clear) WorkQueue_AddItem(world->workqueue, (WorkerItem){WorkerItemType_Decorate, chunk});
+
+				int xVals[RANDOMTICKS_PER_CHUNK];
+				int yVals[RANDOMTICKS_PER_CHUNK];
+				int zVals[RANDOMTICKS_PER_CHUNK];
+				for (int i = 0; i < RANDOMTICKS_PER_CHUNK; i++) {
+					xVals[i] = WorldToLocalCoord(Xorshift32_Next(&world->randomTickGen));
+					yVals[i] = WorldToLocalCoord(Xorshift32_Next(&world->randomTickGen));
+					zVals[i] = WorldToLocalCoord(Xorshift32_Next(&world->randomTickGen));
+				}
+				BlockEvent_RandomTick(world, chunk, xVals, yVals, zVals);
 			}
 		}
 }

@@ -3,7 +3,6 @@
 #include <misc/CommandLine.h>
 #include <misc/NumberUtils.h>
 
-
 #include <gui/DebugUI.h>
 
 #ifdef _3DS
@@ -101,6 +100,7 @@ void PlayerController_Init(PlayerController* ctrl, Player* player) {
 	ctrl->player = player;
 	ctrl->controlScheme = platform_default_scheme;
 	// TODO: alternative Steuerung aus Datei laden 2 %
+	ctrl->openedCmd = false;
 }
 
 void PlayerController_Update(PlayerController* ctrl, InputData input, float dt) {
@@ -149,8 +149,16 @@ void PlayerController_Update(PlayerController* ctrl, InputData input, float dt) 
 	if (switchBlockLeft && --player->blockInHand == 0) player->blockInHand = Blocks_Count - 1;
 	if (switchBlockRight && ++player->blockInHand == Blocks_Count) player->blockInHand = 1;
 
+	if (ctrl->openedCmd) {
+		dt = 0.f;
+		ctrl->openedCmd = false;
+	}
+
 	float cmdLine = WasKeyReleased(ctrl->controlScheme.openCmd, &agnosticInput);
-	if (cmdLine) CommandLine_Activate(player->world, player);
+	if (cmdLine) {
+		CommandLine_Activate(player->world, player);
+		ctrl->openedCmd = true;
+	}
 
 	Player_Move(player, dt, movement);
 	Player_Update(player);

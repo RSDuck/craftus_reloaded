@@ -4,7 +4,11 @@
 
 #include <world/Chunk.h>
 
+#include <misc/Xorshift.h>
+
 #include <stdbool.h>
+
+#include <3ds.h>
 
 typedef enum {
 	WorkerItemType_Load,
@@ -22,29 +26,26 @@ typedef struct {
 } WorkerItem;
 
 typedef struct {
-	vec_t(WorkerItem) queue[2];
-	int currentQueue;
+	vec_t(WorkerItem) queue;
+
+	LightEvent itemAddedEvent;
+	LightLock listInUse;
 } WorkQueue;
 
 inline void WorkQueue_Init(WorkQueue* queue) {
-	vec_init(&queue->queue[0]);
-	vec_init(&queue->queue[1]);
-	queue->currentQueue = 0;
+	vec_init(&queue->queue);
+	LightLock_Init(&queue->listInUse);
+	LightEvent_Init(&queue->itemAddedEvent, RESET_STICKY);
 }
-inline void WorkQueue_Deinit(WorkQueue* queue) {
-	vec_deinit(&queue->queue[0]);
-	vec_deinit(&queue->queue[1]);
-}
-
-inline void WorkQueue_ToggleQueue(WorkQueue* queue) { queue->currentQueue ^= 1; }
+inline void WorkQueue_Deinit(WorkQueue* queue) { vec_deinit(&queue->queue); }
 
 inline void WorkQueue_AddItem(WorkQueue* queue, WorkerItem item) {
 	item.uuid = item.chunk->uuid;
 	++item.chunk->tasksRunning;
 	if (item.type == WorkerItemType_PolyGen) ++item.chunk->graphicalTasksRunning;
-	vec_push(&queue->queue[queue->currentQueue], item);
-}
-inline WorkerItem WorkQueue_PopItem(WorkQueue* queue) { return vec_pop(&queue->queue[!queue->currentQueue]); }
+	LightLock_Lock(&queue->listInUse);
+	vec_push(&queue->queue, item);
+	LightLock_Unlock(&queue->listInUse);
 
-inline bool WorkQueue_HasItem(WorkQueue* queue) { return queue->queue[!queue->currentQueue].length != 0; }
-inline size_t WorkQueue_Empty(WorkQueue* queue) { return queue->queue[0].length == 0 && queue->queue[1].length == 0; }
+	LightEvent_Signal(&queue->itemAddedEvent);
+}

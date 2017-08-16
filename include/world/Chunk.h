@@ -55,6 +55,8 @@ typedef struct {
 
 	uint32_t displayRevision;
 	bool forceVBOUpdate;
+
+	int references;
 } Chunk;
 
 extern Xorshift32 uuidGenerator;

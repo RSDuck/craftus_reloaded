@@ -2,5 +2,6 @@
 *.elf
 *.smdh
 build
+debug_build
 .vscode/*
 .vs
