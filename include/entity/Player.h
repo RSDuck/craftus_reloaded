@@ -9,7 +9,7 @@
 
 #define PLAYER_EYEHEIGHT (1.7f)
 #define PLAYER_HEIGHT (1.8f)
-#define PLAYER_COLLISIONBOX_SIZE (0.6f)
+#define PLAYER_COLLISIONBOX_SIZE (0.65f)
 
 typedef struct {
 	float3 position;

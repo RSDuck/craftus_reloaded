@@ -8,7 +8,7 @@ void Camera_Init(Camera* cam) {
 	Mtx_Identity(&cam->view);
 
 	cam->fov = C3D_AngleFromDegrees(60.f);
-	cam->near = 0.24f, cam->far = 4.f * CHUNK_SIZE;
+	cam->near = 0.22f, cam->far = 4.f * CHUNK_SIZE;
 
 	Mtx_PerspTilt(&cam->projection, cam->fov, ((400.f) / (240.f)), cam->near, cam->far, false);
 }
