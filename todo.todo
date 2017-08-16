@@ -5,7 +5,7 @@ Speichern/Weltenformat:
     ✔ Superchunks implementieren @done (11.8.2017, 15:05:55)
     ✔ Flag für leere Cluster einbauen um Speicher zu sparen @0.2 @done (12.8.2017, 19:21:31)
     ✔ Heightmaps für Chunks generieren @0.2 @done (12.8.2017, 19:21:34)
-    ☐ Altes Speicherformat kompatibel machen @0.2
+    ✘ Altes Speicherformat kompatibel machen @0.2 @cancelled (16.8.2017, 14:47:42)
     ✔ Undead Chunks Geschichte komplett ausbauen und stattdessen einfach eine Liste haben, wo die ältesten Chunks runtergenommen werden @done (14.8.2017, 15:48:40)
 GUI:
     ✔ Ordentliche Sortierung @critical @done (31.7.2017, 14:32:48)
@@ -17,7 +17,7 @@ GUI:
 
 Alles mögliche:
     ☐ Ordentlichen Crashreport anzeigen
-    ☐ Funktion hinzufügen, mit der die Färbefarbe zurückgibt(z.B. für Gras) @0.2
+    ✔ Funktion hinzufügen, mit der die Färbefarbe zurückgibt(z.B. für Gras) @0.2 @done (16.8.2017, 15:19:27)
     ☐ Hand
 
 Weltgeneration:
@@ -26,7 +26,7 @@ Weltgeneration:
 
 Gameplay:
     ☐ Mehr Blöcke überhaupt(Ziegelstein, Steinziegel, Glas und Blätter fehlen noch) @0.2
-    ☐ Zufallsticks @0.2
+    ✔ Zufallsticks @0.2 @done (16.8.2017, 14:47:57)
 
 Rendering:
     ☐ Transparente Blöcke korrekt rendern @0.2

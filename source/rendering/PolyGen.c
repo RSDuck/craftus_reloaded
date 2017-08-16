@@ -298,8 +298,7 @@ void PolyGen_GeneratePolygons(WorkQueue* queue, WorkerItem item, void* this) {
 #define oneDivIconsPerRow (32768 / 8)
 #define halfTexel (6)
 
-				uint16_t color = (face.block == Block_Grass && face.direction == Direction_Top) ? (uint16_t)((17 << 10) | (26 << 5) | 15)
-														: (uint16_t)((31 << 10) | (31 << 5) | 31);
+				uint16_t color = Block_GetColor(face.block, face.direction);
 
 				for (int k = 0; k < 6; k++) {
 					data[k].xyz[0] += offsetX;

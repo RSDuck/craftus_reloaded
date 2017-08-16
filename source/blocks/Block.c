@@ -1,6 +1,7 @@
 #include <blocks/Block.h>
 
 #include <rendering/TextureMap.h>
+#include <rendering/VertexFmt.h>
 
 static Texture_Map textureMap;
 
@@ -88,6 +89,13 @@ void Block_GetTexture(Block block, Direction direction, int16_t* out_uv) {
 			out_uv[1] = icon.sand.v;
 			return;
 	}
+}
+
+uint16_t Block_GetColor(Block block, Direction direction) {
+	if (block == Block_Grass && direction == Direction_Top) {
+		return SHADER_RGB(17, 26, 15);
+	}
+	return SHADER_RGB(31, 31, 31);
 }
 
 const char* BlockNames[Blocks_Count] = {"Air", "Stone", "Dirt", "Grass", "Cobblestone", "Sand", "Log"};

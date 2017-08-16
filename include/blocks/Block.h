@@ -15,4 +15,6 @@ void* Block_GetTextureMap();
 
 void Block_GetTexture(Block block, Direction direction, int16_t* out_uv);
 
+uint16_t Block_GetColor(Block block, Direction direction);
+
 extern const char* BlockNames[Blocks_Count];
