@@ -9,7 +9,7 @@ static Texture_Map textureMap;
 #define PPRX "romfs:/textures/blocks/"
 
 const char* files[] = {PPRX "stone.png", PPRX "dirt.png",	PPRX "cobblestone.png", PPRX "grass_side.png", PPRX "grass_top.png", PPRX "stonebrick.png",
-		       PPRX "sand.png",  PPRX "log_oak_top.png", PPRX "log_oak.png",     PPRX "leaves_oak.png", PPRX "glass.png"};
+		       PPRX "sand.png",  PPRX "log_oak_top.png", PPRX "log_oak.png",     PPRX "leaves_oak.png", PPRX "glass.png",     PPRX "brick.png"};
 
 static struct {
 	Texture_MapIcon stone;
@@ -23,10 +23,11 @@ static struct {
 	Texture_MapIcon oaklog_top;
 	Texture_MapIcon leaves_oak;
 	Texture_MapIcon glass;
+	Texture_MapIcon brick;
 } icon;
 
 void Block_Init() {
-	Texture_MapInit(&textureMap, files, 11);
+	Texture_MapInit(&textureMap, files, 12);
 #define A(i, n) icon.i = Texture_MapGetIcon(&textureMap, PPRX n)
 	A(stone, "stone.png");
 	A(dirt, "dirt.png");
@@ -39,6 +40,7 @@ void Block_Init() {
 	A(oaklog_top, "log_oak_top.png");
 	A(leaves_oak, "leaves_oak.png");
 	A(glass, "glass.png");
+	A(brick, "brick.png");
 #undef A
 }
 void Block_Deinit() { C3D_TexDelete(&textureMap.texture); }
@@ -99,6 +101,15 @@ void Block_GetTexture(Block block, Direction direction, int16_t* out_uv) {
 		case Block_Glass:
 			out_uv[0] = icon.glass.u;
 			out_uv[1] = icon.glass.v;
+			return;
+		case Block_Stonebrick:
+			out_uv[0] = icon.stonebrick.u;
+			out_uv[1] = icon.stonebrick.v;
+			return;
+		case Block_Brick:
+			out_uv[0] = icon.brick.u;
+			out_uv[1] = icon.brick.v;
+			return;
 	}
 }
 
@@ -111,4 +122,4 @@ uint16_t Block_GetColor(Block block, Direction direction) {
 
 bool Block_Opaque(Block block) { return block != Block_Air && block != Block_Leaves && block != Block_Glass; }
 
-const char* BlockNames[Blocks_Count] = {"Air", "Stone", "Dirt", "Grass", "Cobblestone", "Sand", "Log", "Leaves", "Glass"};
+const char* BlockNames[Blocks_Count] = {"Air", "Stone", "Dirt", "Grass", "Cobblestone", "Sand", "Log", "Leaves", "Glass", "Stone Bricks", "Bricks"};

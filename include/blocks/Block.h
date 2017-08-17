@@ -3,12 +3,22 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-
 #include <world/Direction.h>
 
 typedef uint8_t Block;
 
-enum { Block_Air, Block_Stone, Block_Dirt, Block_Grass, Block_Cobblestone, Block_Sand, Block_Log, Block_Leaves, Block_Glass, Blocks_Count };
+enum { Block_Air,
+       Block_Stone,
+       Block_Dirt,
+       Block_Grass,
+       Block_Cobblestone,
+       Block_Sand,
+       Block_Log,
+       Block_Leaves,
+       Block_Glass,
+       Block_Stonebrick,
+       Block_Brick,
+       Blocks_Count };
 
 void Block_Init();
 void Block_Deinit();
