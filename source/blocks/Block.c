@@ -8,8 +8,8 @@ static Texture_Map textureMap;
 // PATH PREFIX
 #define PPRX "romfs:/textures/blocks/"
 
-const char* files[] = {PPRX "stone.png",      PPRX "dirt.png", PPRX "cobblestone.png", PPRX "grass_side.png", PPRX "grass_top.png",
-		       PPRX "stonebrick.png", PPRX "sand.png", PPRX "log_oak_top.png", PPRX "log_oak.png"};
+const char* files[] = {PPRX "stone.png", PPRX "dirt.png",	PPRX "cobblestone.png", PPRX "grass_side.png", PPRX "grass_top.png", PPRX "stonebrick.png",
+		       PPRX "sand.png",  PPRX "log_oak_top.png", PPRX "log_oak.png",     PPRX "leaves_oak.png", PPRX "glass.png"};
 
 static struct {
 	Texture_MapIcon stone;
@@ -21,10 +21,12 @@ static struct {
 	Texture_MapIcon sand;
 	Texture_MapIcon oaklog_side;
 	Texture_MapIcon oaklog_top;
+	Texture_MapIcon leaves_oak;
+	Texture_MapIcon glass;
 } icon;
 
 void Block_Init() {
-	Texture_MapInit(&textureMap, files, 9);
+	Texture_MapInit(&textureMap, files, 11);
 #define A(i, n) icon.i = Texture_MapGetIcon(&textureMap, PPRX n)
 	A(stone, "stone.png");
 	A(dirt, "dirt.png");
@@ -35,6 +37,8 @@ void Block_Init() {
 	A(sand, "sand.png");
 	A(oaklog_side, "log_oak.png");
 	A(oaklog_top, "log_oak_top.png");
+	A(leaves_oak, "leaves_oak.png");
+	A(glass, "glass.png");
 #undef A
 }
 void Block_Deinit() { C3D_TexDelete(&textureMap.texture); }
@@ -88,14 +92,23 @@ void Block_GetTexture(Block block, Direction direction, int16_t* out_uv) {
 			out_uv[0] = icon.sand.u;
 			out_uv[1] = icon.sand.v;
 			return;
+		case Block_Leaves:
+			out_uv[0] = icon.leaves_oak.u;
+			out_uv[1] = icon.leaves_oak.v;
+			return;
+		case Block_Glass:
+			out_uv[0] = icon.glass.u;
+			out_uv[1] = icon.glass.v;
 	}
 }
 
 uint16_t Block_GetColor(Block block, Direction direction) {
-	if (block == Block_Grass && direction == Direction_Top) {
+	if ((block == Block_Grass && direction == Direction_Top) || block == Block_Leaves) {
 		return SHADER_RGB(17, 26, 15);
 	}
 	return SHADER_RGB(31, 31, 31);
 }
 
-const char* BlockNames[Blocks_Count] = {"Air", "Stone", "Dirt", "Grass", "Cobblestone", "Sand", "Log"};
+bool Block_Opaque(Block block) { return block != Block_Air && block != Block_Leaves && block != Block_Glass; }
+
+const char* BlockNames[Blocks_Count] = {"Air", "Stone", "Dirt", "Grass", "Cobblestone", "Sand", "Log", "Leaves", "Glass"};

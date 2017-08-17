@@ -23,8 +23,14 @@ typedef struct {
 	Direction enteredFrom;
 } RenderStep;
 
+typedef struct {
+	Cluster* cluster;
+	Chunk* chunk;
+} TransparentRender;
+
 static vec_t(RenderStep) renderingQueue;
 static uint8_t chunkRendered[CHUNKCACHE_SIZE][CLUSTER_PER_CHUNK][CHUNKCACHE_SIZE];
+static vec_t(TransparentRender) transparentClusters;
 
 static C3D_FogLut fogLut;
 
@@ -38,6 +44,7 @@ void WorldRenderer_Init(Player* player_, World* world_, WorkQueue* workqueue_, i
 	workqueue = workqueue_;
 
 	vec_init(&renderingQueue);
+	vec_init(&transparentClusters);
 
 	Camera_Init(&camera);
 
@@ -60,6 +67,7 @@ void WorldRenderer_Init(Player* player_, World* world_, WorkQueue* workqueue_, i
 }
 void WorldRenderer_Deinit() {
 	vec_deinit(&renderingQueue);
+	vec_deinit(&transparentClusters);
 	Cursor_Deinit();
 }
 
@@ -71,6 +79,7 @@ static void renderWorld() {
 	int polysTotal = 0, clustersDrawn = 0, steps = 0;
 
 	vec_clear(&renderingQueue);
+	vec_clear(&transparentClusters);
 
 	int pY = WorldToChunkCoord(FastFloor(player->position.y));
 	Chunk* pChunk = World_GetChunk(world, WorldToChunkCoord(FastFloor(player->position.x)), WorldToChunkCoord(FastFloor(player->position.z)));
@@ -87,9 +96,18 @@ static void renderWorld() {
 		if (cluster->vertices > 0 && cluster->vbo.size) {
 			clusterWasRendered(chunk->x, cluster->y, chunk->z) |= 2;
 
+			C3D_BufInfo bufInfo;
+			BufInfo_Init(&bufInfo);
+			BufInfo_Add(&bufInfo, cluster->vbo.memory, sizeof(Vertex), 2, 0x10);
+			C3D_SetBufInfo(&bufInfo);
+			C3D_DrawArrays(GPU_TRIANGLES, 0, cluster->vertices);
+
 			polysTotal += cluster->vertices;
 
 			clustersDrawn++;
+		}
+		if (cluster->transparentVertices > 0 && cluster->transparentVBO.size) {
+			vec_push(&transparentClusters, ((TransparentRender){cluster, chunk}));
 		}
 		// if (polysTotal >= 150000) break;
 
@@ -127,18 +145,6 @@ static void renderWorld() {
 		for (int z = 1; z < CHUNKCACHE_SIZE - 1; z++) {
 			Chunk* chunk = world->chunkCache[x][z];
 
-			for (int y = 0; y < CLUSTER_PER_CHUNK; y++) {
-				if (chunkRendered[x][y][z] & 2) {
-					if (chunk->clusters[y].vertices > 0) {
-						C3D_BufInfo bufInfo;
-						BufInfo_Init(&bufInfo);
-						BufInfo_Add(&bufInfo, chunk->clusters[y].vbo.memory, sizeof(Vertex), 2, 0x10);
-						C3D_SetBufInfo(&bufInfo);
-						C3D_DrawArrays(GPU_TRIANGLES, 0, chunk->clusters[y].vertices);
-					}
-				}
-			}
-
 			if ((chunk->revision != chunk->displayRevision || chunk->forceVBOUpdate) && !chunk->tasksRunning) {
 				bool clear = true;
 				for (int xOff = -1; xOff < 2 && clear; xOff++)
@@ -149,6 +155,21 @@ static void renderWorld() {
 			}
 		}
 	}
+
+	C3D_AlphaTest(true, GPU_GREATER, 0);
+
+	int i;
+	TransparentRender* render;
+	vec_foreach_ptr_rev(&transparentClusters, render, i) {
+		C3D_BufInfo bufInfo;
+		BufInfo_Init(&bufInfo);
+		BufInfo_Add(&bufInfo, render->cluster->transparentVBO.memory, sizeof(Vertex), 2, 0x10);
+		C3D_SetBufInfo(&bufInfo);
+		C3D_DrawArrays(GPU_TRIANGLES, 0, render->cluster->transparentVertices);
+
+		polysTotal += render->cluster->transparentVertices;
+	}
+	C3D_AlphaTest(false, GPU_GREATER, 0);
 
 	DebugUI_Text("Clusters drawn %d with %d steps. %d vertices", clustersDrawn, steps, polysTotal);
 	DebugUI_Text("T: %u P: %u %d", world->chunkCache[CHUNKCACHE_SIZE / 2][CHUNKCACHE_SIZE / 2]->tasksRunning,

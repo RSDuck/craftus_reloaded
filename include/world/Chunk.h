@@ -24,8 +24,8 @@ typedef struct {
 	bool empty;
 	uint32_t emptyRevision;
 
-	VBO_Block vbo;
-	size_t vertices;
+	VBO_Block vbo, transparentVBO;
+	size_t vertices, transparentVertices;
 	uint32_t vboRevision;
 	bool forceVBOUpdate;
 } Cluster;
