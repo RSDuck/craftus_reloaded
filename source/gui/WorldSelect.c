@@ -59,6 +59,31 @@ static void scanworlds() {
 	closedir(directory);
 }
 
+static void delete_folder(const char* path) {
+	DIR* dir = opendir(path);
+	struct dirent* entry;
+
+	int pathLen = strlen(path);
+
+	while ((entry = readdir(dir))) {
+		if (!strcmp(entry->d_name, "..") || !strcmp(entry->d_name, ".")) continue;
+
+		int entryLen = strlen(entry->d_name);
+
+		char buffer[pathLen + entryLen + 1];
+		sprintf(buffer, "%s/%s", path, entry->d_name);
+
+		if (entry->d_type == DT_DIR)
+			delete_folder(buffer);
+		else
+			unlink(buffer);
+	}
+
+	closedir(dir);
+
+	rmdir(path);
+}
+
 void WorldSelect_Init() {
 	vec_init(&worlds);
 
@@ -66,6 +91,8 @@ void WorldSelect_Init() {
 }
 
 void WorldSelect_Deinit() { vec_deinit(&worlds); }
+
+typedef enum { MenuState_SelectWorld, MenuState_ConfirmDeletion } MenuState;
 
 static int scroll = 0;
 static float velocity = 0.f;
@@ -75,6 +102,11 @@ static bool clicked_play = false;
 static bool clicked_new_world = false;
 static bool clicked_delete_world = false;
 
+static bool confirmed_deletion = false;
+static bool canceled_deletion = false;
+
+static MenuState menustate = MenuState_SelectWorld;
+
 static float max_velocity = 4.f;
 
 void WorldSelect_Render() {
@@ -83,70 +115,113 @@ void WorldSelect_Render() {
 	Gui_BindGuiTexture(GuiTexture_MenuBackground);
 	for (int i = 0; i < 160 / 32 + 1; i++) {
 		for (int j = 0; j < 120 / 32 + 1; j++) {
-			bool overlay = j >= 2;
+			bool overlay = j >= 2 || menustate == MenuState_ConfirmDeletion;
 			Gui_PushQuadColor(i * 32, j * 32, overlay ? -3 : -10, 32, 32, 0, 0, 32, 32, overlay ? INT16_MAX : SHADER_RGB(12, 12, 12));
 		}
 	}
 
-	int movementX = 0, movementY = 0;
-	Gui_GetCursorMovement(&movementX, &movementY);
-	if (movementY == 0) {
-		movementY = velocity;
-		velocity *= 0.2f;
-	}
-	if (Gui_IsCursorInside(0, 0, 160, 2 * 32)) {
-		velocity += movementY;
-		if (velocity > max_velocity) velocity = max_velocity;
-		if (velocity < -max_velocity) velocity = -max_velocity;
-	}
-	scroll += velocity;
-	if (scroll < 0) scroll = 0;
-	int maximumSize = CHAR_HEIGHT * 2 * worlds.length;
-	if (scroll > maximumSize) scroll = maximumSize;
-
-	WorldInfo info;
-	int i = 0;
-	vec_foreach (&worlds, info, i) {
-		int y = i * (CHAR_HEIGHT + CHAR_HEIGHT) + 10 + scroll;
-		if (selectedWorld == i) {
-			Gui_PushSingleColorQuad(10, y - 3, -7, 140, 1, SHADER_RGB(20, 20, 20));
-			Gui_PushSingleColorQuad(10, y + CHAR_HEIGHT + 2, -7, 140, 1, SHADER_RGB(20, 20, 20));
-			Gui_PushSingleColorQuad(10, y - 3, -7, 1, CHAR_HEIGHT + 6, SHADER_RGB(20, 20, 20));
-			Gui_PushSingleColorQuad(10 + 140, y - 3, -7, 1, CHAR_HEIGHT + 6, SHADER_RGB(20, 20, 20));
+	if (menustate == MenuState_SelectWorld) {
+		int movementX = 0, movementY = 0;
+		Gui_GetCursorMovement(&movementX, &movementY);
+		if (movementY == 0) {
+			movementY = velocity;
+			velocity *= 0.2f;
 		}
-		if (Gui_EnteredCursorInside(10, y - 3, 140, CHAR_HEIGHT + 6)) {
-			selectedWorld = i;
+		if (Gui_IsCursorInside(0, 0, 160, 2 * 32)) {
+			velocity += movementY;
+			if (velocity > max_velocity) velocity = max_velocity;
+			if (velocity < -max_velocity) velocity = -max_velocity;
 		}
-		Gui_PushText(20, y, -6, INT16_MAX, true, INT_MAX, NULL, "%s", info.name, movementY);
-	}
+		scroll += velocity;
+		int maximumSize = CHAR_HEIGHT * 2 * worlds.length;
+		if (scroll < -maximumSize) scroll = -maximumSize;
+		if (scroll > 0) scroll = 0;
 
-	clicked_play = Gui_Button(5, 2 * 32 + 5, 160 - 5 * 2, "Play selected World");
-	clicked_new_world = Gui_Button(5, 3 * 32, 160 / 2 - 5 * 2, "New World");
-	clicked_delete_world = Gui_Button(160 / 2 + 5, 3 * 32, 160 / 2 - 5 * 2, "Delete World");
+		WorldInfo info;
+		int i = 0;
+		vec_foreach (&worlds, info, i) {
+			int y = i * (CHAR_HEIGHT + CHAR_HEIGHT) + 10 + scroll;
+			if (selectedWorld == i) {
+				Gui_PushSingleColorQuad(10, y - 3, -7, 140, 1, SHADER_RGB(20, 20, 20));
+				Gui_PushSingleColorQuad(10, y + CHAR_HEIGHT + 2, -7, 140, 1, SHADER_RGB(20, 20, 20));
+				Gui_PushSingleColorQuad(10, y - 3, -7, 1, CHAR_HEIGHT + 6, SHADER_RGB(20, 20, 20));
+				Gui_PushSingleColorQuad(10 + 140, y - 3, -7, 1, CHAR_HEIGHT + 6, SHADER_RGB(20, 20, 20));
+			}
+			if (Gui_EnteredCursorInside(10, y - 3, 140, CHAR_HEIGHT + 6)) {
+				selectedWorld = i;
+			}
+			Gui_PushText(20, y, -6, INT16_MAX, true, INT_MAX, NULL, "%s", info.name, movementY);
+		}
+
+		clicked_play = Gui_Button(5, 2 * 32 + 5, 160 - 5 * 2, "Play selected World");
+		clicked_new_world = Gui_Button(5, 3 * 32, 160 / 2 - 5 * 2, "New World");
+		clicked_delete_world = Gui_Button(160 / 2 + 5, 3 * 32, 160 / 2 - 5 * 2, "Delete World");
+	} else if (menustate == MenuState_ConfirmDeletion) {
+		int textWidth = Gui_CalcTextWidth("Are you sure?");
+		Gui_PushText(160 / 2 - textWidth / 2, 120 / 3, -1, INT16_MAX, true, INT_MAX, NULL, "Are you sure?");
+		canceled_deletion = Gui_Button(10, 120 / 3 * 2, 160 / 2 - 10 * 2, "No");
+		confirmed_deletion = Gui_Button(160 / 2 + 10, 120 / 3 * 2, 160 / 2 - 10 * 2, "Yes");
+	}
 }
 
-bool WorldSelect_Update(char* out_worldpath) {
+bool WorldSelect_Update(char* out_worldpath, char* out_name) {
 	if (clicked_new_world) {
 		static SwkbdState swkbd;
-		static char textBuffer[WORLD_NAME_SIZE];
-		swkbdInit(&swkbd, SWKBD_TYPE_WESTERN, 2, 64);
-		swkbdSetHintText(&swkbd, "Enter world name");
+		static char name[WORLD_NAME_SIZE];
+		swkbdInit(&swkbd, SWKBD_TYPE_WESTERN, 2, WORLD_NAME_SIZE);
+		swkbdSetHintText(&swkbd, "Enter the world name");
 
-		int button = swkbdInputText(&swkbd, textBuffer, sizeof(textBuffer));
+		int button = swkbdInputText(&swkbd, name, 12);
+
+		strcpy(out_name, name);
 		if (button != SWKBD_BUTTON_NONE) {
-			// TODO: neue Welt implementieren
-		}
+			strcpy(out_worldpath, out_name);
 
-		return true;
+			int length = strlen(out_worldpath);
+
+			for (int i = 0; i < length; i++) {
+				if (out_worldpath[i] == '/' || out_worldpath[i] == '\\' || out_worldpath[i] == '?' || out_worldpath[i] == ':' ||
+				    out_worldpath[i] == '|' || out_worldpath[i] == '<' || out_worldpath[i] == '>')
+					out_worldpath[i] = '_';
+			}
+
+			int i;
+			WorldInfo* info;
+			int alreadyExisting = 0;
+			vec_foreach_ptr(&worlds, info, i) if (!strcmp(out_name, info->name)) alreadyExisting++;
+
+			for (int i = 0; i < alreadyExisting; i++) {
+				out_worldpath[length + i] = '_';
+			}
+			out_worldpath[length + alreadyExisting] = '\0';
+
+			return true;
+		}
 	}
 	if (clicked_play && selectedWorld != -1) {
 		strcpy(out_worldpath, worlds.data[selectedWorld].path);
 		return true;
 	}
+	if (clicked_delete_world && selectedWorld != -1) {
+		menustate = MenuState_ConfirmDeletion;
+	}
+	if (confirmed_deletion) {
+		char buffer[256];
+		sprintf(buffer, "sdmc:/craftus/saves/%s", worlds.data[selectedWorld].path);
+		delete_folder(buffer);
+
+		scanworlds();
+		menustate = MenuState_SelectWorld;
+	}
+	if (canceled_deletion) {
+		menustate = MenuState_SelectWorld;
+	}
 
 	clicked_new_world = false;
 	clicked_play = false;
 	clicked_delete_world = false;
+	canceled_deletion = false;
+	confirmed_deletion = false;
 
 	return false;
 }

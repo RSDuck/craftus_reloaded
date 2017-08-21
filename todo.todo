@@ -20,9 +20,9 @@ Alles mögliche:
     ✔ Funktion hinzufügen, mit der die Färbefarbe zurückgibt(z.B. für Gras) @0.2 @done (16.8.2017, 15:19:27)
     ☐ Hand
     ✔ Menü zum auswählen der Welt @done (21.8.2017, 15:18:49)
-    ☐ Welt löschen einbauen
+    ✔ Welt löschen einbauen @done (21.8.2017, 19:32:26)
     ☐ Welt wechseln
-    ☐ "Neue Welt erstellen" implementieren
+    ✔ "Neue Welt erstellen" implementieren @done (21.8.2017, 18:19:32)
 
 Weltgeneration:
     ☐ Nicht Superflach Welten @0.2

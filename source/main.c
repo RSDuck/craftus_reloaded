@@ -124,7 +124,9 @@ int main() {
 			World_UpdateChunkCache(world, WorldToChunkCoord(FastFloor(player.position.x)), WorldToChunkCoord(FastFloor(player.position.z)));
 		} else if (gamestate == GameState_SelectWorld) {
 			char path[256];
-			if (WorldSelect_Update(path)) {
+			char name[WORLD_NAME_SIZE];
+			if (WorldSelect_Update(path, name)) {
+				strcpy(world->name, name);
 				SaveManager_Load(&savemgr, path);
 
 				world->cacheTranslationX = WorldToChunkCoord(FastFloor(player.position.x));
