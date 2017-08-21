@@ -58,7 +58,7 @@ void ChunkWorker_Mainloop(void* _this) {
 		while (privateQueue.length > 0) {
 			WorkerItem item = vec_pop(&privateQueue);
 
-			if (item.uuid == item.chunk->uuid && (workerToStop == chunkworker ? item.type == WorkerItemType_Save : true)) {
+			if (item.uuid == item.chunk->uuid) {
 				for (int i = 0; i < chunkworker->handler[item.type].length; i++) {
 					chunkworker->handler[item.type].data[i].func(&chunkworker->queue, item, chunkworker->handler[item.type].data[i].this);
 					svcSleepThread(300);
@@ -74,10 +74,11 @@ void ChunkWorker_Mainloop(void* _this) {
 					default:
 						break;
 				}
-				svcSleepThread(1000);
 
 				--item.chunk->tasksRunning;
 				if (item.type == WorkerItemType_PolyGen) --item.chunk->graphicalTasksRunning;
+
+				svcSleepThread(1000);
 			}
 		}
 	}

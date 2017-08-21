@@ -14,7 +14,7 @@ void Gui_Deinit();
 
 void Gui_InputData(InputData data);
 
-typedef enum { GuiTexture_Blank, GuiTexture_Font, GuiTexture_Icons, GuiTexture_Widgets } GuiTexture;
+typedef enum { GuiTexture_Blank, GuiTexture_Font, GuiTexture_Icons, GuiTexture_Widgets, GuiTexture_MenuBackground } GuiTexture;
 
 void Gui_BindGuiTexture(GuiTexture texture);
 void Gui_BindTexture(C3D_Tex* texture);
@@ -34,6 +34,7 @@ int Gui_CalcTextWidth(const char* text, ...);
 bool Gui_IsCursorInside(int x, int y, int w, int h);
 bool Gui_WasCursorInside(int x, int y, int w, int h);
 void Gui_GetCursorMovement(int* x, int* y);
+bool Gui_EnteredCursorInside(int x, int y, int w, int h);    
 
 bool Gui_RectIsVisible(int x, int y, int w, int h);
 

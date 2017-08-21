@@ -5,10 +5,12 @@
 
 #include <3ds.h>
 
+#include <GameStates.h>
 #include <entity/Player.h>
 #include <entity/PlayerController.h>
 #include <gui/DebugUI.h>
 #include <gui/Gui.h>
+#include <gui/WorldSelect.h>
 #include <rendering/PolyGen.h>
 #include <rendering/Renderer.h>
 #include <world/ChunkWorker.h>
@@ -31,14 +33,9 @@ void exitHandler() {
 }
 
 int main() {
+	GameState gamestate = GameState_SelectWorld;
+
 	gfxInitDefault();
-
-	/*PrintConsole consoleEvent, consoleStatus;
-	consoleInit(GFX_BOTTOM, &consoleEvent);
-	consoleInit(GFX_BOTTOM, &consoleStatus);
-
-	consoleSetWindow(&consoleStatus, 0, 0, 320 / 8, 240 / 16);
-	consoleSetWindow(&consoleEvent, 0, 240 / 16 + 1, 320 / 8, 240 / 16 - 1);*/
 
 	gfxSet3D(true);
 
@@ -49,6 +46,8 @@ int main() {
 	SuperFlatGen flatGen;
 
 	SuperChunk_InitPools();
+
+	SaveManager_InitFileSystem();
 
 	ChunkWorker chunkWorker;
 	ChunkWorker_Init(&chunkWorker);
@@ -65,32 +64,18 @@ int main() {
 
 	SuperFlatGen_Init(&flatGen, world);
 
-	Renderer_Init(world, &player, &chunkWorker.queue);
+	Renderer_Init(world, &player, &chunkWorker.queue, &gamestate);
 
 	DebugUI_Init();
 
+	WorldSelect_Init();
+
 	World_Init(world, &chunkWorker.queue);
-	
-	
-	//consoleInit(GFX_BOTTOM, NULL);
 
 	SaveManager savemgr;
 	SaveManager_Init(&savemgr, &player);
 	ChunkWorker_AddHandler(&chunkWorker, WorkerItemType_Load, (WorkerFuncObj){&SaveManager_LoadChunk, &savemgr});
 	ChunkWorker_AddHandler(&chunkWorker, WorkerItemType_Save, (WorkerFuncObj){&SaveManager_SaveChunk, &savemgr});
-
-	world->cacheTranslationX = WorldToChunkCoord(FastFloor(player.position.x));
-	world->cacheTranslationZ = WorldToChunkCoord(FastFloor(player.position.z));
-	for (int i = 0; i < CHUNKCACHE_SIZE; i++) {
-		for (int j = 0; j < CHUNKCACHE_SIZE; j++) {
-			world->chunkCache[i][j] =
-			    World_LoadChunk(world, i - CHUNKCACHE_SIZE / 2 + world->cacheTranslationX, j - CHUNKCACHE_SIZE / 2 + world->cacheTranslationZ);
-		}
-	}
-
-	while (chunkWorker.working) {
-		svcSleepThread(4800000);
-	}
 
 	uint64_t lastTime = svcGetSystemTick();
 	float dt = 0.f, timeAccum = 0.f, fpsClock = 0.f;
@@ -115,12 +100,6 @@ int main() {
 			fpsClock = 0.f;
 		}
 
-		while (timeAccum >= 1.f / 20.f) {
-			World_Tick(world);
-
-			timeAccum -= 1.f / 20.f;
-		}
-
 		hidScanInput();
 		u32 keysdown = hidKeysHeld();
 		if (keysdown & KEY_START) break;
@@ -132,26 +111,57 @@ int main() {
 		hidTouchRead(&touchPos);
 
 		InputData inputData = (InputData){keysdown, hidKeysDown(), hidKeysUp(), circlePos.dx, circlePos.dy, touchPos.px, touchPos.py};
-		PlayerController_Update(&playerCtrl, inputData, dt);
 
-		World_UpdateChunkCache(world, WorldToChunkCoord(FastFloor(player.position.x)), WorldToChunkCoord(FastFloor(player.position.z)));
+		if (gamestate == GameState_Playing) {
+			while (timeAccum >= 1.f / 20.f) {
+				World_Tick(world);
 
+				timeAccum -= 1.f / 20.f;
+			}
+
+			PlayerController_Update(&playerCtrl, inputData, dt);
+
+			World_UpdateChunkCache(world, WorldToChunkCoord(FastFloor(player.position.x)), WorldToChunkCoord(FastFloor(player.position.z)));
+		} else if (gamestate == GameState_SelectWorld) {
+			char path[256];
+			if (WorldSelect_Update(path)) {
+				SaveManager_Load(&savemgr, path);
+
+				world->cacheTranslationX = WorldToChunkCoord(FastFloor(player.position.x));
+				world->cacheTranslationZ = WorldToChunkCoord(FastFloor(player.position.z));
+				for (int i = 0; i < CHUNKCACHE_SIZE; i++) {
+					for (int j = 0; j < CHUNKCACHE_SIZE; j++) {
+						world->chunkCache[i][j] = World_LoadChunk(world, i - CHUNKCACHE_SIZE / 2 + world->cacheTranslationX,
+											  j - CHUNKCACHE_SIZE / 2 + world->cacheTranslationZ);
+					}
+				}
+
+				while (chunkWorker.working) svcSleepThread(4800000);
+
+				gamestate = GameState_Playing;
+			}
+		}
 		Gui_InputData(inputData);
 	}
 
-	for (int i = 0; i < CHUNKCACHE_SIZE; i++) {
-		for (int j = 0; j < CHUNKCACHE_SIZE; j++) {
-			World_UnloadChunk(world, world->chunkCache[i][j]);
+	if (gamestate == GameState_Playing) {
+		for (int i = 0; i < CHUNKCACHE_SIZE; i++) {
+			for (int j = 0; j < CHUNKCACHE_SIZE; j++) {
+				World_UnloadChunk(world, world->chunkCache[i][j]);
+			}
 		}
 	}
 
 	ChunkWorker_Deinit(&chunkWorker);
 
+	SaveManager_Unload(&savemgr);
 	SaveManager_Deinit(&savemgr);
 
 	SuperChunk_DeinitPools();
 
 	free(world);
+
+	WorldSelect_Deinit();
 
 	DebugUI_Deinit();
 

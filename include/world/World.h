@@ -24,8 +24,9 @@ typedef struct {
 	} settings;
 } GeneratorSettings;
 
+#define WORLD_NAME_SIZE 12
 typedef struct {
-	char name[12];
+	char name[WORLD_NAME_SIZE];
 
 	GeneratorSettings genSettings;
 

@@ -8,18 +8,25 @@
 
 #include <gui/DebugUI.h>
 
+#define mkdirFlags S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
+
+void SaveManager_InitFileSystem() {
+	mkdir("sdmc:/craftus", mkdirFlags);
+	mkdir("sdmc:/craftus/saves", mkdirFlags);
+}
+
 void SaveManager_Init(SaveManager* mgr, Player* player) {
 	mgr->player = player;
 	mgr->world = player->world;
 
+	vec_init(&mgr->superchunks);
+}
+void SaveManager_Deinit(SaveManager* mgr) { vec_deinit(&mgr->superchunks); }
+
+void SaveManager_Load(SaveManager* mgr, char* path) {
 	char buffer[256];
 
-#define mkdirFlags S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
-
-	mkdir("sdmc:/craftus", mkdirFlags);
-	mkdir("sdmc:/craftus/saves", mkdirFlags);
-
-	sprintf(buffer, "sdmc:/craftus/saves/%s", mgr->world->name);
+	sprintf(buffer, "sdmc:/craftus/saves/%s", path);
 	mkdir(buffer, mkdirFlags);
 	chdir(buffer);
 
@@ -45,10 +52,9 @@ void SaveManager_Init(SaveManager* mgr, Player* player) {
 			exit(1);
 		}
 	}
-
-	vec_init(&mgr->superchunks);
 }
-void SaveManager_Deinit(SaveManager* mgr) {
+
+void SaveManager_Unload(SaveManager* mgr) {
 	mpack_writer_t writer;
 	mpack_writer_init_file(&writer, "level.mp");
 	mpack_start_map(&writer, 2);
@@ -85,8 +91,6 @@ void SaveManager_Deinit(SaveManager* mgr) {
 		SuperChunk_Deinit(mgr->superchunks.data[i]);
 		free(mgr->superchunks.data[i]);
 	}
-
-	vec_deinit(&mgr->superchunks);
 }
 
 static SuperChunk* fetchSuperChunk(SaveManager* mgr, int x, int z) {

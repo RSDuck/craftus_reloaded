@@ -3,6 +3,7 @@
 #include <blocks/Block.h>
 #include <gui/DebugUI.h>
 #include <gui/Gui.h>
+#include <gui/WorldSelect.h>
 #include <rendering/Camera.h>
 #include <rendering/Cursor.h>
 #include <rendering/PolyGen.h>
@@ -29,10 +30,13 @@ static World* world;
 static Player* player;
 static WorkQueue* workqueue;
 
-void Renderer_Init(World* world_, Player* player_, WorkQueue* queue) {
+static GameState* gamestate;
+
+void Renderer_Init(World* world_, Player* player_, WorkQueue* queue, GameState* gamestate_) {
 	world = world_;
 	player = player_;
 	workqueue = queue;
+	gamestate = gamestate_;
 
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 
@@ -84,28 +88,29 @@ void Renderer_Deinit() {
 	C3D_Fini();
 }
 
-static bool text = false;
 void Renderer_Render() {
 	float iod = osGet3DSliderState() / 4.f;
 
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
-	PolyGen_Harvest();
+	if (*gamestate == GameState_Playing) PolyGen_Harvest();
 
 	for (int i = 0; i < 2; i++) {
 		C3D_FrameDrawOn(renderTargets[i]);
-
-		C3D_TexBind(0, Block_GetTextureMap());
-
-		WorldRenderer_Render(!i ? -iod : iod);
 
 		C3D_TexEnv* env = C3D_GetTexEnv(0);
 		C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, 0);
 		C3D_TexEnvOp(env, C3D_Both, 0, 0, 0);
 		C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
 
-		Gui_BindGuiTexture(GuiTexture_Widgets);
-		if (iod == 0.f) Gui_PushQuad(200 / 2 - 16 / 2, 120 / 2 - 16 / 2, 0, 16, 16, 240, 0, 16, 16);
+		if (*gamestate == GameState_Playing) {
+			C3D_TexBind(0, Block_GetTextureMap());
+
+			WorldRenderer_Render(!i ? -iod : iod);
+
+			Gui_BindGuiTexture(GuiTexture_Widgets);
+			if (iod == 0.f) Gui_PushQuad(200 / 2 - 16 / 2, 120 / 2 - 16 / 2, 0, 16, 16, 240, 0, 16, 16);
+		}
 
 		Gui_Render(GFX_TOP);
 
@@ -113,11 +118,15 @@ void Renderer_Render() {
 	}
 
 	C3D_FrameDrawOn(lowerScreen);
+	
+	if (*gamestate == GameState_SelectWorld)
+		WorldSelect_Render();
+	else {
+		DebugUI_Draw();
 
-	DebugUI_Draw();
-
-	Gui_SetScale(2);
-	Gui_PushIcon(player->blockInHand, 160 - 32, 60 - 16, 20);
+		Gui_SetScale(2);
+		Gui_PushIcon(player->blockInHand, 160 - 32, 60 - 16, 20);
+	}
 
 	Gui_Render(GFX_BOTTOM);
 

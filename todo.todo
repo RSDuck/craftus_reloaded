@@ -19,6 +19,10 @@ Alles mögliche:
     ☐ Ordentlichen Crashreport anzeigen
     ✔ Funktion hinzufügen, mit der die Färbefarbe zurückgibt(z.B. für Gras) @0.2 @done (16.8.2017, 15:19:27)
     ☐ Hand
+    ☐ Code klar machen zu Laden mehrerer Welten
+        ✔ Menü zum auswählen der Welt @done (21.8.2017, 15:18:49)
+    ☐ Welt wechseln
+    ☐ "Neue Welt erstellen" implementieren
 
 Weltgeneration:
     ☐ Nicht Superflach Welten @0.2
@@ -40,3 +44,4 @@ Bugs:
     ✔ Den Bug mit dem nicht aktualisierenden Chunk fixen @critical @0.2 @done (12.8.2017, 21:52:53)
     ✔ Frustum Culling funktioniert doch immer noch nicht ganz so wie es soll @critical  @0.2 @done (12.8.2017, 22:43:14)
     ✔ Load Chunk Funktion kann zu doppelten Chunks führen @done (13.8.2017, 13:26:22) 
+    ✔ Manchmal wird ein Chunk nicht gespeichert oder geladen @done (21.8.2017, 15:19:03)

@@ -16,29 +16,46 @@ uint32_t hash(char* str) {
 	return hash;
 }
 
+void tileImage32(u32* src, u8* dst, int size);
+
 void Texture_Load(C3D_Tex* result, char* filename) {
 	uint32_t* image = NULL;
 	unsigned int width = 255, height = 255;
 	uint32_t error = lodepng_decode32_file((uint8_t**)&image, &width, &height, filename);
 	if (error == 0 && image != NULL) {
 		uint32_t* imgInLinRam = (uint32_t*)linearAlloc(width * height * sizeof(uint32_t));
-		for (int i = 0; i < width * height; i++) {
-			/*uint8_t r = ((image[i] << 0) & 0xff) >> 4;
-			uint8_t g = ((image[i] << 8) & 0xff) >> 4;
-			uint8_t b = ((image[i] << 16) & 0xff) >> 4;
-			uint8_t a = ((image[i] << 24) & 0xff) >> 4;
-			imgInLinRam[i] = r | (g << 4) | (b << 8) | (a << 12);*/
-			imgInLinRam[i] = __builtin_bswap32(image[i]);
+
+		if (width < 64 || height < 64) {
+			for (int j = 0; j < height; j++)
+				for (int i = 0; i < width; i++) {
+					image[i + j * width] = __builtin_bswap32(image[i + j * width]);
+				}
+		} else {
+			for (int i = 0; i < width * height; i++) {
+				/*uint8_t r = ((image[i] << 0) & 0xff) >> 4;
+				uint8_t g = ((image[i] << 8) & 0xff) >> 4;
+				uint8_t b = ((image[i] << 16) & 0xff) >> 4;
+				uint8_t a = ((image[i] << 24) & 0xff) >> 4;
+				imgInLinRam[i] = r | (g << 4) | (b << 8) | (a << 12);*/
+				imgInLinRam[i] = __builtin_bswap32(image[i]);
+			}
 		}
-		GSPGPU_FlushDataCache(imgInLinRam, width * height * 4);
-		free(image);
 
 		C3D_TexInitVRAM(result, width, height, GPU_RGBA8);
 
-		C3D_SafeDisplayTransfer(
-		    (uint32_t*)imgInLinRam, GX_BUFFER_DIM(width, height), result->data, GX_BUFFER_DIM(width, height),
-		    (GX_TRANSFER_FLIP_VERT(1) | GX_TRANSFER_OUT_TILED(1) | GX_TRANSFER_RAW_COPY(0) | GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) |
-		     GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO)));
+		if (width < 64 || height < 64) tileImage32(image, (u8*)imgInLinRam, width);
+
+		GSPGPU_FlushDataCache(imgInLinRam, width * height * sizeof(uint32_t));
+		free(image);
+
+		if (width < 64 || height < 64) {
+			C3D_SafeTextureCopy(imgInLinRam, 0, result->data, 0, width * height * sizeof(uint32_t), 8);
+		} else {
+			C3D_SafeDisplayTransfer(
+			    (uint32_t*)imgInLinRam, GX_BUFFER_DIM(width, height), result->data, GX_BUFFER_DIM(width, height),
+			    (GX_TRANSFER_FLIP_VERT(1) | GX_TRANSFER_OUT_TILED(1) | GX_TRANSFER_RAW_COPY(0) | GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) |
+			     GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO)));
+		}
 		gspWaitForPPF();
 
 		linearFree(imgInLinRam);
@@ -62,10 +79,10 @@ static inline u32 get_morton_offset(u32 x, u32 y, u32 bytes_per_pixel) {
 	unsigned int offset = (x & ~7) * 8;
 	return (i + offset) * bytes_per_pixel;
 }
+// from sf2d https://github.com/xerpi/sf2dlib/blob/effe77ea81d21c26bad457d4f5ed8bb16ce7b753/libsf2d/source/sf2d_texture.c
 void tileImage32(u32* src, u8* dst, int size) {
-	int i, j;
-	for (j = 0; j < size; j++) {
-		for (i = 0; i < size; i++) {
+	for (int j = 0; j < size; j++) {
+		for (int i = 0; i < size; i++) {
 			u32 coarse_y = j & ~7;
 			u32 dst_offset = get_morton_offset(i, j, 4) + coarse_y * size * 4;
 

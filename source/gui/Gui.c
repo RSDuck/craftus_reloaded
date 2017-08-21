@@ -38,6 +38,7 @@ static Font* font;
 static C3D_Tex whiteTex;
 static C3D_Tex widgetsTex;
 static C3D_Tex iconsTex;
+static C3D_Tex menuBackgroundTex;
 
 static InputData oldInput;
 static InputData input;
@@ -61,6 +62,8 @@ void Gui_Init(int projUniform_) {
 	C3D_TexInit(&whiteTex, 16, 16, GPU_L8);
 	C3D_TexLoadImage(&whiteTex, data, GPU_TEXFACE_2D, 0);
 
+	Texture_Load(&menuBackgroundTex, "romfs:/textures/gui/options_background.png");
+
 	memset(&input, 0x0, sizeof(InputData));
 	memset(&oldInput, 0x0, sizeof(InputData));
 }
@@ -74,6 +77,7 @@ void Gui_Deinit() {
 
 	C3D_TexDelete(&whiteTex);
 	C3D_TexDelete(&widgetsTex);
+	C3D_TexDelete(&menuBackgroundTex);
 }
 
 void Gui_BindTexture(C3D_Tex* texture) { currentTexture = texture; }
@@ -90,6 +94,9 @@ void Gui_BindGuiTexture(GuiTexture texture) {
 			break;
 		case GuiTexture_Icons:
 			currentTexture = &iconsTex;
+			break;
+		case GuiTexture_MenuBackground:
+			currentTexture = &menuBackgroundTex;
 			break;
 		default:
 			break;
@@ -219,9 +226,20 @@ bool Gui_WasCursorInside(int x, int y, int w, int h) {
 	int sclOldInputY = oldInput.touchY / guiScale;
 	return sclOldInputX != 0 && sclOldInputY != 0 && sclOldInputX >= x && sclOldInputX < x + w && sclOldInputY >= y && sclOldInputY < y + h;
 }
+bool Gui_EnteredCursorInside(int x, int y, int w, int h) {
+	int sclOldInputX = oldInput.touchX / guiScale;
+	int sclOldInputY = oldInput.touchY / guiScale;
+
+	return (sclOldInputX == 0 && sclOldInputY == 0) && Gui_IsCursorInside(x, y, w, h);
+}
 void Gui_GetCursorMovement(int* x, int* y) {
-	*x = input.touchX - oldInput.touchX;
-	*y = input.touchY - oldInput.touchX;
+	if ((input.touchX == 0 && input.touchY == 0) || (oldInput.touchX == 0 && oldInput.touchY == 0)) {
+		*x = 0;
+		*y = 0;
+		return;
+	}
+	*x = input.touchX / guiScale - oldInput.touchX / guiScale;
+	*y = input.touchY / guiScale - oldInput.touchY / guiScale;
 }
 
 bool Gui_Button(int x, int y, int w, const char* text) {
@@ -264,8 +282,12 @@ void Gui_Render(gfxScreen_t screen) {
 
 	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, projUniform, &projMtx);
 
-	// C3D_AlphaTest(true, GPU_GREATER, 0);
 	C3D_DepthTest(false, GPU_GREATER, GPU_WRITE_ALL);
+
+	C3D_TexEnv* env = C3D_GetTexEnv(0);
+	C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, 0);
+	C3D_TexEnvOp(env, C3D_Both, 0, 0, 0);
+	C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
 
 	Vertex* usedVertexList = vertexList[screen];
 

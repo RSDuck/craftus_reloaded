@@ -7,7 +7,7 @@
 
 static const int SectorSize = 2048;
 static mpack_node_data_t* nodeDataPool = NULL;
-static const int nodeDataPoolSize = 1024;
+static const int nodeDataPoolSize = 2048;
 const int decompressBufferSize = sizeof(Chunk) * 2;
 static char* decompressBuffer;
 static const int fileBufferSize = sizeof(Chunk) * 2;
