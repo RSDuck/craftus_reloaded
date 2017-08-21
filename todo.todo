@@ -5,7 +5,7 @@ Speichern/Weltenformat:
     ✔ Superchunks implementieren @done (11.8.2017, 15:05:55)
     ✔ Flag für leere Cluster einbauen um Speicher zu sparen @0.2 @done (12.8.2017, 19:21:31)
     ✔ Heightmaps für Chunks generieren @0.2 @done (12.8.2017, 19:21:34)
-    ✘ Altes Speicherformat kompatibel machen @0.2 @cancelled (16.8.2017, 14:47:42)
+    ✔ Altes Speicherformat kompatibel machen @0.2 @done (21.8.2017, 17:29:56)
     ✔ Undead Chunks Geschichte komplett ausbauen und stattdessen einfach eine Liste haben, wo die ältesten Chunks runtergenommen werden @done (14.8.2017, 15:48:40)
 GUI:
     ✔ Ordentliche Sortierung @critical @done (31.7.2017, 14:32:48)
@@ -19,8 +19,8 @@ Alles mögliche:
     ☐ Ordentlichen Crashreport anzeigen
     ✔ Funktion hinzufügen, mit der die Färbefarbe zurückgibt(z.B. für Gras) @0.2 @done (16.8.2017, 15:19:27)
     ☐ Hand
-    ☐ Code klar machen zu Laden mehrerer Welten
-        ✔ Menü zum auswählen der Welt @done (21.8.2017, 15:18:49)
+    ✔ Menü zum auswählen der Welt @done (21.8.2017, 15:18:49)
+    ☐ Welt löschen einbauen
     ☐ Welt wechseln
     ☐ "Neue Welt erstellen" implementieren
 

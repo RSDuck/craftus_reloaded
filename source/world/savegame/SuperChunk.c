@@ -232,19 +232,31 @@ void SuperChunk_LoadChunk(SuperChunk* superchunk, Chunk* chunk) {
 			for (int i = 0; i < CLUSTER_PER_CHUNK; i++) {
 				mpack_node_t cluster = mpack_node_array_at(clusters, i);
 
-				bool empty = mpack_node_bool(mpack_node_map_cstr(cluster, "empty"));
+				chunk->clusters[i].revision = mpack_node_u32(mpack_node_map_cstr(cluster, "revision"));
+
+				mpack_node_t emptyNode = mpack_node_map_cstr_optional(cluster, "empty");
+				bool empty = false;
+				if (mpack_node_type(emptyNode) != mpack_type_nil) {
+					empty = mpack_node_bool(emptyNode);
+					chunk->clusters[i].emptyRevision = chunk->clusters[i].revision;
+				} else
+					chunk->clusters[i].emptyRevision = 0;
+
 				if (!empty)
 					memcpy(chunk->clusters[i].blocks, mpack_node_data(mpack_node_map_cstr(cluster, "blocks")),
 					       sizeof(chunk->clusters[i].blocks));
 
-				chunk->clusters[i].revision = mpack_node_u32(mpack_node_map_cstr(cluster, "revision"));
-				chunk->clusters[i].emptyRevision = chunk->clusters[i].revision;
+				chunk->clusters[i].empty = empty;
 			}
 
 			chunk->genProgress = mpack_node_int(mpack_node_map_cstr(root, "genProgress"));
 
-			memcpy(chunk->heightmap, mpack_node_data(mpack_node_map_cstr(root, "heightmap")), sizeof(chunk->heightmap));
-			chunk->heightmapRevision = chunkInfo.revision;
+			mpack_node_t heightmapNode = mpack_node_map_cstr(root, "heightmap");
+			if (mpack_node_type(heightmapNode) != mpack_type_nil) {
+				memcpy(chunk->heightmap, mpack_node_data(heightmapNode), sizeof(chunk->heightmap));
+				chunk->heightmapRevision = chunkInfo.revision;
+			} else
+				chunk->heightmapRevision = 0;
 
 			if (mpack_tree_destroy(&tree) != mpack_ok) {
 				exit(1);
