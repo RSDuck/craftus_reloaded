@@ -114,7 +114,7 @@ static char* worldGenTypesStr[] = {"Smea", "Superflat"};
 
 static MenuState menustate = MenuState_SelectWorld;
 
-static float max_velocity = 4.f;
+static float max_velocity = 20.f;
 
 void WorldSelect_Render() {
 	Gui_SetScale(2);
@@ -131,16 +131,14 @@ void WorldSelect_Render() {
 	if (menustate == MenuState_SelectWorld) {
 		int movementX = 0, movementY = 0;
 		Gui_GetCursorMovement(&movementX, &movementY);
-		if (movementY == 0) {
-			movementY = velocity;
-			velocity *= 0.2f;
-		}
 		if (Gui_IsCursorInside(0, 0, 160, 2 * 32)) {
-			velocity += movementY;
-			if (velocity > max_velocity) velocity = max_velocity;
-			if (velocity < -max_velocity) velocity = -max_velocity;
+			velocity += movementY / 2.f;
+			velocity = CLAMP(velocity, -max_velocity, max_velocity);
 		}
 		scroll += velocity;
+		velocity *= 0.75f;
+		if (ABS(velocity) < 0.001f) velocity = 0.f;
+
 		int maximumSize = CHAR_HEIGHT * 2 * worlds.length;
 		if (scroll < -maximumSize) scroll = -maximumSize;
 		if (scroll > 0) scroll = 0;
