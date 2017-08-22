@@ -1,5 +1,7 @@
 #include <gui/FontLoader.h>
 
+#include <misc/Crash.h>
+
 #include <lodepng/lodepng.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,7 +49,6 @@ void FontLoader_Init(Font* font, const char* filename) {
 
 		linearFree(imgInLinRam);
 	} else {
-		printf("Failed to load %s\n", filename);
-		exit(EXIT_FAILURE);
+		Crash("Failed to load font %s\n", filename);
 	}
 }

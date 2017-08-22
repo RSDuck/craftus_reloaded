@@ -7,6 +7,7 @@
 #include <mpack/mpack.h>
 
 #include <gui/DebugUI.h>
+#include <misc/Crash.h>
 
 #define mkdirFlags S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
 
@@ -48,8 +49,9 @@ void SaveManager_Load(SaveManager* mgr, char* path) {
 		mgr->player->pitch = mpack_node_float(mpack_node_map_cstr(player, "pitch"));
 		mgr->player->yaw = mpack_node_float(mpack_node_map_cstr(player, "yaw"));
 
-		if (mpack_tree_destroy(&levelTree) != mpack_ok) {
-			exit(1);
+		mpack_error_t err = mpack_tree_destroy(&levelTree);
+		if (err != mpack_ok) {
+			Crash("Mpack error %d while loading world manifest %s", err, path);
 		}
 	}
 }
@@ -83,8 +85,9 @@ void SaveManager_Unload(SaveManager* mgr) {
 
 	mpack_finish_map(&writer);
 
-	if (mpack_writer_destroy(&writer) != mpack_ok) {
-		exit(1);
+	mpack_error_t err = mpack_writer_destroy(&writer);
+	if (err != mpack_ok) {
+		Crash("Mpack error %d while saving world manifest", err);
 	}
 
 	for (int i = 0; i < mgr->superchunks.length; i++) {

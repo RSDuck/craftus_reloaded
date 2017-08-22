@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <misc/Crash.h>
+
 static const int SectorSize = 2048;
 static mpack_node_data_t* nodeDataPool = NULL;
 static const int nodeDataPoolSize = 2048;
@@ -71,7 +73,7 @@ void SuperChunk_Init(SuperChunk* superchunk, int x, int z) {
 
 		mpack_error_t err = mpack_tree_destroy(&tree);
 		if (err != mpack_ok) {
-			exit(1);
+			Crash("MPack error %d while loading superchunk manifest %d %d", err, x, z);
 		}
 	} else {
 		memset(superchunk->grid, 0x0, sizeof(superchunk->grid));
@@ -122,8 +124,9 @@ void SuperChunk_SaveIndex(SuperChunk* superchunk) {
 
 	mpack_finish_map(&writer);
 
-	if (mpack_writer_destroy(&writer) != mpack_ok) {
-		exit(1);
+	mpack_error_t err = mpack_writer_destroy(&writer);
+	if (err != mpack_ok) {
+		Crash("Mpack error %d while saving superchunk index %d %d", err, superchunk->x, superchunk->z);
 	}
 }
 
@@ -193,8 +196,7 @@ void SuperChunk_SaveChunk(SuperChunk* superchunk, Chunk* chunk) {
 		mpack_finish_map(&writer);
 		mpack_error_t err = mpack_writer_destroy(&writer);
 		if (err != mpack_ok) {
-			printf("mpack error %d\n", err);
-			exit(1);
+			Crash("MPack error %d while saving chunk(%d, %d) to superchunk", err, chunk->x, chunk->z);
 		}
 
 		size_t uncompressedSize = mpack_writer_buffer_used(&writer);
@@ -258,8 +260,9 @@ void SuperChunk_LoadChunk(SuperChunk* superchunk, Chunk* chunk) {
 			} else
 				chunk->heightmapRevision = 0;
 
-			if (mpack_tree_destroy(&tree) != mpack_ok) {
-				exit(1);
+			mpack_error_t err = mpack_tree_destroy(&tree);
+			if (err != mpack_ok) {
+				Crash("MPack error %d while loading chunk(%d %d) from superchunk", err, chunk->x, chunk->z);
 			}
 
 			chunk->revision = chunkInfo.revision;

@@ -1,13 +1,14 @@
 #include <world/ChunkWorker.h>
 
+#include <misc/Crash.h>
+
 #include <stdio.h>
 
 void ChunkWorker_Init(ChunkWorker* chunkworker) {
 	WorkQueue_Init(&chunkworker->queue);
 
 	if (R_FAILED(APT_SetAppCpuTimeLimit(30))) {
-		printf("Couldn't set AppCpuTimeLimit\n");
-		exit(EXIT_FAILURE);
+		Crash("Couldn't set AppCpuTimeLimit");
 	}
 
 	for (int i = 0; i < WorkerItemTypes_Count; i++) vec_init(&chunkworker->handler[i]);
@@ -16,8 +17,7 @@ void ChunkWorker_Init(ChunkWorker* chunkworker) {
 	svcGetThreadPriority(&prio, CUR_THREAD_HANDLE);
 	chunkworker->thread = threadCreate(&ChunkWorker_Mainloop, (void*)chunkworker, CHUNKWORKER_THREAD_STACKSIZE, /*prio - 1*/ 0x3f, 1, false);
 	if (!chunkworker->thread) {
-		printf("Couldn't create worker thread\n");
-		exit(EXIT_FAILURE);
+		Crash("Couldn't create worker thread");
 	}
 
 	chunkworker->working = false;
@@ -26,6 +26,7 @@ void ChunkWorker_Init(ChunkWorker* chunkworker) {
 static volatile ChunkWorker* workerToStop = NULL;
 void ChunkWorker_Deinit(ChunkWorker* chunkworker) {
 	workerToStop = chunkworker;
+	LightEvent_Signal(&chunkworker->queue.itemAddedEvent);
 	threadJoin(chunkworker->thread, UINT64_MAX);
 
 	threadFree(chunkworker->thread);

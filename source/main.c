@@ -22,7 +22,7 @@
 #include <citro3d.h>
 
 void exitHandler() {
-	printf("Fatal error, press start to exit\n");
+	printf("\n\nFatal error, press start to exit\n");
 	while (aptMainLoop()) {
 		gspWaitForVBlank();
 
@@ -156,7 +156,7 @@ int main() {
 
 	ChunkWorker_Deinit(&chunkWorker);
 
-	SaveManager_Unload(&savemgr);
+	if (gamestate == GameState_Playing) SaveManager_Unload(&savemgr);
 	SaveManager_Deinit(&savemgr);
 
 	SuperChunk_DeinitPools();

@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <misc/Crash.h>
+
 uint32_t hash(char* str) {
 	unsigned long hash = 5381;
 	int c;
@@ -60,8 +62,7 @@ void Texture_Load(C3D_Tex* result, char* filename) {
 
 		linearFree(imgInLinRam);
 	} else {
-		printf("Failed to load %s\n", filename);
-		exit(EXIT_FAILURE);
+		Crash("Failed to load texture %s\n", filename);
 	}
 }
 

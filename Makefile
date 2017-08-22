@@ -33,6 +33,11 @@ DATA		:=	data
 INCLUDES	:=	dependencies include
 ROMFS		:=	romfs
 
+APP_AUTHOR	:= RSDuck
+APP_TITLE	:= Craftus Reloaded
+APP_DESCRIPTION := A Minecraft clone for 3DS
+ICON		:=	icon/craftusreloaded.png
+
 DEBUG		?=	0
 ifeq ($(DEBUG), 0)
 BUILD		:=	build
@@ -40,7 +45,7 @@ CFLAGS_ADD	:=	-fomit-frame-pointer -O2
 LIBS	:= -lcitro3d -lctru -lm
 else
 BUILD		:=	debug_build
-CFLAGS_ADD	:=	-Og
+CFLAGS_ADD	:=	-Og -D_DEBUG
 LIBS	:= -lcitro3dd -lctrud -lm
 endif
 
@@ -143,6 +148,8 @@ $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
+	@makerom -f cia -o $(TARGET).cia -rsf $(TARGET).rsf -target t -exefslogo -elf $(TARGET).elf -icon $(TARGET).smdh -banner banner.bin
+	@echo built ... $(TARGET).cia
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
@@ -199,7 +206,6 @@ endef
 %.shbin.o : %.shlist
 	@echo $(notdir $<)
 	@$(call shader-as,$(foreach file,$(shell cat $<),$(dir $<)/$(file)))
-
 -include $(DEPENDS)
 
 #---------------------------------------------------------------------------------------

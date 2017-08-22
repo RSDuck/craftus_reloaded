@@ -168,10 +168,16 @@ bool WorldSelect_Update(char* out_worldpath, char* out_name) {
 	if (clicked_new_world) {
 		static SwkbdState swkbd;
 		static char name[WORLD_NAME_SIZE];
+
+#ifndef _DEBUG
 		swkbdInit(&swkbd, SWKBD_TYPE_WESTERN, 2, WORLD_NAME_SIZE);
 		swkbdSetHintText(&swkbd, "Enter the world name");
 
 		int button = swkbdInputText(&swkbd, name, 12);
+#else
+		strcpy(name, "testworld");
+		int button = 0;
+#endif
 
 		strcpy(out_name, name);
 		if (button != SWKBD_BUTTON_NONE) {
