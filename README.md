@@ -2,8 +2,10 @@
 
 It's been a while since I started developing this version of Craftus. I started to do a rewrite, because the old Craftus was beyond fixable. Probably 15% is copied from the old Craftus the remaining part is rewritten.
 
-![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/3.png)
-![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/1.png)
+![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/5.png)|![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/6.png)
+----|----
+![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/1.png)|![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/4.png)
+
 
 ## Features
 
