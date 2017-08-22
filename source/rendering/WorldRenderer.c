@@ -8,6 +8,8 @@
 
 #include <citro3d.h>
 
+#include <rendering/Clouds.h>
+
 static Player* player;
 static World* world;
 
@@ -64,11 +66,15 @@ void WorldRenderer_Init(Player* player_, World* world_, WorkQueue* workqueue_, i
 	C3D_FogGasMode(GPU_FOG, GPU_PLAIN_DENSITY, false);
 	C3D_FogColor(0xffd990);
 	C3D_FogLutBind(&fogLut);
+
+	Clouds_Init();
 }
 void WorldRenderer_Deinit() {
 	vec_deinit(&renderingQueue);
 	vec_deinit(&transparentClusters);
 	Cursor_Deinit();
+
+	Clouds_Deinit();
 }
 
 static void renderWorld() {
@@ -82,7 +88,8 @@ static void renderWorld() {
 	vec_clear(&transparentClusters);
 
 	int pY = WorldToChunkCoord(FastFloor(player->position.y));
-	Chunk* pChunk = World_GetChunk(world, WorldToChunkCoord(FastFloor(player->position.x)), WorldToChunkCoord(FastFloor(player->position.z)));
+	Chunk* pChunk =
+	    World_GetChunk(world, WorldToChunkCoord(FastFloor(player->position.x)), WorldToChunkCoord(FastFloor(player->position.z)));
 	vec_push(&renderingQueue, ((RenderStep){&pChunk->clusters[pY < 0 ? 0 : pY], pChunk, Direction_Invalid}));
 	chunkRendered[CHUNKCACHE_SIZE / 2][pY < 0 ? 0 : pY][CHUNKCACHE_SIZE / 2] = 1;
 
@@ -116,11 +123,13 @@ static void renderWorld() {
 			const int* offset = DirectionToOffset[dir];
 
 			int newX = chunk->x + offset[0], newY = cluster->y + offset[1], newZ = chunk->z + offset[2];
-			if (newX < world->cacheTranslationX - CHUNKCACHE_SIZE / 2 + 1 || newX > world->cacheTranslationX + CHUNKCACHE_SIZE / 2 - 1 ||
-			    newZ < world->cacheTranslationZ - CHUNKCACHE_SIZE / 2 + 1 || newZ > world->cacheTranslationZ + CHUNKCACHE_SIZE / 2 - 1 ||
-			    newY < 0 || newY >= CLUSTER_PER_CHUNK)
+			if (newX < world->cacheTranslationX - CHUNKCACHE_SIZE / 2 + 1 ||
+			    newX > world->cacheTranslationX + CHUNKCACHE_SIZE / 2 - 1 ||
+			    newZ < world->cacheTranslationZ - CHUNKCACHE_SIZE / 2 + 1 ||
+			    newZ > world->cacheTranslationZ + CHUNKCACHE_SIZE / 2 - 1 || newY < 0 || newY >= CLUSTER_PER_CHUNK)
 				continue;
-			float3 dist = f3_sub(f3_new(newX * CHUNK_SIZE + CHUNK_SIZE / 2, newY * CHUNK_SIZE + CHUNK_SIZE / 2, newZ * CHUNK_SIZE + CHUNK_SIZE / 2),
+			float3 dist = f3_sub(f3_new(newX * CHUNK_SIZE + CHUNK_SIZE / 2, newY * CHUNK_SIZE + CHUNK_SIZE / 2,
+						    newZ * CHUNK_SIZE + CHUNK_SIZE / 2),
 					     playerPos);
 			if (f3_dot(dist, dist) > (3.f * CHUNK_SIZE) * (3.f * CHUNK_SIZE)) {
 				continue;
@@ -128,7 +137,8 @@ static void renderWorld() {
 
 			if (clusterWasRendered(newX, newY, newZ) & 1) continue;
 
-			if (!ChunkCanBeSeenThrough(cluster->seeThrough, step.enteredFrom, i) && step.enteredFrom != Direction_Invalid) continue;
+			if (!ChunkCanBeSeenThrough(cluster->seeThrough, step.enteredFrom, i) && step.enteredFrom != Direction_Invalid)
+				continue;
 
 			C3D_FVec chunkPosition = FVec3_New(newX * CHUNK_SIZE, newY * CHUNK_SIZE, newZ * CHUNK_SIZE);
 			if (!Camera_IsAABBVisible(&camera, chunkPosition, FVec3_New(CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE))) continue;
@@ -182,6 +192,8 @@ void WorldRenderer_Render(float iod) {
 	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, projectionUniform, &camera.vp);
 
 	renderWorld();
+
+	Clouds_Render(projectionUniform, &camera.vp, world, player->position.x, player->position.z);
 
 	if (player->blockInActionRange)
 		Cursor_Draw(projectionUniform, &camera.vp, world, player->viewRayCast.x, player->viewRayCast.y, player->viewRayCast.z,

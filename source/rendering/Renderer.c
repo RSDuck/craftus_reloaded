@@ -5,6 +5,7 @@
 #include <gui/Gui.h>
 #include <gui/WorldSelect.h>
 #include <rendering/Camera.h>
+#include <rendering/Clouds.h>
 #include <rendering/Cursor.h>
 #include <rendering/PolyGen.h>
 #include <rendering/TextureMap.h>
@@ -25,6 +26,8 @@ static C3D_RenderTarget* lowerScreen;
 static DVLB_s* world_dvlb;
 static shaderProgram_s world_shader;
 static int world_shader_uLocProjection;
+
+static C3D_Tex logoTex;
 
 static World* world;
 static Player* player;
@@ -72,8 +75,12 @@ void Renderer_Init(World* world_, Player* player_, WorkQueue* queue, GameState* 
 	C3D_CullFace(GPU_CULL_BACK_CCW);
 
 	Block_Init();
+
+	Texture_Load(&logoTex, "romfs:/textures/gui/title/craftus.png");
 }
 void Renderer_Deinit() {
+	C3D_TexDelete(&logoTex);
+
 	Block_Deinit();
 
 	PolyGen_Deinit();
@@ -110,6 +117,26 @@ void Renderer_Render() {
 
 			Gui_BindGuiTexture(GuiTexture_Widgets);
 			if (iod == 0.f) Gui_PushQuad(200 / 2 - 16 / 2, 120 / 2 - 16 / 2, 0, 16, 16, 240, 0, 16, 16);
+		} else {
+			C3D_Mtx projection;
+			Mtx_PerspStereoTilt(&projection, C3D_AngleFromDegrees(90.f), ((400.f) / (240.f)), 0.22f, 4.f * CHUNK_SIZE,
+					    !i ? -iod : iod, 3.f, false);
+
+			C3D_Mtx view;
+			Mtx_Identity(&view);
+			Mtx_Translate(&view, 0.f, -70.f, 0.f, false);
+
+			Mtx_RotateX(&view, -C3D_AngleFromDegrees(30.f), true);
+
+			C3D_Mtx vp;
+			Mtx_Multiply(&vp, &projection, &view);
+
+			Clouds_Render(world_shader_uLocProjection, &vp, world, 0.f, 0.f);
+
+			Gui_BindTexture(&logoTex);
+
+			Gui_SetScale(2);
+			Gui_PushQuad(100 / 2 - 76 / 2, 120 / 2, 0, 256, 64, 0, 0, 128, 32);
 		}
 
 		Gui_Render(GFX_TOP);
@@ -118,7 +145,7 @@ void Renderer_Render() {
 	}
 
 	C3D_FrameDrawOn(lowerScreen);
-	
+
 	if (*gamestate == GameState_SelectWorld)
 		WorldSelect_Render();
 	else {

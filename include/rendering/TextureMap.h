@@ -21,3 +21,5 @@ typedef struct {
 
 void Texture_MapInit(Texture_Map* map, const char** files, int num_files);
 Texture_MapIcon Texture_MapGetIcon(Texture_Map* map, char* filename);
+
+void Texture_TileImage8(uint8_t* src, uint8_t* dst, int size);

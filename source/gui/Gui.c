@@ -49,7 +49,7 @@ void Gui_Init(int projUniform_) {
 	vec_init(&cmdList);
 
 	vertexList[0] = linearAlloc(sizeof(Vertex) * 256);
-	vertexList[1] = linearAlloc(sizeof(Vertex) * 4096);
+	vertexList[1] = linearAlloc(sizeof(Vertex) * (4096 + 1024));
 
 	projUniform = projUniform_;
 

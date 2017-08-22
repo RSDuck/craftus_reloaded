@@ -18,7 +18,7 @@ uint32_t hash(char* str) {
 	return hash;
 }
 
-void tileImage32(u32* src, u8* dst, int size);
+void tileImage32(u32* src, u8* dst, int sizex, int sizez);
 
 void Texture_Load(C3D_Tex* result, char* filename) {
 	uint32_t* image = NULL;
@@ -45,7 +45,7 @@ void Texture_Load(C3D_Tex* result, char* filename) {
 
 		C3D_TexInitVRAM(result, width, height, GPU_RGBA8);
 
-		if (width < 64 || height < 64) tileImage32(image, (u8*)imgInLinRam, width);
+		if (width < 64 || height < 64) tileImage32(image, (u8*)imgInLinRam, width, height);
 
 		GSPGPU_FlushDataCache(imgInLinRam, width * height * sizeof(uint32_t));
 		free(image);
@@ -55,8 +55,9 @@ void Texture_Load(C3D_Tex* result, char* filename) {
 		} else {
 			C3D_SafeDisplayTransfer(
 			    (uint32_t*)imgInLinRam, GX_BUFFER_DIM(width, height), result->data, GX_BUFFER_DIM(width, height),
-			    (GX_TRANSFER_FLIP_VERT(1) | GX_TRANSFER_OUT_TILED(1) | GX_TRANSFER_RAW_COPY(0) | GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) |
-			     GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO)));
+			    (GX_TRANSFER_FLIP_VERT(1) | GX_TRANSFER_OUT_TILED(1) | GX_TRANSFER_RAW_COPY(0) |
+			     GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGBA8) |
+			     GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO)));
 		}
 		gspWaitForPPF();
 
@@ -81,14 +82,25 @@ static inline u32 get_morton_offset(u32 x, u32 y, u32 bytes_per_pixel) {
 	return (i + offset) * bytes_per_pixel;
 }
 // from sf2d https://github.com/xerpi/sf2dlib/blob/effe77ea81d21c26bad457d4f5ed8bb16ce7b753/libsf2d/source/sf2d_texture.c
-void tileImage32(u32* src, u8* dst, int size) {
+void tileImage32(u32* src, u8* dst, int sizex, int sizey) {
+	for (int j = 0; j < sizey; j++) {
+		for (int i = 0; i < sizex; i++) {
+			u32 coarse_y = j & ~7;
+			u32 dst_offset = get_morton_offset(i, j, 4) + coarse_y * sizex * 4;
+
+			u32 v = src[i + (sizey - 1 - j) * sizex];
+			*(u32*)(dst + dst_offset) = v;
+		}
+	}
+}
+void Texture_TileImage8(uint8_t* src, uint8_t* dst, int size) {
 	for (int j = 0; j < size; j++) {
 		for (int i = 0; i < size; i++) {
 			u32 coarse_y = j & ~7;
-			u32 dst_offset = get_morton_offset(i, j, 4) + coarse_y * size * 4;
+			u32 dst_offset = get_morton_offset(i, j, 1) + coarse_y * size;
 
-			u32 v = src[i + (size - 1 - j) * size];
-			*(u32*)(dst + dst_offset) = v;
+			u8 v = src[i + (size - 1 - j) * size];
+			*(dst + dst_offset) = v;
 		}
 	}
 }
@@ -98,14 +110,18 @@ void downscaleImage(u8* data, int size) {
 		for (i = 0; i < size; i++) {
 			const u32 offset = (i + j * size) * 4;
 			const u32 offset2 = (i * 2 + j * 2 * size * 2) * 4;
-			data[offset + 0] =
-			    (data[offset2 + 0 + 0] + data[offset2 + 4 + 0] + data[offset2 + size * 4 * 2 + 0] + data[offset2 + (size * 2 + 1) * 4 + 0]) / 4;
-			data[offset + 1] =
-			    (data[offset2 + 0 + 1] + data[offset2 + 4 + 1] + data[offset2 + size * 4 * 2 + 1] + data[offset2 + (size * 2 + 1) * 4 + 1]) / 4;
-			data[offset + 2] =
-			    (data[offset2 + 0 + 2] + data[offset2 + 4 + 2] + data[offset2 + size * 4 * 2 + 2] + data[offset2 + (size * 2 + 1) * 4 + 2]) / 4;
-			data[offset + 3] =
-			    (data[offset2 + 0 + 3] + data[offset2 + 4 + 3] + data[offset2 + size * 4 * 2 + 3] + data[offset2 + (size * 2 + 1) * 4 + 3]) / 4;
+			data[offset + 0] = (data[offset2 + 0 + 0] + data[offset2 + 4 + 0] + data[offset2 + size * 4 * 2 + 0] +
+					    data[offset2 + (size * 2 + 1) * 4 + 0]) /
+					   4;
+			data[offset + 1] = (data[offset2 + 0 + 1] + data[offset2 + 4 + 1] + data[offset2 + size * 4 * 2 + 1] +
+					    data[offset2 + (size * 2 + 1) * 4 + 1]) /
+					   4;
+			data[offset + 2] = (data[offset2 + 0 + 2] + data[offset2 + 4 + 2] + data[offset2 + size * 4 * 2 + 2] +
+					    data[offset2 + (size * 2 + 1) * 4 + 2]) /
+					   4;
+			data[offset + 3] = (data[offset2 + 0 + 3] + data[offset2 + 4 + 3] + data[offset2 + size * 4 * 2 + 3] +
+					    data[offset2 + (size * 2 + 1) * 4 + 3]) /
+					   4;
 		}
 	}
 }
@@ -157,13 +173,15 @@ void Texture_MapInit(Texture_Map* map, const char** files, int num_files) {
 	}
 
 	GSPGPU_FlushDataCache(buffer, maxSize);
-	if (!C3D_TexInitWithParams(&map->texture, NULL, (C3D_TexInitParams){TEXTURE_MAPSIZE, TEXTURE_MAPSIZE, mipmapLevels, GPU_RGBA8, GPU_TEX_2D, true}))
+	if (!C3D_TexInitWithParams(&map->texture, NULL,
+				   (C3D_TexInitParams){TEXTURE_MAPSIZE, TEXTURE_MAPSIZE, mipmapLevels, GPU_RGBA8, GPU_TEX_2D, true}))
 		printf("Couldn't alloc texture memory\n");
 	C3D_TexSetFilter(&map->texture, GPU_NEAREST, GPU_NEAREST);
 
-	C3D_SafeDisplayTransfer(buffer, GX_BUFFER_DIM(TEXTURE_MAPSIZE, TEXTURE_MAPSIZE), map->texture.data, GX_BUFFER_DIM(TEXTURE_MAPSIZE, TEXTURE_MAPSIZE),
-				(GX_TRANSFER_FLIP_VERT(1) | GX_TRANSFER_OUT_TILED(1) | GX_TRANSFER_RAW_COPY(0) | GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) |
-				 GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO)));
+	C3D_SafeDisplayTransfer(
+	    buffer, GX_BUFFER_DIM(TEXTURE_MAPSIZE, TEXTURE_MAPSIZE), map->texture.data, GX_BUFFER_DIM(TEXTURE_MAPSIZE, TEXTURE_MAPSIZE),
+	    (GX_TRANSFER_FLIP_VERT(1) | GX_TRANSFER_OUT_TILED(1) | GX_TRANSFER_RAW_COPY(0) | GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) |
+	     GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO)));
 	gspWaitForPPF();
 
 	int size = TEXTURE_MAPSIZE / 2;
@@ -174,7 +192,7 @@ void Texture_MapInit(Texture_Map* map, const char** files, int num_files) {
 	for (int i = 0; i < mipmapLevels; i++) {
 		downscaleImage((u8*)buffer, size);
 
-		tileImage32(buffer, (u8*)tiledImage, size);
+		tileImage32(buffer, (u8*)tiledImage, size, size);
 
 		GSPGPU_FlushDataCache(tiledImage, size * size * 4);
 
