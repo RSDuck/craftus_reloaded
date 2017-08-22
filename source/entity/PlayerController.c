@@ -5,11 +5,15 @@
 
 #include <gui/DebugUI.h>
 
+#include <ini/ini.h>
+#include <unistd.h>
+
 #ifdef _3DS
 #include <3ds.h>
-#define PLATFORM_BUTTONS 17
-const char* platform_key_names[PLATFORM_BUTTONS] = {"Not Set", "A",     "B",     "X",      "Y",      "L",	"R",	"Start",    "Select",
-						    "DUp",     "DDown", "DLeft", "DRight", "CircUp", "CircDown", "CircLeft", "CircRight"};
+#define PLATFORM_BUTTONS 23
+const char* platform_key_names[PLATFORM_BUTTONS] = {"Not Set",   "A",	"B",	  "X",		 "Y",		"L",      "R",	"Start",
+						    "Select",    "DUp",      "DDown",      "DLeft",      "DRight",      "CircUp", "CircDown", "CircLeft",
+						    "CircRight", "CStickUp", "CStickDown", "CStickLeft", "CStickRight", "ZL",     "ZR"};
 enum { K3DS_Undefined = 0,
        K3DS_A,
        K3DS_B,
@@ -26,7 +30,13 @@ enum { K3DS_Undefined = 0,
        K3DS_CPAD_UP,
        K3DS_CPAD_DOWN,
        K3DS_CPAD_LEFT,
-       K3DS_CPAD_RIGHT };
+       K3DS_CPAD_RIGHT,
+       K3DS_CSTICK_UP,
+       K3DS_CSTICK_DOWN,
+       K3DS_CSTICK_LEFT,
+       K3DS_CSTICK_RIGHT,
+       K3DS_ZL,
+       K3DS_ZR };
 const PlayerControlScheme platform_default_scheme = {.forward = K3DS_X,
 						     .backward = K3DS_B,
 						     .strafeLeft = K3DS_L,
@@ -41,6 +51,20 @@ const PlayerControlScheme platform_default_scheme = {.forward = K3DS_X,
 						     .switchBlockLeft = K3DS_DLEFT,
 						     .switchBlockRight = K3DS_DRIGHT,
 						     .openCmd = K3DS_SELECT};
+const PlayerControlScheme n3ds_default_scheme = {.forward = K3DS_CPAD_UP,
+						 .backward = K3DS_CPAD_DOWN,
+						 .strafeLeft = K3DS_CPAD_LEFT,
+						 .strafeRight = K3DS_CPAD_RIGHT,
+						 .lookLeft = K3DS_CSTICK_LEFT,
+						 .lookRight = K3DS_CSTICK_RIGHT,
+						 .lookUp = K3DS_CSTICK_UP,
+						 .lookDown = K3DS_CSTICK_DOWN,
+						 .placeBlock = K3DS_L,
+						 .breakBlock = K3DS_R,
+						 .jump = K3DS_ZL,
+						 .switchBlockLeft = K3DS_DLEFT,
+						 .switchBlockRight = K3DS_DRIGHT,
+						 .openCmd = K3DS_SELECT};
 static void convertPlatformInput(InputData* input, float ctrls[], bool keysdown[], bool keysup[]) {
 #define reg_bin_key(i, k)                                                         \
 	ctrls[(i)] = (float)((input->keysdown & (k)) || (input->keysheld & (k))); \
@@ -67,6 +91,9 @@ static void convertPlatformInput(InputData* input, float ctrls[], bool keysdown[
 	reg_bin_key(K3DS_DLEFT, KEY_DLEFT);
 	reg_bin_key(K3DS_DRIGHT, KEY_DRIGHT);
 
+	reg_bin_key(K3DS_ZL, KEY_ZL);
+	reg_bin_key(K3DS_ZR, KEY_ZR);
+
 	float circX = (float)input->circlePadX / 0x9c;
 	float circY = (float)input->circlePadY / 0x9c;
 
@@ -79,6 +106,15 @@ static void convertPlatformInput(InputData* input, float ctrls[], bool keysdown[
 	reg_cpad_key(K3DS_CPAD_DOWN, circY, KEY_CPAD_DOWN);
 	reg_cpad_key(K3DS_CPAD_LEFT, circX, KEY_CPAD_LEFT);
 	reg_cpad_key(K3DS_CPAD_RIGHT, circX, KEY_CPAD_RIGHT);
+
+	float cstickX = (float)input->cStickX / 0x9c;
+	float cstickY = (float)input->cStickY / 0x9c;
+
+	reg_cpad_key(K3DS_CSTICK_UP, cstickY, KEY_CSTICK_UP);
+	reg_cpad_key(K3DS_CSTICK_DOWN, cstickY, KEY_CSTICK_DOWN);
+	reg_cpad_key(K3DS_CSTICK_LEFT, cstickX, KEY_CSTICK_LEFT);
+	reg_cpad_key(K3DS_CSTICK_RIGHT, cstickX, KEY_CSTICK_RIGHT);
+
 #undef reg_bin_key
 }
 #else
@@ -89,7 +125,6 @@ typedef struct {
 	float keys[PLATFORM_BUTTONS];
 	bool keysup[PLATFORM_BUTTONS];
 	bool keysdown[PLATFORM_BUTTONS];
-	int layer;
 } PlatformAgnosticInput;
 
 static inline float IsKeyDown(KeyCombo combo, PlatformAgnosticInput* input) { return input->keys[combo]; }
@@ -98,9 +133,85 @@ static inline bool WasKeyReleased(KeyCombo combo, PlatformAgnosticInput* input) 
 void PlayerController_Init(PlayerController* ctrl, Player* player) {
 	ctrl->breakPlaceTimeout = 0.f;
 	ctrl->player = player;
-	ctrl->controlScheme = platform_default_scheme;
-	// TODO: alternative Steuerung aus Datei laden 2 %
+
+	bool isNew3ds = false;
+	APT_CheckNew3DS(&isNew3ds);
+	if (isNew3ds)
+		ctrl->controlScheme = n3ds_default_scheme;
+	else
+		ctrl->controlScheme = platform_default_scheme;
+
 	ctrl->openedCmd = false;
+
+	const char path[] = "sdmc:/craftus/options.ini";
+	if (access(path, F_OK) != -1) {
+		ini_t* cfg = ini_load(path);
+
+		char buffer[64];
+
+#define loadKey(variable)                                             \
+	if (ini_sget(cfg, "controls", #variable, "%s", buffer)) {     \
+		for (int i = 0; i < PLATFORM_BUTTONS; i++) {          \
+			if (!strcmp(platform_key_names[i], buffer)) { \
+				ctrl->controlScheme.variable = i;     \
+				break;                                \
+			}                                             \
+		}                                                     \
+	}
+
+		loadKey(forward);
+		loadKey(backward);
+		loadKey(strafeLeft);
+		loadKey(strafeRight);
+		loadKey(lookLeft);
+		loadKey(lookRight);
+		loadKey(lookUp);
+		loadKey(lookDown);
+		loadKey(placeBlock);
+		loadKey(breakBlock);
+		loadKey(jump);
+		loadKey(switchBlockLeft);
+		loadKey(switchBlockRight);
+		loadKey(openCmd);
+#undef loadKey
+
+		ini_free(cfg);
+	} else {
+		FILE* f = fopen(path, "w");
+
+		fprintf(f, "[controls]\n");
+		fprintf(f, "; The allowed key values are: \n; ");
+		int j = 0;
+		for (int i = 0; i < PLATFORM_BUTTONS - 1; i++) {
+			fprintf(f, "%s, ", platform_key_names[i]);
+			if (++j == 5) {
+				j = 0;
+				fprintf(f, "\n ; ");
+			}
+		}
+		fprintf(f, "%s\n\n", platform_key_names[PLATFORM_BUTTONS - 1]);
+
+#define writeKey(key) fprintf(f, #key "=%s\n", platform_key_names[ctrl->controlScheme.key]);
+
+		writeKey(forward);
+		writeKey(backward);
+		writeKey(strafeLeft);
+		writeKey(strafeRight);
+		writeKey(lookLeft);
+		writeKey(lookRight);
+		writeKey(lookUp);
+		writeKey(lookDown);
+		writeKey(placeBlock);
+		writeKey(breakBlock);
+		writeKey(jump);
+		writeKey(switchBlockLeft);
+		writeKey(switchBlockRight);
+		writeKey(openCmd);
+
+#undef writeKey
+
+		fclose(f);
+	}
 }
 
 void PlayerController_Update(PlayerController* ctrl, InputData input, float dt) {

@@ -107,10 +107,14 @@ int main() {
 		circlePosition circlePos;
 		hidCircleRead(&circlePos);
 
+		circlePosition cstickPos;
+		hidCstickRead(&cstickPos);
+
 		touchPosition touchPos;
 		hidTouchRead(&touchPos);
 
-		InputData inputData = (InputData){keysdown, hidKeysDown(), hidKeysUp(), circlePos.dx, circlePos.dy, touchPos.px, touchPos.py};
+		InputData inputData =
+		    (InputData){keysdown, hidKeysDown(), hidKeysUp(), circlePos.dx, circlePos.dy, touchPos.px, touchPos.py, cstickPos.dx, cstickPos.dy};
 
 		if (gamestate == GameState_Playing) {
 			while (timeAccum >= 1.f / 20.f) {
