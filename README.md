@@ -2,6 +2,9 @@
 
 It's been a while since I started developing this version of Craftus. I started to do a rewrite, because the old Craftus was beyond fixable. Probably 15% is copied from the old Craftus the remaining part is rewritten.
 
+![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/3.png)
+![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/1.png)
+
 ## Features
 
 * An infinte world(in theory)
@@ -21,4 +24,5 @@ It's been a while since I started developing this version of Craftus. I started 
     * Fincs for citro3d
 * XSSheep, for the textures, taken from his [resourcepack](http://www.minecraftforum.net/forums/mapping-and-modding/resource-packs/1242533-pixel-perfection-now-with-polar-bears-1-11) which is licensed under [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/)
 * Tommaso Checchi, for his [culling algorithm](https://tomcc.github.io/2014/08/31/visibility-1.html), orginally developed for the use in MC PE
+* Of course all other MC devs, how could I forget them?
 * All people who worked on the libraries Craftus is depending on(see the dependencies folder)
