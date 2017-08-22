@@ -17,7 +17,10 @@
 #include <world/World.h>
 #include <world/savegame/SaveManager.h>
 #include <world/savegame/SuperChunk.h>
+#include <world/worldgen/SmeaGen.h>
 #include <world/worldgen/SuperFlatGen.h>
+
+#include <sino/sino.h>
 
 #include <citro3d.h>
 
@@ -44,6 +47,7 @@ int main() {
 	atexit(&exitHandler);
 
 	SuperFlatGen flatGen;
+	SmeaGen smeaGen;
 
 	SuperChunk_InitPools();
 
@@ -51,18 +55,22 @@ int main() {
 
 	ChunkWorker chunkWorker;
 	ChunkWorker_Init(&chunkWorker);
-	ChunkWorker_AddHandler(&chunkWorker, WorkerItemType_PolyGen, (WorkerFuncObj){&PolyGen_GeneratePolygons, NULL});
-	ChunkWorker_AddHandler(&chunkWorker, WorkerItemType_BaseGen, (WorkerFuncObj){&SuperFlatGen_Generate, &flatGen});
+	ChunkWorker_AddHandler(&chunkWorker, WorkerItemType_PolyGen, (WorkerFuncObj){&PolyGen_GeneratePolygons, NULL, true});
+	ChunkWorker_AddHandler(&chunkWorker, WorkerItemType_BaseGen, (WorkerFuncObj){&SuperFlatGen_Generate, &flatGen, true});
+	ChunkWorker_AddHandler(&chunkWorker, WorkerItemType_BaseGen, (WorkerFuncObj){&SmeaGen_Generate, &smeaGen, true});
+
+	sino_init();
 
 	World* world = (World*)malloc(sizeof(World));
 	Player player;
 	PlayerController playerCtrl;
 	Player_Init(&player);
-	player.position.y = 40.f;
+	player.position.y = 80.f;
 	Player_Spawn(&player, world);
 	PlayerController_Init(&playerCtrl, &player);
 
 	SuperFlatGen_Init(&flatGen, world);
+	SmeaGen_Init(&smeaGen, world);
 
 	Renderer_Init(world, &player, &chunkWorker.queue, &gamestate);
 
@@ -74,8 +82,8 @@ int main() {
 
 	SaveManager savemgr;
 	SaveManager_Init(&savemgr, &player);
-	ChunkWorker_AddHandler(&chunkWorker, WorkerItemType_Load, (WorkerFuncObj){&SaveManager_LoadChunk, &savemgr});
-	ChunkWorker_AddHandler(&chunkWorker, WorkerItemType_Save, (WorkerFuncObj){&SaveManager_SaveChunk, &savemgr});
+	ChunkWorker_AddHandler(&chunkWorker, WorkerItemType_Load, (WorkerFuncObj){&SaveManager_LoadChunk, &savemgr, true});
+	ChunkWorker_AddHandler(&chunkWorker, WorkerItemType_Save, (WorkerFuncObj){&SaveManager_SaveChunk, &savemgr, true});
 
 	uint64_t lastTime = svcGetSystemTick();
 	float dt = 0.f, timeAccum = 0.f, fpsClock = 0.f;
@@ -129,9 +137,14 @@ int main() {
 		} else if (gamestate == GameState_SelectWorld) {
 			char path[256];
 			char name[WORLD_NAME_SIZE];
-			if (WorldSelect_Update(path, name)) {
+			WorldGenType worldType;
+			if (WorldSelect_Update(path, name, &worldType)) {
 				strcpy(world->name, name);
+				world->genSettings.type = worldType;
 				SaveManager_Load(&savemgr, path);
+
+				ChunkWorker_SetHandlerActive(&chunkWorker, WorkerItemType_BaseGen, &flatGen, world->genSettings.type == WorldGen_SuperFlat);
+				ChunkWorker_SetHandlerActive(&chunkWorker, WorkerItemType_BaseGen, &smeaGen, world->genSettings.type == WorldGen_Smea);
 
 				world->cacheTranslationX = WorldToChunkCoord(FastFloor(player.position.x));
 				world->cacheTranslationZ = WorldToChunkCoord(FastFloor(player.position.z));
@@ -166,6 +179,8 @@ int main() {
 	SuperChunk_DeinitPools();
 
 	free(world);
+
+	sino_exit();
 
 	WorldSelect_Deinit();
 

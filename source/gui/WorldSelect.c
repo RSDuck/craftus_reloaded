@@ -92,7 +92,7 @@ void WorldSelect_Init() {
 
 void WorldSelect_Deinit() { vec_deinit(&worlds); }
 
-typedef enum { MenuState_SelectWorld, MenuState_ConfirmDeletion } MenuState;
+typedef enum { MenuState_SelectWorld, MenuState_ConfirmDeletion, MenuState_WorldOptions } MenuState;
 
 static int scroll = 0;
 static float velocity = 0.f;
@@ -102,8 +102,15 @@ static bool clicked_play = false;
 static bool clicked_new_world = false;
 static bool clicked_delete_world = false;
 
+static bool confirmed_world_options = false;
+static bool canceled_world_options = false;
+
 static bool confirmed_deletion = false;
 static bool canceled_deletion = false;
+
+static WorldGenType worldGenType = WorldGen_SuperFlat;
+
+static char* worldGenTypesStr[] = {"Smea", "Superflat"};
 
 static MenuState menustate = MenuState_SelectWorld;
 
@@ -115,7 +122,7 @@ void WorldSelect_Render() {
 	Gui_BindGuiTexture(GuiTexture_MenuBackground);
 	for (int i = 0; i < 160 / 32 + 1; i++) {
 		for (int j = 0; j < 120 / 32 + 1; j++) {
-			bool overlay = j >= 2 || menustate == MenuState_ConfirmDeletion;
+			bool overlay = j >= 2 && menustate == MenuState_SelectWorld;
 			Gui_PushQuadColor(i * 32, j * 32, overlay ? -3 : -10, 32, 32, 0, 0, 32, 32, overlay ? INT16_MAX : SHADER_RGB(12, 12, 12));
 		}
 	}
@@ -161,11 +168,24 @@ void WorldSelect_Render() {
 		Gui_PushText(160 / 2 - textWidth / 2, 120 / 3, -1, INT16_MAX, true, INT_MAX, NULL, "Are you sure?");
 		canceled_deletion = Gui_Button(10, 120 / 3 * 2, 160 / 2 - 10 * 2, "No");
 		confirmed_deletion = Gui_Button(160 / 2 + 10, 120 / 3 * 2, 160 / 2 - 10 * 2, "Yes");
+	} else if (menustate == MenuState_WorldOptions) {
+		Gui_PushText(10, 20, -2, INT16_MAX, true, INT_MAX, NULL, "World type: ");
+		if (Gui_Button(160 / 2, 20 - BUTTON_TEXT_PADDING, 160 / 2 - 10, worldGenTypesStr[worldGenType])) {
+			worldGenType++;
+			if (worldGenType == WorldGenTypes_Count) worldGenType = 0;
+		}
+		canceled_world_options = Gui_Button(10, 120 / 3 * 2, 160 / 2 - 10 * 2, "Cancel");
+		confirmed_world_options = Gui_Button(160 / 2 + 10, 120 / 3 * 2, 160 / 2 - 10 * 2, "Continue");
 	}
 }
 
-bool WorldSelect_Update(char* out_worldpath, char* out_name) {
+bool WorldSelect_Update(char* out_worldpath, char* out_name, WorldGenType* worldType) {
 	if (clicked_new_world) {
+		menustate = MenuState_WorldOptions;
+	}
+	if (confirmed_world_options) {
+		*worldType = worldGenType;
+
 		static SwkbdState swkbd;
 		static char name[WORLD_NAME_SIZE];
 
@@ -202,6 +222,8 @@ bool WorldSelect_Update(char* out_worldpath, char* out_name) {
 			out_worldpath[length + alreadyExisting] = '\0';
 
 			return true;
+		} else {
+			menustate = MenuState_SelectWorld;
 		}
 	}
 	if (clicked_play && selectedWorld != -1) {
@@ -222,12 +244,17 @@ bool WorldSelect_Update(char* out_worldpath, char* out_name) {
 	if (canceled_deletion) {
 		menustate = MenuState_SelectWorld;
 	}
+	if (canceled_world_options) {
+		menustate = MenuState_SelectWorld;
+	}
 
 	clicked_new_world = false;
 	clicked_play = false;
 	clicked_delete_world = false;
 	canceled_deletion = false;
 	confirmed_deletion = false;
+	confirmed_world_options = false;
+	canceled_world_options = false;
 
 	return false;
 }

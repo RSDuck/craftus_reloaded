@@ -39,6 +39,7 @@ bool Gui_EnteredCursorInside(int x, int y, int w, int h);
 bool Gui_RectIsVisible(int x, int y, int w, int h);
 
 #define BUTTON_HEIGHT 20
+#define BUTTON_TEXT_PADDING ((BUTTON_HEIGHT - CHAR_HEIGHT) / 2)
 bool Gui_Button(int x, int y, int w, const char* text);
 
 void Gui_SetScale(int scale);

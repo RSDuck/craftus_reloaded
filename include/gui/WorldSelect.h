@@ -14,4 +14,4 @@ void WorldSelect_Init();
 void WorldSelect_Deinit();
 
 void WorldSelect_Render();
-bool WorldSelect_Update(char* out_worldpath, char* out_name);
+bool WorldSelect_Update(char* out_worldpath, char* out_name, WorldGenType* worldType);

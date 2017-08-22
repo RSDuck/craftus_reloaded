@@ -2,8 +2,6 @@
 
 #include <misc/NumberUtils.h>
 
-#include <sino/sino.h>
-
 void SuperFlatGen_Init(SuperFlatGen* gen, World* world) {}
 
 void SuperFlatGen_Generate(WorkQueue* queue, WorkerItem item, void* this) {

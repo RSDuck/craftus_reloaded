@@ -40,6 +40,12 @@ void SaveManager_Load(SaveManager* mgr, char* path) {
 
 		mpack_node_copy_utf8_cstr(mpack_node_map_cstr(root, "name"), mgr->world->name, sizeof(mgr->world->name));
 
+		mpack_node_t worldTypeNode = mpack_node_map_cstr_optional(root, "worldType");
+		if (mpack_node_type(worldTypeNode) != mpack_type_nil)
+			mgr->world->genSettings.type = mpack_node_uint(worldTypeNode);
+		else
+			mgr->world->genSettings.type = WorldGen_SuperFlat;
+
 		mpack_node_t player = mpack_node_array_at(mpack_node_map_cstr(root, "players"), 0);
 
 		mgr->player->position.x = mpack_node_float(mpack_node_map_cstr(player, "x"));
@@ -59,7 +65,7 @@ void SaveManager_Load(SaveManager* mgr, char* path) {
 void SaveManager_Unload(SaveManager* mgr) {
 	mpack_writer_t writer;
 	mpack_writer_init_file(&writer, "level.mp");
-	mpack_start_map(&writer, 2);
+	mpack_start_map(&writer, 3);
 
 	mpack_write_cstr(&writer, "name");
 	mpack_write_cstr(&writer, mgr->world->name);
@@ -82,6 +88,9 @@ void SaveManager_Unload(SaveManager* mgr) {
 
 	mpack_finish_map(&writer);
 	mpack_finish_array(&writer);
+
+	mpack_write_cstr(&writer, "worldType");
+	mpack_write_uint(&writer, mgr->world->genSettings.type);
 
 	mpack_finish_map(&writer);
 

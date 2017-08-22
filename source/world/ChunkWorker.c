@@ -39,6 +39,15 @@ void ChunkWorker_Deinit(ChunkWorker* chunkworker) {
 
 void ChunkWorker_AddHandler(ChunkWorker* chunkworker, WorkerItemType type, WorkerFuncObj obj) { vec_push(&chunkworker->handler[type], obj); }
 
+void ChunkWorker_SetHandlerActive(ChunkWorker* chunkworker, WorkerItemType type, void* this, bool active) {
+	for (size_t i = 0; i < chunkworker->handler[type].length; i++) {
+		if (chunkworker->handler[type].data[i].this == this) {
+			chunkworker->handler[type].data[i].active = active;
+			return;
+		}
+	}
+}
+
 void ChunkWorker_Mainloop(void* _this) {
 	vec_t(WorkerItem) privateQueue;
 	vec_init(&privateQueue);
@@ -61,7 +70,9 @@ void ChunkWorker_Mainloop(void* _this) {
 
 			if (item.uuid == item.chunk->uuid) {
 				for (int i = 0; i < chunkworker->handler[item.type].length; i++) {
-					chunkworker->handler[item.type].data[i].func(&chunkworker->queue, item, chunkworker->handler[item.type].data[i].this);
+					if (chunkworker->handler[item.type].data[i].active)
+						chunkworker->handler[item.type].data[i].func(&chunkworker->queue, item,
+											     chunkworker->handler[item.type].data[i].this);
 					svcSleepThread(300);
 				}
 
