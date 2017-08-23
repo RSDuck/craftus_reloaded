@@ -14,7 +14,7 @@ void CommandLine_Activate(World* world, Player* player) {
 	swkbdSetHintText(&swkbd, "Enter command");
 
 	int button = swkbdInputText(&swkbd, textBuffer, sizeof(textBuffer));
-	if (button != SWKBD_BUTTON_NONE) {
+	if (button == SWKBD_BUTTON_CONFIRM) {
 		CommandLine_Execute(world, player, textBuffer);
 	}
 }

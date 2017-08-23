@@ -79,6 +79,9 @@ void Player_Move(Player* player, float dt, float3 accl) {
 	const float SimStep = 1.f / 60.f;
 	while (player->simStepAccum >= SimStep) {
 		player->velocity.y -= GravityPlusFriction * SimStep * 2.f;
+		if(player->velocity.y < MaxFallVelocity)
+			player->velocity.y = MaxFallVelocity;
+			
 		float speedFactor = 1.f;
 		if (!player->grounded) {
 			if (player->jumped)

@@ -25,7 +25,7 @@ Alles mögliche:
     ✔ "Neue Welt erstellen" implementieren @done (21.8.2017, 18:19:32)
 
 Weltgeneration:
-    ☐ Nicht Superflach Welten @0.2
+    ✔ Nicht Superflach Welten @0.2 @done (23.8.2017, 13:12:11)
     ☐ Bäume(benötigt entsprechende Blöcke)
 
 Gameplay:
@@ -46,3 +46,4 @@ Bugs:
     ✔ Load Chunk Funktion kann zu doppelten Chunks führen @done (13.8.2017, 13:26:22) 
     ✔ Manchmal wird ein Chunk nicht gespeichert oder geladen @done (21.8.2017, 15:19:03)
     ✔ Beenden wenn man noch im Menü ist @done (22.8.2017, 02:14:19)
+    ☐ Wenn man einen Namen eingibt der, bereinigt, identisch ist mit einer existierenden Welt, wird nichts dagegen unternommen

@@ -190,6 +190,7 @@ bool WorldSelect_Update(char* out_worldpath, char* out_name, WorldGenType* world
 
 #ifndef _DEBUG
 		swkbdInit(&swkbd, SWKBD_TYPE_WESTERN, 2, WORLD_NAME_SIZE);
+		swkbdSetValidation(&swkbd, SWKBD_NOTEMPTY_NOTBLANK, 0, WORLD_NAME_SIZE);
 		swkbdSetHintText(&swkbd, "Enter the world name");
 
 		int button = swkbdInputText(&swkbd, name, 12);
@@ -199,7 +200,7 @@ bool WorldSelect_Update(char* out_worldpath, char* out_name, WorldGenType* world
 #endif
 
 		strcpy(out_name, name);
-		if (button != SWKBD_BUTTON_NONE) {
+		if (button == SWKBD_BUTTON_CONFIRM) {
 			strcpy(out_worldpath, out_name);
 
 			int length = strlen(out_worldpath);
