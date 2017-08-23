@@ -158,6 +158,7 @@ int main() {
 				while (chunkWorker.working) svcSleepThread(4800000);
 
 				gamestate = GameState_Playing;
+				lastTime = svcGetSystemTick(); //fix timing
 			}
 		}
 		Gui_InputData(inputData);
