@@ -137,6 +137,8 @@ void Renderer_Render() {
 
 			Gui_SetScale(2);
 			Gui_PushQuad(100 / 2 - 76 / 2, 120 / 2, 0, 256, 64, 0, 0, 128, 32);
+
+			Gui_PushText(0, 0, 0, INT16_MAX, true, INT_MAX, NULL, "v" CRAFTUS_VERSION_STR);
 		}
 
 		Gui_Render(GFX_TOP);
