@@ -98,8 +98,22 @@ void World_SetBlock(World* world, int x, int y, int z, Block block) {
 		NOTIFY_NEIGHTBOR(lZ, 15, 0, 1)
 
 		if (WorldToLocalCoord(y) == 0 && y / CHUNK_SIZE - 1 >= 0) Chunk_RequestGraphicsUpdate(chunk, y / CHUNK_SIZE - 1);
-		if (WorldToLocalCoord(y) == 15 && y / CHUNK_SIZE + 1 < CLUSTER_PER_CHUNK) Chunk_RequestGraphicsUpdate(chunk, y / CHUNK_SIZE + 1);
+		if (WorldToLocalCoord(y) == 15 && y / CHUNK_SIZE + 1 < CLUSTER_PER_CHUNK)
+			Chunk_RequestGraphicsUpdate(chunk, y / CHUNK_SIZE + 1);
 	}
+}
+
+int World_GetHeight(World* world, int x, int z) {
+	int cX = WorldToChunkCoord(x);
+	int cZ = WorldToChunkCoord(z);
+	Chunk* chunk = World_GetChunk(world, cX, cZ);
+	if (chunk) {
+		int lX = WorldToLocalCoord(x);
+		int lZ = WorldToLocalCoord(z);
+
+		return Chunk_GetHeightMap(chunk, lX, lZ);
+	}
+	return 0;
 }
 
 void World_UpdateChunkCache(World* world, int orginX, int orginZ) {
@@ -148,8 +162,8 @@ void World_Tick(World* world) {
 			if (chunk->genProgress == ChunkGen_Empty && !chunk->tasksRunning)
 				WorkQueue_AddItem(world->workqueue, (WorkerItem){WorkerItemType_BaseGen, chunk});
 
-			if (x > 0 && z > 0 && x < CHUNKCACHE_SIZE - 1 && z < CHUNKCACHE_SIZE - 1 && chunk->genProgress == ChunkGen_Terrain &&
-			    !chunk->tasksRunning) {
+			if (x > 0 && z > 0 && x < CHUNKCACHE_SIZE - 1 && z < CHUNKCACHE_SIZE - 1 &&
+			    chunk->genProgress == ChunkGen_Terrain && !chunk->tasksRunning) {
 				bool clear = true;
 				for (int xOff = -1; xOff < 2 && clear; xOff++)
 					for (int zOff = -1; zOff < 2 && clear; zOff++) {

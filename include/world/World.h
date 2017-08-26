@@ -57,3 +57,5 @@ Block World_GetBlock(World* world, int x, int y, int z);
 void World_SetBlock(World* world, int x, int y, int z, Block block);
 
 void World_UpdateChunkCache(World* world, int orginX, int orginZ);
+
+int World_GetHeight(World* world, int x, int z);	

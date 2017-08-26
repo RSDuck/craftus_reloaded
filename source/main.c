@@ -89,8 +89,8 @@ int main() {
 	float dt = 0.f, timeAccum = 0.f, fpsClock = 0.f;
 	int frameCounter = 0, fps = 0;
 	while (aptMainLoop()) {
-		DebugUI_Text("%d FPS  Usage: CPU: %5.2f%% GPU: %5.2f%% Buf: %5.2f%% Lin: %d", fps, C3D_GetProcessingTime() * 6.f, C3D_GetDrawingTime() * 6.f,
-			     C3D_GetCmdBufUsage() * 100.f, linearSpaceFree());
+		DebugUI_Text("%d FPS  Usage: CPU: %5.2f%% GPU: %5.2f%% Buf: %5.2f%% Lin: %d", fps, C3D_GetProcessingTime() * 6.f,
+			     C3D_GetDrawingTime() * 6.f, C3D_GetCmdBufUsage() * 100.f, linearSpaceFree());
 		DebugUI_Text("Player: %f, %f, %f P: %f Y: %f", f3_unpack(player.position), player.pitch, player.yaw);
 
 		Renderer_Render();
@@ -121,8 +121,8 @@ int main() {
 		touchPosition touchPos;
 		hidTouchRead(&touchPos);
 
-		InputData inputData =
-		    (InputData){keysdown, hidKeysDown(), hidKeysUp(), circlePos.dx, circlePos.dy, touchPos.px, touchPos.py, cstickPos.dx, cstickPos.dy};
+		InputData inputData = (InputData){keysdown,    hidKeysDown(), hidKeysUp(),  circlePos.dx, circlePos.dy,
+						  touchPos.px, touchPos.py,   cstickPos.dx, cstickPos.dy};
 
 		if (gamestate == GameState_Playing) {
 			while (timeAccum >= 1.f / 20.f) {
@@ -133,32 +133,53 @@ int main() {
 
 			PlayerController_Update(&playerCtrl, inputData, dt);
 
-			World_UpdateChunkCache(world, WorldToChunkCoord(FastFloor(player.position.x)), WorldToChunkCoord(FastFloor(player.position.z)));
+			World_UpdateChunkCache(world, WorldToChunkCoord(FastFloor(player.position.x)),
+					       WorldToChunkCoord(FastFloor(player.position.z)));
 		} else if (gamestate == GameState_SelectWorld) {
 			char path[256];
-			char name[WORLD_NAME_SIZE];
+			char name[WORLD_NAME_SIZE] = {'\0'};
 			WorldGenType worldType;
-			if (WorldSelect_Update(path, name, &worldType)) {
+			bool newWorld = false;
+			if (WorldSelect_Update(path, name, &worldType, &newWorld)) {
 				strcpy(world->name, name);
 				world->genSettings.type = worldType;
 				SaveManager_Load(&savemgr, path);
 
-				ChunkWorker_SetHandlerActive(&chunkWorker, WorkerItemType_BaseGen, &flatGen, world->genSettings.type == WorldGen_SuperFlat);
-				ChunkWorker_SetHandlerActive(&chunkWorker, WorkerItemType_BaseGen, &smeaGen, world->genSettings.type == WorldGen_Smea);
+				ChunkWorker_SetHandlerActive(&chunkWorker, WorkerItemType_BaseGen, &flatGen,
+							     world->genSettings.type == WorldGen_SuperFlat);
+				ChunkWorker_SetHandlerActive(&chunkWorker, WorkerItemType_BaseGen, &smeaGen,
+							     world->genSettings.type == WorldGen_Smea);
 
 				world->cacheTranslationX = WorldToChunkCoord(FastFloor(player.position.x));
 				world->cacheTranslationZ = WorldToChunkCoord(FastFloor(player.position.z));
 				for (int i = 0; i < CHUNKCACHE_SIZE; i++) {
 					for (int j = 0; j < CHUNKCACHE_SIZE; j++) {
-						world->chunkCache[i][j] = World_LoadChunk(world, i - CHUNKCACHE_SIZE / 2 + world->cacheTranslationX,
-											  j - CHUNKCACHE_SIZE / 2 + world->cacheTranslationZ);
+						world->chunkCache[i][j] =
+						    World_LoadChunk(world, i - CHUNKCACHE_SIZE / 2 + world->cacheTranslationX,
+								    j - CHUNKCACHE_SIZE / 2 + world->cacheTranslationZ);
 					}
 				}
 
-				while (chunkWorker.working) svcSleepThread(4800000);
+				for (int i = 0; i < 3; i++) {
+					while (chunkWorker.working || chunkWorker.queue.queue.length > 0) {
+						svcSleepThread(50000000);  // 1 Tick
+					}
+					World_Tick(world);
+				}
+
+				if (newWorld) {
+					int highestBlock = 0;
+					for (int x = -1; x < 1; x++) {
+						for (int z = -1; z < 1; z++) {
+							int height = World_GetHeight(world, x, z);
+							if (height > highestBlock) highestBlock = height;
+						}
+					}
+					player.position.y = (float)highestBlock + 0.2f;
+				}
 
 				gamestate = GameState_Playing;
-				lastTime = svcGetSystemTick(); //fix timing
+				lastTime = svcGetSystemTick();  // fix timing
 			}
 		}
 		Gui_InputData(inputData);

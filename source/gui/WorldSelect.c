@@ -178,7 +178,7 @@ void WorldSelect_Render() {
 	}
 }
 
-bool WorldSelect_Update(char* out_worldpath, char* out_name, WorldGenType* worldType) {
+bool WorldSelect_Update(char* out_worldpath, char* out_name, WorldGenType* worldType, bool* newWorld) {
 	if (clicked_new_world) {
 		menustate = MenuState_WorldOptions;
 	}
@@ -196,7 +196,7 @@ bool WorldSelect_Update(char* out_worldpath, char* out_name, WorldGenType* world
 		int button = swkbdInputText(&swkbd, name, 12);
 #else
 		strcpy(name, "testworld");
-		int button = 0;
+		int button = 2;
 #endif
 
 		strcpy(out_name, name);
@@ -222,6 +222,8 @@ bool WorldSelect_Update(char* out_worldpath, char* out_name, WorldGenType* world
 			}
 			out_worldpath[length + alreadyExisting] = '\0';
 
+			*newWorld = true;
+
 			return true;
 		} else {
 			menustate = MenuState_SelectWorld;
@@ -229,6 +231,8 @@ bool WorldSelect_Update(char* out_worldpath, char* out_name, WorldGenType* world
 	}
 	if (clicked_play && selectedWorld != -1) {
 		strcpy(out_worldpath, worlds.data[selectedWorld].path);
+
+		*newWorld = false;
 		return true;
 	}
 	if (clicked_delete_world && selectedWorld != -1) {

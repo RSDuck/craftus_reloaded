@@ -17,10 +17,10 @@ void Chunk_GenerateHeightmap(Chunk* chunk) {
 		for (int x = 0; x < CHUNK_SIZE; x++)
 			for (int z = 0; z < CHUNK_SIZE; z++)
 				for (int i = CLUSTER_PER_CHUNK - 1; i >= 0; --i) {
-					if (chunk->clusters[i].empty) continue;
+					if (Cluster_IsEmpty(&chunk->clusters[i])) continue;
 					for (int j = CHUNK_SIZE - 1; j >= 0; --j) {
 						if (chunk->clusters[i].blocks[x][j][z] != Block_Air) {
-							chunk->heightmap[x][z] = i * CHUNK_SIZE + j;
+							chunk->heightmap[x][z] = i * CHUNK_SIZE + j + 1;
 							i = -1;
 							break;
 						}
