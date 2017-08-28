@@ -30,6 +30,8 @@ void Player_Init(Player* player) {
 	player->breakPlaceTimeout = 0.f;
 
 	player->blockInHand = Block_Stone;
+
+	player->autoJumpEnabled = true;
 }
 
 void Player_Spawn(Player* player, World* world) { player->world = world; }
@@ -140,7 +142,7 @@ void Player_Move(Player* player, float dt, float3 accl) {
 			}
 		}
 
-		if (wallCollision) Player_Jump(player, accl);
+		if (wallCollision && player->autoJumpEnabled) Player_Jump(player, accl);
 
 		player->position = finalPos;
 		player->velocity = f3_new(player->velocity.x * 0.95f, player->velocity.y, player->velocity.z * 0.95f);

@@ -11,9 +11,10 @@
 #ifdef _3DS
 #include <3ds.h>
 #define PLATFORM_BUTTONS 23
-const char* platform_key_names[PLATFORM_BUTTONS] = {"Not Set",   "A",	"B",	  "X",		 "Y",		"L",      "R",	"Start",
-						    "Select",    "DUp",      "DDown",      "DLeft",      "DRight",      "CircUp", "CircDown", "CircLeft",
-						    "CircRight", "CStickUp", "CStickDown", "CStickLeft", "CStickRight", "ZL",     "ZR"};
+const char* platform_key_names[PLATFORM_BUTTONS] = {"Not Set",    "A",		"B",	   "X",	"Y",		"L",
+						    "R",	  "Start",      "Select",      "DUp",      "DDown",     "DLeft",
+						    "DRight",     "CircUp",     "CircDown",    "CircLeft", "CircRight", "CStickUp",
+						    "CStickDown", "CStickLeft", "CStickRight", "ZL",       "ZR"};
 enum { K3DS_Undefined = 0,
        K3DS_A,
        K3DS_B,
@@ -136,10 +137,13 @@ void PlayerController_Init(PlayerController* ctrl, Player* player) {
 
 	bool isNew3ds = false;
 	APT_CheckNew3DS(&isNew3ds);
-	if (isNew3ds)
+	if (isNew3ds) {
 		ctrl->controlScheme = n3ds_default_scheme;
-	else
+		ctrl->player->autoJumpEnabled = false;
+	} else {
 		ctrl->controlScheme = platform_default_scheme;
+		ctrl->player->autoJumpEnabled = true;
+	}
 
 	ctrl->openedCmd = false;
 
@@ -176,6 +180,8 @@ void PlayerController_Init(PlayerController* ctrl, Player* player) {
 #undef loadKey
 
 		ini_free(cfg);
+
+		ini_sget(cfg, "controls", "auto_jumping", "%d", &ctrl->player->autoJumpEnabled);
 	} else {
 		FILE* f = fopen(path, "w");
 
@@ -209,6 +215,8 @@ void PlayerController_Init(PlayerController* ctrl, Player* player) {
 		writeKey(openCmd);
 
 #undef writeKey
+
+		fprintf(f, "; 0 = disabled, 1 = enabled default: 1 for O3ds, 0 for N3ds\nautojump=%d\n", player->autoJumpEnabled);
 
 		fclose(f);
 	}

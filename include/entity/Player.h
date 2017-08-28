@@ -20,6 +20,8 @@ typedef struct {
 
 	float3 view;
 
+	bool autoJumpEnabled;
+
 	float3 velocity;
 	float simStepAccum;
 
