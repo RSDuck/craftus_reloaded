@@ -114,6 +114,7 @@ static SuperChunk* fetchSuperChunk(SaveManager* mgr, int x, int z) {
 	SuperChunk* superchunk = (SuperChunk*)malloc(sizeof(SuperChunk));
 	SuperChunk_Init(superchunk, x, z);
 	vec_push(&mgr->superchunks, superchunk);
+	svcSleepThread(50000);
 	return superchunk;
 }
 
@@ -122,7 +123,7 @@ void SaveManager_LoadChunk(WorkQueue* queue, WorkerItem item, void* this) {
 	int x = ChunkToSuperChunkCoord(item.chunk->x);
 	int z = ChunkToSuperChunkCoord(item.chunk->z);
 	SuperChunk* superchunk = fetchSuperChunk(mgr, x, z);
-
+	
 	SuperChunk_LoadChunk(superchunk, item.chunk);
 }
 void SaveManager_SaveChunk(WorkQueue* queue, WorkerItem item, void* this) {

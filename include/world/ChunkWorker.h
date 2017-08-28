@@ -4,7 +4,7 @@
 
 #include <world/WorkQueue.h>
 
-#define CHUNKWORKER_THREAD_STACKSIZE (8 * 1024)
+#define CHUNKWORKER_THREAD_STACKSIZE (16 * 1024)
 
 typedef void (*WorkerFunc)(WorkQueue* queue, WorkerItem item, void* this);
 typedef struct {

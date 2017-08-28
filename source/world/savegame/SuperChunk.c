@@ -55,10 +55,12 @@ void SuperChunk_Init(SuperChunk* superchunk, int x, int z) {
 		mpack_node_t chunkIndices = mpack_node_map_cstr(root, "chunkIndices");
 		for (int i = 0; i < SUPERCHUNK_SIZE * SUPERCHUNK_SIZE; i++) {
 			mpack_node_t chunkInfo = mpack_node_array_at(chunkIndices, i);
-			superchunk->grid[i % SUPERCHUNK_SIZE][i / SUPERCHUNK_SIZE] = (ChunkInfo){
-			    mpack_node_u32(mpack_node_map_cstr(chunkInfo, "position")), mpack_node_u32(mpack_node_map_cstr(chunkInfo, "compressedSize")),
-			    mpack_node_u32(mpack_node_map_cstr(chunkInfo, "actualSize")), mpack_node_u8(mpack_node_map_cstr(chunkInfo, "blockSize")),
-			    mpack_node_u32(mpack_node_map_cstr(chunkInfo, "revision"))};
+			superchunk->grid[i % SUPERCHUNK_SIZE][i / SUPERCHUNK_SIZE] =
+			    (ChunkInfo){mpack_node_u32(mpack_node_map_cstr(chunkInfo, "position")),
+					mpack_node_u32(mpack_node_map_cstr(chunkInfo, "compressedSize")),
+					mpack_node_u32(mpack_node_map_cstr(chunkInfo, "actualSize")),
+					mpack_node_u8(mpack_node_map_cstr(chunkInfo, "blockSize")),
+					mpack_node_u32(mpack_node_map_cstr(chunkInfo, "revision"))};
 
 			{
 				ChunkInfo chunkInfo = superchunk->grid[i % SUPERCHUNK_SIZE][i / SUPERCHUNK_SIZE];
@@ -66,7 +68,8 @@ void SuperChunk_Init(SuperChunk* superchunk, int x, int z) {
 					while (chunkInfo.position + chunkInfo.blockSize > superchunk->sectors.length) {
 						vec_push(&superchunk->sectors, false);
 					}
-					for (int j = 0; j < chunkInfo.blockSize; j++) superchunk->sectors.data[chunkInfo.position + j] = true;
+					for (int j = 0; j < chunkInfo.blockSize; j++)
+						superchunk->sectors.data[chunkInfo.position + j] = true;
 				}
 			}
 		}
@@ -204,12 +207,14 @@ void SuperChunk_SaveChunk(SuperChunk* superchunk, Chunk* chunk) {
 		if (compress((uint8_t*)fileBuffer, &compressedSize, (uint8_t*)decompressBuffer, uncompressedSize) == Z_OK) {
 			size_t blockSize = compressedSize / SectorSize + 1;
 
-			if (superchunk->grid[x][z].actualSize > 0) freeSectors(superchunk, superchunk->grid[x][z].position, superchunk->grid[x][z].blockSize);
+			if (superchunk->grid[x][z].actualSize > 0)
+				freeSectors(superchunk, superchunk->grid[x][z].position, superchunk->grid[x][z].blockSize);
 
 			size_t address = reserveSectors(superchunk, blockSize);
 
 			fseek(superchunk->dataFile, address * SectorSize, SEEK_SET);
-			fwrite(fileBuffer, sizeof(char), compressedSize, superchunk->dataFile);
+			if (fwrite(fileBuffer, sizeof(char), compressedSize, superchunk->dataFile) != compressedSize) Crash("Couldn't write complete chunk data to file");
+
 			superchunk->grid[x][z] = (ChunkInfo){address, compressedSize, uncompressedSize, blockSize, chunk->revision};
 		}
 	}
@@ -221,8 +226,8 @@ void SuperChunk_LoadChunk(SuperChunk* superchunk, Chunk* chunk) {
 	ChunkInfo chunkInfo = superchunk->grid[x][z];
 	if (chunkInfo.actualSize > 0) {
 		fseek(superchunk->dataFile, chunkInfo.position * SectorSize, SEEK_SET);
-		fread(fileBuffer, chunkInfo.compressedSize, 1, superchunk->dataFile);
-
+		if (fread(fileBuffer, chunkInfo.compressedSize, 1, superchunk->dataFile) != chunkInfo.compressedSize)
+			Crash("Read chunk data size isn't equal to the expected size");
 		mz_ulong uncompressedSize = decompressBufferSize;
 
 		if (uncompress((uint8_t*)decompressBuffer, &uncompressedSize, (uint8_t*)fileBuffer, chunkInfo.compressedSize) == Z_OK) {

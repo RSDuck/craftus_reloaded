@@ -73,7 +73,7 @@ void ChunkWorker_Mainloop(void* _this) {
 					if (chunkworker->handler[item.type].data[i].active)
 						chunkworker->handler[item.type].data[i].func(&chunkworker->queue, item,
 											     chunkworker->handler[item.type].data[i].this);
-					svcSleepThread(300);
+					svcSleepThread(7000);
 				}
 
 				switch (item.type) {
