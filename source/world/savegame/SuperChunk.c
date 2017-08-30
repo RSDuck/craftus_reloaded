@@ -213,7 +213,8 @@ void SuperChunk_SaveChunk(SuperChunk* superchunk, Chunk* chunk) {
 			size_t address = reserveSectors(superchunk, blockSize);
 
 			fseek(superchunk->dataFile, address * SectorSize, SEEK_SET);
-			if (fwrite(fileBuffer, sizeof(char), compressedSize, superchunk->dataFile) != compressedSize) Crash("Couldn't write complete chunk data to file");
+			if (fwrite(fileBuffer, sizeof(char), compressedSize, superchunk->dataFile) != compressedSize)
+				Crash("Couldn't write complete chunk data to file");
 
 			superchunk->grid[x][z] = (ChunkInfo){address, compressedSize, uncompressedSize, blockSize, chunk->revision};
 		}
@@ -249,9 +250,9 @@ void SuperChunk_LoadChunk(SuperChunk* superchunk, Chunk* chunk) {
 				} else
 					chunk->clusters[i].emptyRevision = 0;
 
-				if (!empty)
-					memcpy(chunk->clusters[i].blocks, mpack_node_data(mpack_node_map_cstr(cluster, "blocks")),
-					       sizeof(chunk->clusters[i].blocks));
+				mpack_node_t blocksNode = mpack_node_map_cstr(cluster, "blocks");
+				if (!empty && mpack_node_type(blocksNode) == mpack_type_bin)
+					memcpy(chunk->clusters[i].blocks, mpack_node_data(blocksNode), sizeof(chunk->clusters[i].blocks));
 
 				chunk->clusters[i].empty = empty;
 			}
