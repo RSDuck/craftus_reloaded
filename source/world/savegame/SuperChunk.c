@@ -243,18 +243,18 @@ void SuperChunk_LoadChunk(SuperChunk* superchunk, Chunk* chunk) {
 				chunk->clusters[i].revision = mpack_node_u32(mpack_node_map_cstr(cluster, "revision"));
 
 				mpack_node_t emptyNode = mpack_node_map_cstr_optional(cluster, "empty");
-				bool empty = false;
 				if (mpack_node_type(emptyNode) != mpack_type_nil) {
 					empty = mpack_node_bool(emptyNode);
 					chunk->clusters[i].emptyRevision = chunk->clusters[i].revision;
-				} else
+					chunk->clusters[i].empty = empty;
+				} else {
 					chunk->clusters[i].emptyRevision = 0;
+					chunk->clusters[i].empty = false;
+				}
 
 				mpack_node_t blocksNode = mpack_node_map_cstr(cluster, "blocks");
-				if (!empty && mpack_node_type(blocksNode) == mpack_type_bin)
+				if (mpack_node_type(blocksNode) == mpack_type_bin)  // preserve savedata, in case of a wrong empty flag
 					memcpy(chunk->clusters[i].blocks, mpack_node_data(blocksNode), sizeof(chunk->clusters[i].blocks));
-
-				chunk->clusters[i].empty = empty;
 			}
 
 			chunk->genProgress = mpack_node_int(mpack_node_map_cstr(root, "genProgress"));

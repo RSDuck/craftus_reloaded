@@ -32,6 +32,7 @@ void Chunk_GenerateHeightmap(Chunk* chunk) {
 bool Cluster_IsEmpty(Cluster* cluster) {
 	if (cluster->emptyRevision == cluster->revision) return cluster->empty;
 	cluster->empty = false;
+	cluster->emptyRevision = cluster->revision;
 	for (int i = 0; i < sizeof(cluster->blocks) / sizeof(uint32_t); i++) {
 		if (((uint32_t*)cluster->blocks)[i] != 0) return false;
 	}
