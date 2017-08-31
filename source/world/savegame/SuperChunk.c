@@ -213,7 +213,7 @@ void SuperChunk_SaveChunk(SuperChunk* superchunk, Chunk* chunk) {
 			size_t address = reserveSectors(superchunk, blockSize);
 
 			fseek(superchunk->dataFile, address * SectorSize, SEEK_SET);
-			if (fwrite(fileBuffer, sizeof(char), compressedSize, superchunk->dataFile) != compressedSize)
+			if (fwrite(fileBuffer, compressedSize, 1, superchunk->dataFile) != 1)
 				Crash("Couldn't write complete chunk data to file");
 
 			superchunk->grid[x][z] = (ChunkInfo){address, compressedSize, uncompressedSize, blockSize, chunk->revision};
@@ -227,7 +227,7 @@ void SuperChunk_LoadChunk(SuperChunk* superchunk, Chunk* chunk) {
 	ChunkInfo chunkInfo = superchunk->grid[x][z];
 	if (chunkInfo.actualSize > 0) {
 		fseek(superchunk->dataFile, chunkInfo.position * SectorSize, SEEK_SET);
-		if (fread(fileBuffer, chunkInfo.compressedSize, 1, superchunk->dataFile) != chunkInfo.compressedSize)
+		if (fread(fileBuffer, chunkInfo.compressedSize, 1, superchunk->dataFile) != 1)
 			Crash("Read chunk data size isn't equal to the expected size");
 		mz_ulong uncompressedSize = decompressBufferSize;
 
@@ -244,15 +244,14 @@ void SuperChunk_LoadChunk(SuperChunk* superchunk, Chunk* chunk) {
 
 				mpack_node_t emptyNode = mpack_node_map_cstr_optional(cluster, "empty");
 				if (mpack_node_type(emptyNode) != mpack_type_nil) {
-					empty = mpack_node_bool(emptyNode);
 					chunk->clusters[i].emptyRevision = chunk->clusters[i].revision;
-					chunk->clusters[i].empty = empty;
+					chunk->clusters[i].empty = mpack_node_bool(emptyNode);
 				} else {
 					chunk->clusters[i].emptyRevision = 0;
 					chunk->clusters[i].empty = false;
 				}
 
-				mpack_node_t blocksNode = mpack_node_map_cstr(cluster, "blocks");
+				mpack_node_t blocksNode = mpack_node_map_cstr_optional(cluster, "blocks");
 				if (mpack_node_type(blocksNode) == mpack_type_bin)  // preserve savedata, in case of a wrong empty flag
 					memcpy(chunk->clusters[i].blocks, mpack_node_data(blocksNode), sizeof(chunk->clusters[i].blocks));
 			}
