@@ -4,7 +4,7 @@
 
 #include <misc/NumberUtils.h>
 
-bool Collision_BoxIntersect(Box a, Box b,
+bool Collision_BoxIntersect(Box a, Box b, int ignore_faces,
 			    float3* ncoll,  // normal of collision.
 			    float* dcoll,   // depth of intersection.
 			    int* fcoll)     // face intersected.
@@ -17,7 +17,7 @@ bool Collision_BoxIntersect(Box a, Box b,
 	    {0, -1, 0},  // 'bottom' face normal (-y direction)
 	    {0, 1, 0},   // 'top' face normal (+y direction)
 	    {0, 0, -1},  // 'far' face normal (-z direction)
-	    {0, 0, 1},   // 'near' face normal (+x direction)
+	    {0, 0, 1},   // 'near' face normal (+z direction)
 	};
 
 	// distance of collided box to the face.
@@ -40,6 +40,8 @@ bool Collision_BoxIntersect(Box a, Box b,
 		// box does not intersect face. So boxes don't intersect at all.
 
 		if (distances[i] < 0.0f) return false;
+
+		if (ignore_faces & (1 << i)) continue;
 
 		// face of least intersection depth. That's our candidate.
 

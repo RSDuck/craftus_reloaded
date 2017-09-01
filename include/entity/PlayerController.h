@@ -17,6 +17,8 @@ typedef struct {
 	KeyCombo switchBlockRight;
 
 	KeyCombo openCmd;
+
+	KeyCombo crouch;
 } PlayerControlScheme;
 typedef struct {
 	Player* player;
@@ -24,6 +26,8 @@ typedef struct {
 
 	float breakPlaceTimeout;
 	bool openedCmd;
+
+	float flyTimer;
 } PlayerController;
 
 void PlayerController_Init(PlayerController* ctrl, Player* player);

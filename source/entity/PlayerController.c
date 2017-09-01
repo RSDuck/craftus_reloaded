@@ -51,7 +51,8 @@ const PlayerControlScheme platform_default_scheme = {.forward = K3DS_X,
 						     .jump = K3DS_DUP,
 						     .switchBlockLeft = K3DS_DLEFT,
 						     .switchBlockRight = K3DS_DRIGHT,
-						     .openCmd = K3DS_SELECT};
+						     .openCmd = K3DS_SELECT,
+						     .crouch = K3DS_DDOWN};
 const PlayerControlScheme n3ds_default_scheme = {.forward = K3DS_CPAD_UP,
 						 .backward = K3DS_CPAD_DOWN,
 						 .strafeLeft = K3DS_CPAD_LEFT,
@@ -65,7 +66,8 @@ const PlayerControlScheme n3ds_default_scheme = {.forward = K3DS_CPAD_UP,
 						 .jump = K3DS_ZL,
 						 .switchBlockLeft = K3DS_DLEFT,
 						 .switchBlockRight = K3DS_DRIGHT,
-						 .openCmd = K3DS_SELECT};
+						 .openCmd = K3DS_SELECT,
+						 .crouch = K3DS_ZR};
 static void convertPlatformInput(InputData* input, float ctrls[], bool keysdown[], bool keysup[]) {
 #define reg_bin_key(i, k)                                                         \
 	ctrls[(i)] = (float)((input->keysdown & (k)) || (input->keysheld & (k))); \
@@ -147,6 +149,8 @@ void PlayerController_Init(PlayerController* ctrl, Player* player) {
 
 	ctrl->openedCmd = false;
 
+	bool elementMissing = false;
+
 	const char path[] = "sdmc:/craftus/options.ini";
 	if (access(path, F_OK) != -1) {
 		ini_t* cfg = ini_load(path);
@@ -161,7 +165,8 @@ void PlayerController_Init(PlayerController* ctrl, Player* player) {
 				break;                                \
 			}                                             \
 		}                                                     \
-	}
+	} else                                                        \
+		elementMissing = true;
 
 		loadKey(forward);
 		loadKey(backward);
@@ -177,12 +182,17 @@ void PlayerController_Init(PlayerController* ctrl, Player* player) {
 		loadKey(switchBlockLeft);
 		loadKey(switchBlockRight);
 		loadKey(openCmd);
+		loadKey(crouch);
 #undef loadKey
+
+		if (!ini_sget(cfg, "controls", "auto_jumping", "%d", &ctrl->player->autoJumpEnabled)) elementMissing = true;
 
 		ini_free(cfg);
 
-		ini_sget(cfg, "controls", "auto_jumping", "%d", &ctrl->player->autoJumpEnabled);
-	} else {
+	} else
+		elementMissing = true;
+
+	if (elementMissing) {
 		FILE* f = fopen(path, "w");
 
 		fprintf(f, "[controls]\n");
@@ -213,6 +223,7 @@ void PlayerController_Init(PlayerController* ctrl, Player* player) {
 		writeKey(switchBlockLeft);
 		writeKey(switchBlockRight);
 		writeKey(openCmd);
+		writeKey(crouch);
 
 #undef writeKey
 
@@ -220,12 +231,17 @@ void PlayerController_Init(PlayerController* ctrl, Player* player) {
 
 		fclose(f);
 	}
+
+	ctrl->flyTimer = -1.f;
 }
 
 void PlayerController_Update(PlayerController* ctrl, InputData input, float dt) {
 	Player* player = ctrl->player;
 	PlatformAgnosticInput agnosticInput;
 	convertPlatformInput(&input, agnosticInput.keys, agnosticInput.keysdown, agnosticInput.keysup);
+
+	float jump = IsKeyDown(ctrl->controlScheme.jump, &agnosticInput);
+	float crouch = IsKeyDown(ctrl->controlScheme.crouch, &agnosticInput);
 
 	float forward = IsKeyDown(ctrl->controlScheme.forward, &agnosticInput);
 	float backward = IsKeyDown(ctrl->controlScheme.backward, &agnosticInput);
@@ -240,8 +256,12 @@ void PlayerController_Update(PlayerController* ctrl, InputData input, float dt) 
 	movement = f3_sub(movement, f3_scl(forwardVec, backward));
 	movement = f3_add(movement, f3_scl(rightVec, strafeRight));
 	movement = f3_sub(movement, f3_scl(rightVec, strafeLeft));
+	if (player->flying) {
+		movement = f3_add(movement, f3_new(0.f, jump, 0.f));
+		movement = f3_sub(movement, f3_new(0.f, crouch, 0.f));
+	}
 	if (f3_magSqr(movement) > 0.f) {
-		float speed = 4.3f * f3_mag(f3_new(-strafeLeft + strafeRight, 0, -forward + backward));
+		float speed = 4.3f * f3_mag(f3_new(-strafeLeft + strafeRight, -crouch + jump, -forward + backward));
 		player->bobbing += speed * 1.5f * dt;
 		movement = f3_scl(f3_nrm(movement), speed);
 	}
@@ -260,8 +280,19 @@ void PlayerController_Update(PlayerController* ctrl, InputData input, float dt) 
 	if (placeBlock > 0.f) Player_PlaceBlock(player, player->blockInHand);
 	if (breakBlock > 0.f) Player_BreakBlock(player);
 
-	float jump = IsKeyDown(ctrl->controlScheme.jump, &agnosticInput);
 	if (jump > 0.f) Player_Jump(player, movement);
+
+	bool releasedJump = WasKeyReleased(ctrl->controlScheme.jump, &agnosticInput);
+	if (ctrl->flyTimer >= 0.f) {
+		if (jump > 0.f) player->flying ^= true;
+		ctrl->flyTimer += dt;
+		if (ctrl->flyTimer > 0.25f) ctrl->flyTimer = -1.f;
+	} else if (releasedJump) {
+		ctrl->flyTimer = 0.f;
+	}
+
+	bool releasedCrouch = WasKeyReleased(ctrl->controlScheme.crouch, &agnosticInput);
+	player->crouching ^= !player->flying && releasedCrouch;
 
 	bool switchBlockLeft = WasKeyReleased(ctrl->controlScheme.switchBlockLeft, &agnosticInput);
 	bool switchBlockRight = WasKeyReleased(ctrl->controlScheme.switchBlockRight, &agnosticInput);

@@ -24,6 +24,10 @@ void SaveManager_Init(SaveManager* mgr, Player* player) {
 }
 void SaveManager_Deinit(SaveManager* mgr) { vec_deinit(&mgr->superchunks); }
 
+#define mpack_elvis(node, key, typ, default_) \
+	((mpack_node_type(mpack_node_map_cstr_optional((node), (key))) != mpack_type_nil) ? mpack_node_ ## typ (mpack_node_map_cstr_optional((node), (key))) : (default_))
+	
+
 void SaveManager_Load(SaveManager* mgr, char* path) {
 	char buffer[256];
 
@@ -55,6 +59,9 @@ void SaveManager_Load(SaveManager* mgr, char* path) {
 		mgr->player->pitch = mpack_node_float(mpack_node_map_cstr(player, "pitch"));
 		mgr->player->yaw = mpack_node_float(mpack_node_map_cstr(player, "yaw"));
 
+		mgr->player->flying = mpack_elvis(player, "flying", bool, false);
+		mgr->player->crouching = mpack_elvis(player, "crouching", bool, false);
+
 		mpack_error_t err = mpack_tree_destroy(&levelTree);
 		if (err != mpack_ok) {
 			Crash("Mpack error %d while loading world manifest %s", err, path);
@@ -72,7 +79,7 @@ void SaveManager_Unload(SaveManager* mgr) {
 
 	mpack_write_cstr(&writer, "players");
 	mpack_start_array(&writer, 1);
-	mpack_start_map(&writer, 5);
+	mpack_start_map(&writer, 7);
 
 	mpack_write_cstr(&writer, "x");
 	mpack_write_float(&writer, mgr->player->position.x);
@@ -85,6 +92,12 @@ void SaveManager_Unload(SaveManager* mgr) {
 	mpack_write_float(&writer, mgr->player->pitch);
 	mpack_write_cstr(&writer, "yaw");
 	mpack_write_float(&writer, mgr->player->yaw);
+
+	mpack_write_cstr(&writer, "flying");
+	mpack_write_bool(&writer, mgr->player->flying);
+	
+	mpack_write_cstr(&writer, "crouching");
+	mpack_write_bool(&writer, mgr->player->crouching);
 
 	mpack_finish_map(&writer);
 	mpack_finish_array(&writer);
