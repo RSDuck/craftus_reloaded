@@ -33,7 +33,7 @@ void Cursor_Draw(int projUniform, C3D_Mtx* projectionview, World* world, int x, 
 		const int* offset = DirectionToOffset[i];
 		if (World_GetBlock(world, x + offset[0], y + offset[1], z + offset[2]) == Block_Air) {
 			memcpy(vtx, &cube_sides_lut[i * 6], sizeof(Vertex) * 6);
-			int16_t color = i == highlight ? SHADER_RGB(12, 12, 12) : SHADER_RGB(7, 7, 7);
+			int16_t color = i == highlight ? SHADER_RGB(8, 8, 8) : SHADER_RGB(4, 4, 4);
 			for (int j = 0; j < 6; j++) 
 				vtx[j].uvc[2] = color;
 			vtx += 6;
@@ -43,9 +43,9 @@ void Cursor_Draw(int projUniform, C3D_Mtx* projectionview, World* world, int x, 
 
 	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, projUniform, &mvp);
 
-	C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_ONE, GPU_ONE, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
+	C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_ONE, GPU_ONE, GPU_ZERO, GPU_ONE_MINUS_SRC_ALPHA);
 
-	C3D_DepthTest(false, GPU_GREATER, GPU_WRITE_ALL);
+	C3D_DepthMap(true, -1.f, 0.001f);
 
 	C3D_TexEnv* env = C3D_GetTexEnv(0);
 	C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, 0, 0);
@@ -60,5 +60,5 @@ void Cursor_Draw(int projUniform, C3D_Mtx* projectionview, World* world, int x, 
 
 	C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
 
-	C3D_DepthTest(true, GPU_GREATER, GPU_WRITE_ALL);
+	C3D_DepthMap(true, -1.f, 0.0f);	
 }

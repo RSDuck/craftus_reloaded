@@ -43,6 +43,7 @@ Rendering:
     ✔ Transparente Blöcke korrekt rendern @0.2 @done (17.8.2017, 20:34:12)
     ☐ Beleuchtung
     ☐ Seperaten Shader für Welt und UI, um partielle Blöcke zu unterstützen
+    ☐ Cursor verbessern(nicht mehr hinter anderen Blöcken sichtbar sein, Farbe anpassen)
 
 PC Port:
     ☐ Rendering Code portabler machen
@@ -56,4 +57,4 @@ Bugs:
     ✔ Beenden wenn man noch im Menü ist @done (22.8.2017, 02:14:19)
     ☐ Wenn man einen Namen eingibt der, bereinigt, identisch ist mit einer existierenden Welt, wird nichts dagegen unternommen
     ☐ Crash mit dem SuperChunk laden beheben
-    ☐ Kameranahwert und 3D Parameter so einstellen dass man nicht mehr so oft schielen muss und das nichts weg geclippt wird
+    ✔ Kameranahwert und 3D Parameter so einstellen dass man nicht mehr so oft schielen muss und das nichts weg geclippt wird @done (2017-9-13 18:18:48)
