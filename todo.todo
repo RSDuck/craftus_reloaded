@@ -14,6 +14,7 @@ GUI:
     ✔ FontLoader in den Ordner Gui bewegen @done (31.7.2017, 20:18:29)
     ✔ Buttons @done (31.7.2017, 16:42:30)
     ✔ Blockicons @done (12.8.2017, 15:42:49)
+    ☐ Keine absoluten Werte mehr benutzen
 
 Alles mögliche:
     ✔ Ordentlichen Crashreport anzeigen @done (22.8.2017, 02:11:11)
@@ -23,19 +24,25 @@ Alles mögliche:
     ✔ Welt löschen einbauen @done (21.8.2017, 19:32:26)
     ☐ Welt wechseln
     ✔ "Neue Welt erstellen" implementieren @done (21.8.2017, 18:19:32)
+    ☐ Debug Informationen ausblenden
 
 Weltgeneration:
     ✔ Nicht Superflach Welten @0.2 @done (23.8.2017, 13:12:11)
     ☐ Bäume(benötigt entsprechende Blöcke)
+    ☐ Neuer Weltentyp, Craftus spezifisch
 
 Gameplay:
     ✔ Mehr Blöcke überhaupt(Ziegelstein, Steinziegel, Glas und Blätter fehlen noch) @0.2 @done (17.8.2017, 20:48:42)
     ✔ Zufallsticks @0.2 @done (16.8.2017, 14:47:57)
     ☐ Besseres Autospringen
+    ☐ Sprinten
+    ☐ Survivalmodus
+    ☐ Planken
 
 Rendering:
     ✔ Transparente Blöcke korrekt rendern @0.2 @done (17.8.2017, 20:34:12)
     ☐ Beleuchtung
+    ☐ Seperaten Shader für Welt und UI, um partielle Blöcke zu unterstützen
 
 PC Port:
     ☐ Rendering Code portabler machen
@@ -49,3 +56,4 @@ Bugs:
     ✔ Beenden wenn man noch im Menü ist @done (22.8.2017, 02:14:19)
     ☐ Wenn man einen Namen eingibt der, bereinigt, identisch ist mit einer existierenden Welt, wird nichts dagegen unternommen
     ☐ Crash mit dem SuperChunk laden beheben
+    ☐ Kameranahwert und 3D Parameter so einstellen dass man nicht mehr so oft schielen muss und das nichts weg geclippt wird

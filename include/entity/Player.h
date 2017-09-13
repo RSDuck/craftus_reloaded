@@ -7,9 +7,10 @@
 #include <misc/Raycast.h>
 #include <misc/VecMath.h>
 
-#define PLAYER_EYEHEIGHT (1.7f)
+#define PLAYER_EYEHEIGHT (1.65f)
 #define PLAYER_HEIGHT (1.8f)
 #define PLAYER_COLLISIONBOX_SIZE (0.65f)
+#define PLAYER_HALFEYEDIFF (0.07f)
 
 typedef struct {
 	float3 position;

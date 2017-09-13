@@ -8,14 +8,14 @@ void Camera_Init(Camera* cam) {
 	Mtx_Identity(&cam->view);
 
 	cam->fov = C3D_AngleFromDegrees(60.f);
-	cam->near = 0.22f, cam->far = 4.f * CHUNK_SIZE;
+	cam->near = 0.2f, cam->far = 8.f * CHUNK_SIZE;
 
 	Mtx_PerspTilt(&cam->projection, cam->fov, ((400.f) / (240.f)), cam->near, cam->far, false);
 }
 
 void Camera_Update(Camera* cam, Player* player, float iod) {
 	float fov = cam->fov + C3D_AngleFromDegrees(12.f) * player->fovAdd;
-	Mtx_PerspStereoTilt(&cam->projection, fov, ((400.f) / (240.f)), cam->near, cam->far, iod, 3.f, false);
+	Mtx_PerspStereoTilt(&cam->projection, fov, ((400.f) / (240.f)), cam->near, cam->far, iod, 1.f, false);
 
 	float3 playerHead =
 	    f3_new(player->position.x, player->position.y + PLAYER_EYEHEIGHT + sinf(player->bobbing) * 0.1f + player->crouchAdd, player->position.z);

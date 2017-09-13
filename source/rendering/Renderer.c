@@ -96,7 +96,7 @@ void Renderer_Deinit() {
 }
 
 void Renderer_Render() {
-	float iod = osGet3DSliderState() / 4.f;
+	float iod = osGet3DSliderState() * PLAYER_HALFEYEDIFF;
 
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
