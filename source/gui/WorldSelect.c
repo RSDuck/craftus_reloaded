@@ -212,15 +212,20 @@ bool WorldSelect_Update(char* out_worldpath, char* out_name, WorldGenType* world
 					out_worldpath[i] = '_';
 			}
 
-			int i;
-			WorldInfo* info;
-			int alreadyExisting = 0;
-			vec_foreach_ptr(&worlds, info, i) if (!strcmp(out_name, info->name)) alreadyExisting++;
+			while (true) {
+				int i;
+				WorldInfo* info;
+				bool alreadyExisting = false;
+				vec_foreach_ptr(&worlds, info, i) if (!strcmp(out_worldpath, info->path)) {
+					alreadyExisting = true;
+					break;
+				}
+				if (!alreadyExisting) break;
 
-			for (int i = 0; i < alreadyExisting; i++) {
-				out_worldpath[length + i] = '_';
+				out_worldpath[length] = '_';
+				out_worldpath[length + alreadyExisting] = '\0';
+				length += alreadyExisting;
 			}
-			out_worldpath[length + alreadyExisting] = '\0';
 
 			*newWorld = true;
 
