@@ -8,8 +8,9 @@ static Texture_Map textureMap;
 // PATH PREFIX
 #define PPRX "romfs:/textures/blocks/"
 
-const char* files[] = {PPRX "stone.png", PPRX "dirt.png",	PPRX "cobblestone.png", PPRX "grass_side.png", PPRX "grass_top.png", PPRX "stonebrick.png",
-		       PPRX "sand.png",  PPRX "log_oak_top.png", PPRX "log_oak.png",     PPRX "leaves_oak.png", PPRX "glass.png",     PPRX "brick.png"};
+const char* files[] = {PPRX "stone.png",      PPRX "dirt.png",  PPRX "cobblestone.png", PPRX "grass_side.png", PPRX "grass_top.png",
+		       PPRX "stonebrick.png", PPRX "sand.png",  PPRX "log_oak_top.png", PPRX "log_oak.png",    PPRX "leaves_oak.png",
+		       PPRX "glass.png",      PPRX "brick.png", PPRX "planks_oak.png"};
 
 static struct {
 	Texture_MapIcon stone;
@@ -24,10 +25,11 @@ static struct {
 	Texture_MapIcon leaves_oak;
 	Texture_MapIcon glass;
 	Texture_MapIcon brick;
+	Texture_MapIcon oakplanks;
 } icon;
 
 void Block_Init() {
-	Texture_MapInit(&textureMap, files, 12);
+	Texture_MapInit(&textureMap, files, 13);
 #define A(i, n) icon.i = Texture_MapGetIcon(&textureMap, PPRX n)
 	A(stone, "stone.png");
 	A(dirt, "dirt.png");
@@ -41,6 +43,7 @@ void Block_Init() {
 	A(leaves_oak, "leaves_oak.png");
 	A(glass, "glass.png");
 	A(brick, "brick.png");
+	A(oakplanks, "planks_oak.png");
 #undef A
 }
 void Block_Deinit() { C3D_TexDelete(&textureMap.texture); }
@@ -110,6 +113,10 @@ void Block_GetTexture(Block block, Direction direction, int16_t* out_uv) {
 			out_uv[0] = icon.brick.u;
 			out_uv[1] = icon.brick.v;
 			return;
+		case Block_Planks:
+			out_uv[0] = icon.oakplanks.u;
+			out_uv[1] = icon.oakplanks.v;
+			return;
 	}
 }
 
@@ -122,4 +129,5 @@ uint16_t Block_GetColor(Block block, Direction direction) {
 
 bool Block_Opaque(Block block) { return block != Block_Air && block != Block_Leaves && block != Block_Glass; }
 
-const char* BlockNames[Blocks_Count] = {"Air", "Stone", "Dirt", "Grass", "Cobblestone", "Sand", "Log", "Leaves", "Glass", "Stone Bricks", "Bricks"};
+const char* BlockNames[Blocks_Count] = {"Air", "Stone",  "Dirt",  "Grass",	"Cobblestone", "Sand",
+					"Log", "Leaves", "Glass", "Stone Bricks", "Bricks",      "Planks"};
