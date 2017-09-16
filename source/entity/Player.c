@@ -155,7 +155,14 @@ void Player_Move(Player* player, float dt, float3 accl) {
 
 		if (player->grounded && player->flying) player->flying = false;
 
-		if (wallCollision && player->autoJumpEnabled) Player_Jump(player, accl);
+		if (wallCollision && player->autoJumpEnabled) {
+			float3 nrmDiff = f3_nrm(f3_sub(newPos, player->position));
+			Block block = World_GetBlock(player->world, FastFloor(finalPos.x + nrmDiff.x),
+						     FastFloor(finalPos.y + nrmDiff.y) + 2, FastFloor(finalPos.z + nrmDiff.z));
+			Block landingBlock = World_GetBlock(player->world, FastFloor(finalPos.x + nrmDiff.x),
+							    FastFloor(finalPos.y + nrmDiff.y) + 1, FastFloor(finalPos.z + nrmDiff.z));
+			if (block == Block_Air && landingBlock != Block_Air) Player_Jump(player, accl);
+		}
 
 		if (player->crouching && player->crouchAdd > -0.3f) player->crouchAdd -= SimStep * 2.f;
 		if (!player->crouching && player->crouchAdd < 0.0f) player->crouchAdd += SimStep * 2.f;
