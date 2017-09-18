@@ -2,6 +2,7 @@
 
 #include <blocks/Block.h>
 #include <gui/DebugUI.h>
+#include <gui/SpriteBatch.h>
 #include <gui/Gui.h>
 #include <gui/WorldSelect.h>
 #include <rendering/Camera.h>
@@ -70,7 +71,9 @@ void Renderer_Init(World* world_, Player* player_, WorkQueue* queue, GameState* 
 
 	WorldRenderer_Init(player, world, workqueue, world_shader_uLocProjection);
 
-	Gui_Init(world_shader_uLocProjection);
+	SpriteBatch_Init(world_shader_uLocProjection);
+
+	Gui_Init();
 
 	C3D_CullFace(GPU_CULL_BACK_CCW);
 
@@ -88,6 +91,8 @@ void Renderer_Deinit() {
 	WorldRenderer_Deinit();
 
 	Gui_Deinit();
+	
+	SpriteBatch_Deinit();
 
 	shaderProgramFree(&world_shader);
 	DVLB_Free(world_dvlb);
@@ -115,8 +120,8 @@ void Renderer_Render() {
 
 			WorldRenderer_Render(!i ? -iod : iod);
 
-			Gui_BindGuiTexture(GuiTexture_Widgets);
-			if (iod == 0.f) Gui_PushQuad(200 / 2 - 16 / 2, 120 / 2 - 16 / 2, 0, 16, 16, 240, 0, 16, 16);
+			SpriteBatch_BindGuiTexture(GuiTexture_Widgets);
+			if (iod == 0.f) SpriteBatch_PushQuad(200 / 2 - 16 / 2, 120 / 2 - 16 / 2, 0, 16, 16, 240, 0, 16, 16);
 		} else {
 			C3D_Mtx projection;
 			Mtx_PerspStereoTilt(&projection, C3D_AngleFromDegrees(90.f), ((400.f) / (240.f)), 0.22f, 4.f * CHUNK_SIZE,
@@ -133,15 +138,15 @@ void Renderer_Render() {
 
 			Clouds_Render(world_shader_uLocProjection, &vp, world, 0.f, 0.f);
 
-			Gui_BindTexture(&logoTex);
+			SpriteBatch_BindTexture(&logoTex);
 
-			Gui_SetScale(2);
-			Gui_PushQuad(100 / 2 - 76 / 2, 120 / 2, 0, 256, 64, 0, 0, 128, 32);
+			SpriteBatch_SetScale(2);
+			SpriteBatch_PushQuad(100 / 2 - 76 / 2, 120 / 2, 0, 256, 64, 0, 0, 128, 32);
 
-			Gui_PushText(0, 0, 0, INT16_MAX, true, INT_MAX, NULL, "v" CRAFTUS_VERSION_STR);
+			SpriteBatch_PushText(0, 0, 0, INT16_MAX, true, INT_MAX, NULL, "v" CRAFTUS_VERSION_STR);
 		}
 
-		Gui_Render(GFX_TOP);
+		SpriteBatch_Render(GFX_TOP);
 
 		if (iod <= 0.f) break;
 	}
@@ -153,11 +158,11 @@ void Renderer_Render() {
 	else {
 		DebugUI_Draw();
 
-		Gui_SetScale(2);
-		Gui_PushIcon(player->blockInHand, 160 - 32, 60 - 16, 20);
+		SpriteBatch_SetScale(2);
+		SpriteBatch_PushIcon(player->blockInHand, 160 - 32, 60 - 16, 20);
 	}
 
-	Gui_Render(GFX_BOTTOM);
+	SpriteBatch_Render(GFX_BOTTOM);
 
 	C3D_FrameEnd(0);
 }

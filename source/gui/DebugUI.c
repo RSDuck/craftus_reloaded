@@ -1,4 +1,4 @@
-#include <gui/Gui.h>
+#include <gui/SpriteBatch.h>
 #include <rendering/VertexFmt.h>
 
 #include <gui/DebugUI.h>
@@ -54,21 +54,21 @@ void DebugUI_Log(const char* text, ...) {
 }
 
 void DebugUI_Draw() {
-	Gui_SetScale(1);
+	SpriteBatch_SetScale(1);
 
-	Gui_PushSingleColorQuad(0, 0, 1, 320, 240, SHADER_RGB(4, 4, 4));
+	SpriteBatch_PushSingleColorQuad(0, 0, 1, 320, 240, SHADER_RGB(4, 4, 4));
 
 	int yOffset = (240 / 3) * 2;
 	for (int i = 0; i < LOG_LINES; i++) {
 		int step = 0;
-		Gui_PushText(0, yOffset, 2, INT16_MAX, false, 320, &step, "%s", logLines[i]);
+		SpriteBatch_PushText(0, yOffset, 2, INT16_MAX, false, 320, &step, "%s", logLines[i]);
 		yOffset += step;
 		if (yOffset >= 240) break;
 	}
 	yOffset = 0;
 	for (int i = 0; i < STATUS_LINES; i++) {
 		int step = 0;
-		Gui_PushText(0, yOffset, 2, INT16_MAX, false, 320, &step, "%s", statusLines[i]);
+		SpriteBatch_PushText(0, yOffset, 2, INT16_MAX, false, 320, &step, "%s", statusLines[i]);
 		yOffset += step;
 
 		memset(statusLines[i], 0x0, STATUS_LINE_LENGTH);

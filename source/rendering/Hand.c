@@ -16,7 +16,7 @@ void Hand_Draw(int projUniform, C3D_Mtx* projection, Block block, Player* player
 	C3D_Mtx pm;
 	C3D_Mtx model;
 	Mtx_Identity(&model);
-	Mtx_Translate(&model, 0.5f + sinf(player->bobbing) * 0.03f, -0.6f + ABS(sinf(player->bobbing)) * 0.01f, -1.2f, true);
+	Mtx_Translate(&model, 0.5f + sinf(player->bobbing) * 0.03f, -0.68f + ABS(sinf(player->bobbing)) * 0.01f, -1.2f, true);
 	Mtx_RotateX(&model, M_PI / 18.f, true);
 	Mtx_RotateY(&model, M_PI / 18.f, true);
 	if (player->breakPlaceTimeout > -0.1f) {

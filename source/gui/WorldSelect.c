@@ -1,6 +1,7 @@
 #include <gui/WorldSelect.h>
 
 #include <gui/Gui.h>
+#include <gui/SpriteBatch.h>
 
 #include <vec/vec.h>
 
@@ -117,13 +118,13 @@ static MenuState menustate = MenuState_SelectWorld;
 static float max_velocity = 20.f;
 
 void WorldSelect_Render() {
-	Gui_SetScale(2);
+	SpriteBatch_SetScale(2);
 
-	Gui_BindGuiTexture(GuiTexture_MenuBackground);
+	SpriteBatch_BindGuiTexture(GuiTexture_MenuBackground);
 	for (int i = 0; i < 160 / 32 + 1; i++) {
 		for (int j = 0; j < 120 / 32 + 1; j++) {
 			bool overlay = j >= 2 && menustate == MenuState_SelectWorld;
-			Gui_PushQuadColor(i * 32, j * 32, overlay ? -3 : -10, 32, 32, 0, 0, 32, 32,
+			SpriteBatch_PushQuadColor(i * 32, j * 32, overlay ? -3 : -10, 32, 32, 0, 0, 32, 32,
 					  overlay ? INT16_MAX : SHADER_RGB(12, 12, 12));
 		}
 	}
@@ -148,27 +149,27 @@ void WorldSelect_Render() {
 		vec_foreach (&worlds, info, i) {
 			int y = i * (CHAR_HEIGHT + CHAR_HEIGHT) + 10 + scroll;
 			if (selectedWorld == i) {
-				Gui_PushSingleColorQuad(10, y - 3, -7, 140, 1, SHADER_RGB(20, 20, 20));
-				Gui_PushSingleColorQuad(10, y + CHAR_HEIGHT + 2, -7, 140, 1, SHADER_RGB(20, 20, 20));
-				Gui_PushSingleColorQuad(10, y - 3, -7, 1, CHAR_HEIGHT + 6, SHADER_RGB(20, 20, 20));
-				Gui_PushSingleColorQuad(10 + 140, y - 3, -7, 1, CHAR_HEIGHT + 6, SHADER_RGB(20, 20, 20));
+				SpriteBatch_PushSingleColorQuad(10, y - 3, -7, 140, 1, SHADER_RGB(20, 20, 20));
+				SpriteBatch_PushSingleColorQuad(10, y + CHAR_HEIGHT + 2, -7, 140, 1, SHADER_RGB(20, 20, 20));
+				SpriteBatch_PushSingleColorQuad(10, y - 3, -7, 1, CHAR_HEIGHT + 6, SHADER_RGB(20, 20, 20));
+				SpriteBatch_PushSingleColorQuad(10 + 140, y - 3, -7, 1, CHAR_HEIGHT + 6, SHADER_RGB(20, 20, 20));
 			}
 			if (Gui_EnteredCursorInside(10, y - 3, 140, CHAR_HEIGHT + 6) && y < 32 * 2) {
 				selectedWorld = i;
 			}
-			Gui_PushText(20, y, -6, INT16_MAX, true, INT_MAX, NULL, "%s", info.name, movementY);
+			SpriteBatch_PushText(20, y, -6, INT16_MAX, true, INT_MAX, NULL, "%s", info.name, movementY);
 		}
 
 		clicked_play = Gui_Button(5, 2 * 32 + 5, 160 - 5 * 2, "Play selected World");
 		clicked_new_world = Gui_Button(5, 3 * 32, 160 / 2 - 5 * 2, "New World");
 		clicked_delete_world = Gui_Button(160 / 2 + 5, 3 * 32, 160 / 2 - 5 * 2, "Delete World");
 	} else if (menustate == MenuState_ConfirmDeletion) {
-		int textWidth = Gui_CalcTextWidth("Are you sure?");
-		Gui_PushText(160 / 2 - textWidth / 2, 120 / 3, -1, INT16_MAX, true, INT_MAX, NULL, "Are you sure?");
+		int textWidth = SpriteBatch_CalcTextWidth("Are you sure?");
+		SpriteBatch_PushText(160 / 2 - textWidth / 2, 120 / 3, -1, INT16_MAX, true, INT_MAX, NULL, "Are you sure?");
 		canceled_deletion = Gui_Button(10, 120 / 3 * 2, 160 / 2 - 10 * 2, "No");
 		confirmed_deletion = Gui_Button(160 / 2 + 10, 120 / 3 * 2, 160 / 2 - 10 * 2, "Yes");
 	} else if (menustate == MenuState_WorldOptions) {
-		Gui_PushText(10, 20, -2, INT16_MAX, true, INT_MAX, NULL, "World type: ");
+		SpriteBatch_PushText(10, 20, -2, INT16_MAX, true, INT_MAX, NULL, "World type: ");
 		if (Gui_Button(160 / 2, 20 - BUTTON_TEXT_PADDING, 160 / 2 - 10, worldGenTypesStr[worldGenType])) {
 			worldGenType++;
 			if (worldGenType == WorldGenTypes_Count) worldGenType = 0;
