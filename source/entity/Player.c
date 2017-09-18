@@ -183,7 +183,6 @@ void Player_Move(Player* player, float dt, float3 accl) {
 	}
 }
 
-static const float BreakPlace_Timout = 0.2f;
 void Player_PlaceBlock(Player* player, Block block) {
 	if (player->world && player->blockInActionRange && player->breakPlaceTimeout < 0.f) {
 		const int* offset = DirectionToOffset[player->viewRayCast.direction];
@@ -194,14 +193,14 @@ void Player_PlaceBlock(Player* player, Block block) {
 			return;
 		World_SetBlock(player->world, player->viewRayCast.x + offset[0], player->viewRayCast.y + offset[1],
 			       player->viewRayCast.z + offset[2], block);
-		player->breakPlaceTimeout = BreakPlace_Timout;
+		player->breakPlaceTimeout = PLAYER_PLACE_REPLACE_TIMEOUT;
 	}
 }
 
 void Player_BreakBlock(Player* player) {
 	if (player->world && player->blockInActionRange && player->breakPlaceTimeout < 0.f) {
 		World_SetBlock(player->world, player->viewRayCast.x, player->viewRayCast.y, player->viewRayCast.z, Block_Air);
-		player->breakPlaceTimeout = BreakPlace_Timout;
+		player->breakPlaceTimeout = PLAYER_PLACE_REPLACE_TIMEOUT;
 	}
 }
 

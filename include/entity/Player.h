@@ -12,6 +12,8 @@
 #define PLAYER_COLLISIONBOX_SIZE (0.65f)
 #define PLAYER_HALFEYEDIFF (0.07f)
 
+#define PLAYER_PLACE_REPLACE_TIMEOUT (0.2f)
+
 typedef struct {
 	float3 position;
 	float pitch, yaw;

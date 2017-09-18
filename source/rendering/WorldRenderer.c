@@ -9,6 +9,7 @@
 #include <citro3d.h>
 
 #include <rendering/Clouds.h>
+#include <rendering/Hand.h>
 
 static Player* player;
 static World* world;
@@ -51,6 +52,7 @@ void WorldRenderer_Init(Player* player_, World* world_, WorkQueue* workqueue_, i
 	Camera_Init(&camera);
 
 	Cursor_Init();
+	Hand_Init();
 
 	float data[256];
 	for (int i = 0; i <= 128; i++) {
@@ -73,6 +75,8 @@ void WorldRenderer_Deinit() {
 	vec_deinit(&renderingQueue);
 	vec_deinit(&transparentClusters);
 	Cursor_Deinit();
+
+	Hand_Deinit();
 
 	Clouds_Deinit();
 }
@@ -166,7 +170,7 @@ static void renderWorld() {
 		}
 	}
 
-	C3D_AlphaTest(true, GPU_GREATER, 0);
+	C3D_AlphaTest(true, GPU_GEQUAL, 255);
 
 	int i;
 	TransparentRender* render;
@@ -188,6 +192,8 @@ static void renderWorld() {
 
 void WorldRenderer_Render(float iod) {
 	Camera_Update(&camera, player, iod);
+
+	Hand_Draw(projectionUniform, &camera.projection, player->blockInHand, player);
 
 	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, projectionUniform, &camera.vp);
 

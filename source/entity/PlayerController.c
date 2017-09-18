@@ -132,6 +132,7 @@ typedef struct {
 
 static inline float IsKeyDown(KeyCombo combo, PlatformAgnosticInput* input) { return input->keys[combo]; }
 static inline bool WasKeyReleased(KeyCombo combo, PlatformAgnosticInput* input) { return input->keysup[combo]; }
+static inline bool WasKeyPressed(KeyCombo combo, PlatformAgnosticInput* input) { return input->keysdown[combo]; }
 
 void PlayerController_Init(PlayerController* ctrl, Player* player) {
 	ctrl->breakPlaceTimeout = 0.f;
@@ -294,8 +295,8 @@ void PlayerController_Update(PlayerController* ctrl, InputData input, float dt) 
 	bool releasedCrouch = WasKeyReleased(ctrl->controlScheme.crouch, &agnosticInput);
 	player->crouching ^= !player->flying && releasedCrouch;
 
-	bool switchBlockLeft = WasKeyReleased(ctrl->controlScheme.switchBlockLeft, &agnosticInput);
-	bool switchBlockRight = WasKeyReleased(ctrl->controlScheme.switchBlockRight, &agnosticInput);
+	bool switchBlockLeft = WasKeyPressed(ctrl->controlScheme.switchBlockLeft, &agnosticInput);
+	bool switchBlockRight = WasKeyPressed(ctrl->controlScheme.switchBlockRight, &agnosticInput);
 	if (switchBlockLeft && --player->blockInHand == 0) player->blockInHand = Blocks_Count - 1;
 	if (switchBlockRight && ++player->blockInHand == Blocks_Count) player->blockInHand = 1;
 
@@ -304,7 +305,7 @@ void PlayerController_Update(PlayerController* ctrl, InputData input, float dt) 
 		ctrl->openedCmd = false;
 	}
 
-	float cmdLine = WasKeyReleased(ctrl->controlScheme.openCmd, &agnosticInput);
+	float cmdLine = WasKeyPressed(ctrl->controlScheme.openCmd, &agnosticInput);
 	if (cmdLine) {
 		CommandLine_Activate(player->world, player);
 		ctrl->openedCmd = true;
