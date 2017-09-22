@@ -1,8 +1,9 @@
 #pragma once
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <limits.h>
+
 
 #include <misc/InputData.h>
 #include <world/World.h>
@@ -15,7 +16,7 @@ void SpriteBatch_Deinit();
 typedef enum { GuiTexture_Blank, GuiTexture_Font, GuiTexture_Icons, GuiTexture_Widgets, GuiTexture_MenuBackground } GuiTexture;
 
 void SpriteBatch_BindGuiTexture(GuiTexture texture);
-void Sprite_BindTexture(C3D_Tex* texture);
+void SpriteBatch_BindTexture(C3D_Tex* texture);
 
 void SpriteBatch_PushSingleColorQuad(int x, int y, int z, int w, int h, int16_t color);
 void SpriteBatch_PushQuadColor(int x, int y, int z, int w, int h, int rx, int ry, int rw, int rh, int16_t color);
@@ -34,4 +35,8 @@ bool SpriteBatch_RectIsVisible(int x, int y, int w, int h);
 void SpriteBatch_SetScale(int scale);
 int SpriteBatch_GetScale();
 
+int SpriteBatch_GetWidth();
+int SpriteBatch_GetHeight();
+
+void SpriteBatch_StartFrame(int width, int height);
 void SpriteBatch_Render(gfxScreen_t screen);

@@ -2,8 +2,8 @@
 
 #include <blocks/Block.h>
 #include <gui/DebugUI.h>
-#include <gui/SpriteBatch.h>
 #include <gui/Gui.h>
+#include <gui/SpriteBatch.h>
 #include <gui/WorldSelect.h>
 #include <rendering/Camera.h>
 #include <rendering/Clouds.h>
@@ -11,6 +11,7 @@
 #include <rendering/PolyGen.h>
 #include <rendering/TextureMap.h>
 #include <rendering/WorldRenderer.h>
+
 
 #include <citro3d.h>
 
@@ -91,7 +92,7 @@ void Renderer_Deinit() {
 	WorldRenderer_Deinit();
 
 	Gui_Deinit();
-	
+
 	SpriteBatch_Deinit();
 
 	shaderProgramFree(&world_shader);
@@ -109,6 +110,8 @@ void Renderer_Render() {
 
 	for (int i = 0; i < 2; i++) {
 		C3D_FrameDrawOn(renderTargets[i]);
+
+		SpriteBatch_StartFrame(400, 240);
 
 		C3D_TexEnv* env = C3D_GetTexEnv(0);
 		C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, 0);
@@ -153,14 +156,26 @@ void Renderer_Render() {
 
 	C3D_FrameDrawOn(lowerScreen);
 
+	SpriteBatch_StartFrame(320, 240);
+
 	if (*gamestate == GameState_SelectWorld)
 		WorldSelect_Render();
 	else {
-		DebugUI_Draw();
+		// DebugUI_Draw();
+		Gui_BeginRow(160, 1);
+		Gui_Label(1.f, true, INT16_MAX, true, "Are you sure?");
+		Gui_EndRow();
+		Gui_BeginRow(160, 4);
+		Gui_Space(0.4f / 3.f);
+		Gui_ButtonNew(0.3f, "Yes");
+		Gui_Space(0.4f / 3.f);
+		Gui_ButtonNew(0.3f, "No");
 
 		SpriteBatch_SetScale(2);
 		SpriteBatch_PushIcon(player->blockInHand, 160 - 32, 60 - 16, 20);
 	}
+
+	Gui_Frame();
 
 	SpriteBatch_Render(GFX_BOTTOM);
 

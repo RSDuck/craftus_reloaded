@@ -29,6 +29,7 @@ static C3D_Tex widgetsTex;
 static C3D_Tex iconsTex;
 static C3D_Tex menuBackgroundTex;
 
+static int screenWidth = 0, screenHeight = 0;
 static int guiScale = 2;
 
 void SpriteBatch_Init(int projUniform_) {
@@ -169,6 +170,8 @@ int SpriteBatch_PushTextVargs(int x, int y, int z, int16_t color, bool shadow, i
 		++text;
 	}
 
+	maxWidth = MAX(maxWidth, offsetX);
+
 	if (ySize != NULL) *ySize = offsetY + CHAR_HEIGHT;
 
 	return maxWidth;
@@ -190,9 +193,18 @@ int SpriteBatch_CalcTextWidthVargs(const char* text, va_list args) {
 	char* it = fmtedText;
 
 	int length = 0;
-	while (*it != '\0') length += font->fontWidth[(int)*(it++)];
+	int maxLength = 0;
+	while (*it != '\0') {
+		if (*it == '\n') {
+			maxLength = MAX(maxLength, length);
+			length = 0;
+		} else
+			length += font->fontWidth[(int)*(it++)];
+	}
 
-	return length;
+	maxLength = MAX(maxLength, length);
+
+	return maxLength;
 }
 
 static int compareDrawCommands(const void* a, const void* b) {
@@ -202,14 +214,22 @@ static int compareDrawCommands(const void* a, const void* b) {
 	return ga->depth == gb->depth ? gb->texture - ga->texture : gb->depth - ga->depth;
 }
 
+int SpriteBatch_GetWidth() { return screenWidth / guiScale; }
+int SpriteBatch_GetHeight() { return screenHeight / guiScale; }
+
 void SpriteBatch_SetScale(int scale) { guiScale = scale; }
 int SpriteBatch_GetScale() { return guiScale; }
+
+void SpriteBatch_StartFrame(int width, int height) {
+	screenWidth = width;
+	screenHeight = height;
+}
 
 void SpriteBatch_Render(gfxScreen_t screen) {
 	vec_sort(&cmdList, &compareDrawCommands);
 
 	C3D_Mtx projMtx;
-	Mtx_OrthoTilt(&projMtx, 0.f, screen == GFX_BOTTOM ? 320.f : 400.f, 240.f, 0.f, 1.f, -1.f, false);
+	Mtx_OrthoTilt(&projMtx, 0.f, screenWidth, screenHeight, 0.f, 1.f, -1.f, false);
 
 	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, projUniform, &projMtx);
 

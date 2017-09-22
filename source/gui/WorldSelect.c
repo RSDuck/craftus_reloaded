@@ -124,8 +124,8 @@ void WorldSelect_Render() {
 	for (int i = 0; i < 160 / 32 + 1; i++) {
 		for (int j = 0; j < 120 / 32 + 1; j++) {
 			bool overlay = j >= 2 && menustate == MenuState_SelectWorld;
-			SpriteBatch_PushQuadColor(i * 32, j * 32, overlay ? -3 : -10, 32, 32, 0, 0, 32, 32,
-					  overlay ? INT16_MAX : SHADER_RGB(12, 12, 12));
+			SpriteBatch_PushQuadColor(i * 32, j * 32, overlay ? -4 : -10, 32, 32, 0, 0, 32, 32,
+						  overlay ? INT16_MAX : SHADER_RGB(12, 12, 12));
 		}
 	}
 
@@ -160,22 +160,42 @@ void WorldSelect_Render() {
 			SpriteBatch_PushText(20, y, -6, INT16_MAX, true, INT_MAX, NULL, "%s", info.name, movementY);
 		}
 
-		clicked_play = Gui_Button(5, 2 * 32 + 5, 160 - 5 * 2, "Play selected World");
-		clicked_new_world = Gui_Button(5, 3 * 32, 160 / 2 - 5 * 2, "New World");
-		clicked_delete_world = Gui_Button(160 / 2 + 5, 3 * 32, 160 / 2 - 5 * 2, "Delete World");
+		Gui_Offset(0, 2 * 32 + 5 + BUTTON_TEXT_PADDING);
+		Gui_BeginRowCenter(Gui_RelativeWidth(0.95f), 1);
+		clicked_play = Gui_ButtonNew(1.f, "Play selected world");
+		Gui_EndRow();
+		Gui_BeginRowCenter(Gui_RelativeWidth(0.95f), 2);
+		clicked_new_world = Gui_ButtonNew(0.5f, "New World");
+		clicked_delete_world = Gui_ButtonNew(0.5f, "Delete World");
+		Gui_EndRow();
 	} else if (menustate == MenuState_ConfirmDeletion) {
-		int textWidth = SpriteBatch_CalcTextWidth("Are you sure?");
-		SpriteBatch_PushText(160 / 2 - textWidth / 2, 120 / 3, -1, INT16_MAX, true, INT_MAX, NULL, "Are you sure?");
-		canceled_deletion = Gui_Button(10, 120 / 3 * 2, 160 / 2 - 10 * 2, "No");
-		confirmed_deletion = Gui_Button(160 / 2 + 10, 120 / 3 * 2, 160 / 2 - 10 * 2, "Yes");
+		Gui_Offset(0, 10);
+		Gui_BeginRow(SpriteBatch_GetWidth(), 1);
+		Gui_Label(0.f, true, INT16_MAX, true, "Are you sure?");
+		Gui_EndRow();
+		Gui_VerticalSpace(Gui_RelativeHeight(0.4f));
+		Gui_BeginRowCenter(Gui_RelativeWidth(0.8f), 3);
+		canceled_deletion = Gui_ButtonNew(0.4f, "No");
+		Gui_Space(0.2f);
+		confirmed_deletion = Gui_ButtonNew(0.4f, "Yes");
+		Gui_EndRow();
 	} else if (menustate == MenuState_WorldOptions) {
-		SpriteBatch_PushText(10, 20, -2, INT16_MAX, true, INT_MAX, NULL, "World type: ");
-		if (Gui_Button(160 / 2, 20 - BUTTON_TEXT_PADDING, 160 / 2 - 10, worldGenTypesStr[worldGenType])) {
+		Gui_Offset(0, 10);
+		Gui_BeginRowCenter(Gui_RelativeWidth(0.9f), 3);
+		Gui_Label(0.45f, true, INT16_MAX, false, "World type:");
+		Gui_Space(0.1f);
+		if (Gui_ButtonNew(0.45f, "%s", worldGenTypesStr[worldGenType])) {
 			worldGenType++;
 			if (worldGenType == WorldGenTypes_Count) worldGenType = 0;
 		}
-		canceled_world_options = Gui_Button(10, 120 / 3 * 2, 160 / 2 - 10 * 2, "Cancel");
-		confirmed_world_options = Gui_Button(160 / 2 + 10, 120 / 3 * 2, 160 / 2 - 10 * 2, "Continue");
+		Gui_EndRow();
+
+		Gui_VerticalSpace(Gui_RelativeHeight(0.4f));
+
+		Gui_BeginRowCenter(Gui_RelativeWidth(0.9f), 3);
+		canceled_world_options = Gui_ButtonNew(0.45f, "Cancel");
+		Gui_Space(0.1f);
+		confirmed_world_options = Gui_ButtonNew(0.45f, "Continue");
 	}
 }
 
