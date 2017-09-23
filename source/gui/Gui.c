@@ -77,7 +77,7 @@ void Gui_Label(float size, bool shadow, int16_t color, bool center, const char* 
 	currentRow.highestElement = MAX(currentRow.highestElement, yTextSize);
 }
 
-bool Gui_ButtonNew(float size, const char* label, ...) {
+bool Gui_Button(float size, const char* label, ...) {
 #define SLICE_SIZE 8
 
 	va_list vl;
@@ -118,32 +118,6 @@ void Gui_VerticalSpace(int y) { windowY += y; }
 void Gui_InputData(InputData data) {
 	oldInput = input;
 	input = data;
-}
-
-bool Gui_Button(int x, int y, int w, const char* text) {
-#define SLICE_SIZE 8
-
-	int textWidth = SpriteBatch_CalcTextWidth(text);
-
-	if (w == -1) w = textWidth + SLICE_SIZE;
-
-	bool pressed = Gui_IsCursorInside(x, y, w, BUTTON_HEIGHT);
-
-	int middlePieceSize = w - SLICE_SIZE * 2;
-
-	SpriteBatch_BindGuiTexture(GuiTexture_Widgets);
-	SpriteBatch_PushQuad(x, y, -2, SLICE_SIZE, 20, 0, 46 + (pressed * BUTTON_HEIGHT * 2), SLICE_SIZE, 20);
-	SpriteBatch_PushQuad(x + SLICE_SIZE, y, -2, middlePieceSize, 20, SLICE_SIZE, 46 + (pressed * BUTTON_HEIGHT * 2), middlePieceSize,
-			     20);
-	SpriteBatch_PushQuad(x + SLICE_SIZE + middlePieceSize, y, -2, SLICE_SIZE, 20, 192, 46 + (pressed * BUTTON_HEIGHT * 2), SLICE_SIZE,
-			     20);
-
-	SpriteBatch_PushText(x + (w / 2 - textWidth / 2), y + (BUTTON_HEIGHT - CHAR_HEIGHT) / 2, 0, SHADER_RGB(31, 31, 31), true, INT_MAX,
-			     NULL, text);
-
-	if (input.keysup & KEY_TOUCH && Gui_WasCursorInside(x, y, w, BUTTON_HEIGHT)) return true;
-
-	return false;
 }
 
 bool Gui_IsCursorInside(int x, int y, int w, int h) {

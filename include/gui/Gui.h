@@ -10,10 +10,6 @@ void Gui_Deinit();
 
 void Gui_InputData(InputData data);
 
-#define BUTTON_HEIGHT 20
-#define BUTTON_TEXT_PADDING ((BUTTON_HEIGHT - CHAR_HEIGHT) / 2)
-bool Gui_Button(int x, int y, int w, const char* text);
-
 void Gui_Frame();
 
 int Gui_RelativeWidth(float x);
@@ -29,7 +25,9 @@ void Gui_BeginRow(int width, int count);
 void Gui_EndRow();
 
 void Gui_Label(float size, bool shadow, int16_t color, bool center, const char* text, ...); // size[0-1] Anteil
-bool Gui_ButtonNew(float size, const char* label, ...); // size[0-1] Anteil an derzeitiger Reihe
+#define BUTTON_HEIGHT 20
+#define BUTTON_TEXT_PADDING ((BUTTON_HEIGHT - CHAR_HEIGHT) / 2)
+bool Gui_Button(float size, const char* label, ...); // size[0-1] Anteil an derzeitiger Reihe
 
 bool Gui_IsCursorInside(int x, int y, int w, int h);
 bool Gui_WasCursorInside(int x, int y, int w, int h);

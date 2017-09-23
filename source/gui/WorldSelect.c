@@ -162,11 +162,11 @@ void WorldSelect_Render() {
 
 		Gui_Offset(0, 2 * 32 + 5 + BUTTON_TEXT_PADDING);
 		Gui_BeginRowCenter(Gui_RelativeWidth(0.95f), 1);
-		clicked_play = Gui_ButtonNew(1.f, "Play selected world");
+		clicked_play = Gui_Button(1.f, "Play selected world");
 		Gui_EndRow();
 		Gui_BeginRowCenter(Gui_RelativeWidth(0.95f), 2);
-		clicked_new_world = Gui_ButtonNew(0.5f, "New World");
-		clicked_delete_world = Gui_ButtonNew(0.5f, "Delete World");
+		clicked_new_world = Gui_Button(0.5f, "New World");
+		clicked_delete_world = Gui_Button(0.5f, "Delete World");
 		Gui_EndRow();
 	} else if (menustate == MenuState_ConfirmDeletion) {
 		Gui_Offset(0, 10);
@@ -175,16 +175,16 @@ void WorldSelect_Render() {
 		Gui_EndRow();
 		Gui_VerticalSpace(Gui_RelativeHeight(0.4f));
 		Gui_BeginRowCenter(Gui_RelativeWidth(0.8f), 3);
-		canceled_deletion = Gui_ButtonNew(0.4f, "No");
+		canceled_deletion = Gui_Button(0.4f, "No");
 		Gui_Space(0.2f);
-		confirmed_deletion = Gui_ButtonNew(0.4f, "Yes");
+		confirmed_deletion = Gui_Button(0.4f, "Yes");
 		Gui_EndRow();
 	} else if (menustate == MenuState_WorldOptions) {
 		Gui_Offset(0, 10);
 		Gui_BeginRowCenter(Gui_RelativeWidth(0.9f), 3);
 		Gui_Label(0.45f, true, INT16_MAX, false, "World type:");
 		Gui_Space(0.1f);
-		if (Gui_ButtonNew(0.45f, "%s", worldGenTypesStr[worldGenType])) {
+		if (Gui_Button(0.45f, "%s", worldGenTypesStr[worldGenType])) {
 			worldGenType++;
 			if (worldGenType == WorldGenTypes_Count) worldGenType = 0;
 		}
@@ -193,9 +193,9 @@ void WorldSelect_Render() {
 		Gui_VerticalSpace(Gui_RelativeHeight(0.4f));
 
 		Gui_BeginRowCenter(Gui_RelativeWidth(0.9f), 3);
-		canceled_world_options = Gui_ButtonNew(0.45f, "Cancel");
+		canceled_world_options = Gui_Button(0.45f, "Cancel");
 		Gui_Space(0.1f);
-		confirmed_world_options = Gui_ButtonNew(0.45f, "Continue");
+		confirmed_world_options = Gui_Button(0.45f, "Continue");
 	}
 }
 

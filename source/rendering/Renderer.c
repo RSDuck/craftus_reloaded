@@ -167,9 +167,9 @@ void Renderer_Render() {
 		Gui_EndRow();
 		Gui_BeginRow(160, 4);
 		Gui_Space(0.4f / 3.f);
-		Gui_ButtonNew(0.3f, "Yes");
+		Gui_Button(0.3f, "Yes");
 		Gui_Space(0.4f / 3.f);
-		Gui_ButtonNew(0.3f, "No");
+		Gui_Button(0.3f, "No");
 
 		SpriteBatch_SetScale(2);
 		SpriteBatch_PushIcon(player->blockInHand, 160 - 32, 60 - 16, 20);

@@ -59,3 +59,4 @@ Bugs:
     ✔ Wenn man einen Namen eingibt der, bereinigt, identisch ist mit einer existierenden Welt, wird nichts dagegen unternommen @done (2017-9-16 15:11:07)
     ☐ Crash mit dem SuperChunk laden beheben
     ✔ Kameranahwert und 3D Parameter so einstellen dass man nicht mehr so oft schielen muss und das nichts weg geclippt wird @done (2017-9-13 18:18:48)
+    ☐ Crash beim bauen überhalb der oberen Grenze, der Welt, beheben
