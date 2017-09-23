@@ -91,11 +91,11 @@ static void renderWorld() {
 	vec_clear(&renderingQueue);
 	vec_clear(&transparentClusters);
 
-	int pY = WorldToChunkCoord(FastFloor(player->position.y));
+	int pY = CLAMP(WorldToChunkCoord(FastFloor(player->position.y)), 0, CLUSTER_PER_CHUNK - 1);
 	Chunk* pChunk =
 	    World_GetChunk(world, WorldToChunkCoord(FastFloor(player->position.x)), WorldToChunkCoord(FastFloor(player->position.z)));
-	vec_push(&renderingQueue, ((RenderStep){&pChunk->clusters[pY < 0 ? 0 : pY], pChunk, Direction_Invalid}));
-	chunkRendered[CHUNKCACHE_SIZE / 2][pY < 0 ? 0 : pY][CHUNKCACHE_SIZE / 2] = 1;
+	vec_push(&renderingQueue, ((RenderStep){&pChunk->clusters[pY], pChunk, Direction_Invalid}));
+	chunkRendered[CHUNKCACHE_SIZE / 2][pY][CHUNKCACHE_SIZE / 2] = 1;
 
 	float3 playerPos = player->position;
 

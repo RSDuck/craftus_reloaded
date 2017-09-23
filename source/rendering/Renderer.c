@@ -161,15 +161,7 @@ void Renderer_Render() {
 	if (*gamestate == GameState_SelectWorld)
 		WorldSelect_Render();
 	else {
-		// DebugUI_Draw();
-		Gui_BeginRow(160, 1);
-		Gui_Label(1.f, true, INT16_MAX, true, "Are you sure?");
-		Gui_EndRow();
-		Gui_BeginRow(160, 4);
-		Gui_Space(0.4f / 3.f);
-		Gui_Button(0.3f, "Yes");
-		Gui_Space(0.4f / 3.f);
-		Gui_Button(0.3f, "No");
+		DebugUI_Draw();
 
 		SpriteBatch_SetScale(2);
 		SpriteBatch_PushIcon(player->blockInHand, 160 - 32, 60 - 16, 20);
