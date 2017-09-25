@@ -26,10 +26,12 @@ static struct {
 	Texture_MapIcon glass;
 	Texture_MapIcon brick;
 	Texture_MapIcon oakplanks;
+	Texture_MapIcon wool;
+	Texture_MapIcon bedrock;
 } icon;
 
 void Block_Init() {
-	Texture_MapInit(&textureMap, files, 13);
+	Texture_MapInit(&textureMap, files, 15);
 #define A(i, n) icon.i = Texture_MapGetIcon(&textureMap, PPRX n)
 	A(stone, "stone.png");
 	A(dirt, "dirt.png");
@@ -44,6 +46,8 @@ void Block_Init() {
 	A(glass, "glass.png");
 	A(brick, "brick.png");
 	A(oakplanks, "planks_oak.png");
+	A(wool, "wool.png");
+	A(bedrock, "bedrock.png");
 #undef A
 }
 void Block_Deinit() { C3D_TexDelete(&textureMap.texture); }
@@ -116,6 +120,14 @@ void Block_GetTexture(Block block, Direction direction, int16_t* out_uv) {
 		case Block_Planks:
 			out_uv[0] = icon.oakplanks.u;
 			out_uv[1] = icon.oakplanks.v;
+			return;
+		case Block_Wool:
+			out_uv[0] = icon.wool.u;
+			out_uv[1] = icon.wool.v;
+			return;
+		case Block_Bedrock:
+			out_uv[0] = icon.bedrock.u;
+			out_uv[1] = icon.bedrock.v;
 			return;
 	}
 }
