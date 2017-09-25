@@ -19,6 +19,8 @@ enum { Block_Air,
        Block_Stonebrick,
        Block_Brick,
        Block_Planks,
+       Block_Wool,
+       Block_Bedrock,
        Blocks_Count };
 
 void Block_Init();
