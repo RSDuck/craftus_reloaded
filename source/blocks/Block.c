@@ -10,7 +10,7 @@ static Texture_Map textureMap;
 
 const char* files[] = {PPRX "stone.png",      PPRX "dirt.png",  PPRX "cobblestone.png", PPRX "grass_side.png", PPRX "grass_top.png",
 		       PPRX "stonebrick.png", PPRX "sand.png",  PPRX "log_oak_top.png", PPRX "log_oak.png",    PPRX "leaves_oak.png",
-		       PPRX "glass.png",      PPRX "brick.png", PPRX "planks_oak.png"};
+		       PPRX "glass.png",      PPRX "brick.png", PPRX "planks_oak.png",  PPRX "wool.png",       PPRX "bedrock.png"};
 
 static struct {
 	Texture_MapIcon stone;
@@ -141,5 +141,5 @@ uint16_t Block_GetColor(Block block, Direction direction) {
 
 bool Block_Opaque(Block block) { return block != Block_Air && block != Block_Leaves && block != Block_Glass; }
 
-const char* BlockNames[Blocks_Count] = {"Air", "Stone",  "Dirt",  "Grass",	"Cobblestone", "Sand",
-					"Log", "Leaves", "Glass", "Stone Bricks", "Bricks",      "Planks"};
+const char* BlockNames[Blocks_Count] = {"Air",    "Stone", "Dirt",	 "Grass",  "Cobblestone", "Sand", "Log",
+					"Leaves", "Glass", "Stone Bricks", "Bricks", "Planks",      "Wool", "Bedrock"};
