@@ -8,9 +8,16 @@ static Texture_Map textureMap;
 // PATH PREFIX
 #define PPRX "romfs:/textures/blocks/"
 
-const char* files[] = {PPRX "stone.png",      PPRX "dirt.png",  PPRX "cobblestone.png", PPRX "grass_side.png", PPRX "grass_top.png",
-		       PPRX "stonebrick.png", PPRX "sand.png",  PPRX "log_oak_top.png", PPRX "log_oak.png",    PPRX "leaves_oak.png",
-		       PPRX "glass.png",      PPRX "brick.png", PPRX "planks_oak.png",  PPRX "wool.png",       PPRX "bedrock.png"};
+#define TEXTURE_FILES                                                                                                              \
+	A(stone, "stone.png")                                                                                                      \
+	, A(dirt, "dirt.png"), A(cobblestone, "cobblestone.png"), A(grass_side, "grass_side.png"), A(grass_top, "grass_top.png"),  \
+	    A(stonebrick, "stonebrick.png"), A(sand, "sand.png"), A(oaklog_side, "log_oak.png"), A(oaklog_top, "log_oak_top.png"), \
+	    A(leaves_oak, "leaves_oak.png"), A(glass, "glass.png"), A(brick, "brick.png"), A(oakplanks, "planks_oak.png"),         \
+	    A(wool, "wool.png"), A(bedrock, "bedrock.png")
+
+#define A(i, n) PPRX n
+const char* texture_files[] = {TEXTURE_FILES};
+#undef A
 
 static struct {
 	Texture_MapIcon stone;
@@ -31,23 +38,9 @@ static struct {
 } icon;
 
 void Block_Init() {
-	Texture_MapInit(&textureMap, files, 15);
+	Texture_MapInit(&textureMap, texture_files, sizeof(texture_files) / sizeof(texture_files[0]));
 #define A(i, n) icon.i = Texture_MapGetIcon(&textureMap, PPRX n)
-	A(stone, "stone.png");
-	A(dirt, "dirt.png");
-	A(cobblestone, "cobblestone.png");
-	A(grass_side, "grass_side.png");
-	A(grass_top, "grass_top.png");
-	A(stonebrick, "stonebrick.png");
-	A(sand, "sand.png");
-	A(oaklog_side, "log_oak.png");
-	A(oaklog_top, "log_oak_top.png");
-	A(leaves_oak, "leaves_oak.png");
-	A(glass, "glass.png");
-	A(brick, "brick.png");
-	A(oakplanks, "planks_oak.png");
-	A(wool, "wool.png");
-	A(bedrock, "bedrock.png");
+	TEXTURE_FILES;
 #undef A
 }
 void Block_Deinit() { C3D_TexDelete(&textureMap.texture); }
@@ -55,81 +48,70 @@ void Block_Deinit() { C3D_TexDelete(&textureMap.texture); }
 void* Block_GetTextureMap() { return &textureMap.texture; }
 
 void Block_GetTexture(Block block, Direction direction, int16_t* out_uv) {
+	Texture_MapIcon i;
 	switch (block) {
 		case Block_Air:
 			return;
 		case Block_Dirt:
-			out_uv[0] = icon.dirt.u;
-			out_uv[1] = icon.dirt.v;
-			return;
+			i = icon.dirt;
+			break;
 		case Block_Stone:
-			out_uv[0] = icon.stone.u;
-			out_uv[1] = icon.stone.v;
-			return;
+			i = icon.stone;
+			break;
 		case Block_Grass:
 			switch (direction) {
 				case Direction_Top:
-					out_uv[0] = icon.grass_top.u;
-					out_uv[1] = icon.grass_top.v;
-					return;
+					i = icon.grass_top;
+					break;
 				case Direction_Bottom:
-					out_uv[0] = icon.dirt.u;
-					out_uv[1] = icon.dirt.v;
-					return;
+					i = icon.dirt;
+					break;
 				default:
-					out_uv[0] = icon.grass_side.u;
-					out_uv[1] = icon.grass_side.v;
-					return;
+					i = icon.grass_side;
+					break;
 			}
+			break;
 		case Block_Cobblestone:
-			out_uv[0] = icon.cobblestone.u;
-			out_uv[1] = icon.cobblestone.v;
-			return;
+			i = icon.cobblestone;
+			break;
 		case Block_Log:
 			switch (direction) {
 				case Direction_Bottom:
 				case Direction_Top:
-					out_uv[0] = icon.oaklog_top.u;
-					out_uv[1] = icon.oaklog_top.v;
-					return;
+					i = icon.oaklog_top;
+					break;
 				default:
-					out_uv[0] = icon.oaklog_side.u;
-					out_uv[1] = icon.oaklog_side.v;
-					return;
+					i = icon.oaklog_side;
+					break;
 			}
+			break;
 		case Block_Sand:
-			out_uv[0] = icon.sand.u;
-			out_uv[1] = icon.sand.v;
-			return;
+			i = icon.sand;
+			break;
 		case Block_Leaves:
-			out_uv[0] = icon.leaves_oak.u;
-			out_uv[1] = icon.leaves_oak.v;
-			return;
+			i = icon.leaves_oak;
+			break;
 		case Block_Glass:
-			out_uv[0] = icon.glass.u;
-			out_uv[1] = icon.glass.v;
-			return;
+			i = icon.glass;
+			break;
 		case Block_Stonebrick:
-			out_uv[0] = icon.stonebrick.u;
-			out_uv[1] = icon.stonebrick.v;
-			return;
+			i = icon.stonebrick;
+			break;
 		case Block_Brick:
-			out_uv[0] = icon.brick.u;
-			out_uv[1] = icon.brick.v;
-			return;
+			i = icon.brick;
+			break;
 		case Block_Planks:
-			out_uv[0] = icon.oakplanks.u;
-			out_uv[1] = icon.oakplanks.v;
-			return;
+			i = icon.oakplanks;
+			break;
 		case Block_Wool:
-			out_uv[0] = icon.wool.u;
-			out_uv[1] = icon.wool.v;
-			return;
+			i = icon.wool;
+			break;
 		case Block_Bedrock:
-			out_uv[0] = icon.bedrock.u;
-			out_uv[1] = icon.bedrock.v;
-			return;
+			i = icon.bedrock;
+			break;
 	}
+	out_uv[0] = i.u;
+	out_uv[1] = i.v;
 }
 
 uint16_t Block_GetColor(Block block, Direction direction) {
