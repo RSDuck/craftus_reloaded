@@ -10,12 +10,13 @@ void BlockEvent_RandomTick(World* world, Chunk* chunk, int x[], int y[], int z[]
 			Block block = Chunk_GetBlock(chunk, px, py, pz);
 			switch (block) {
 				case Block_Dirt:
-					if (!Block_Opaque(Chunk_GetBlock(chunk, px, py + 1, pz))) {
+					if (!Block_Opaque(Chunk_GetBlock(chunk, px, py + 1, pz),
+							  Chunk_GetMetadata(chunk, px, py + 1, pz))) {
 						Chunk_SetBlock(chunk, px, py, pz, Block_Grass);
 					}
 					break;
 				case Block_Grass:
-					if (Block_Opaque(Chunk_GetBlock(chunk, px, py + 1, pz))) {
+					if (Block_Opaque(Chunk_GetBlock(chunk, px, py + 1, pz), Chunk_GetMetadata(chunk, px, py + 1, pz))) {
 						Chunk_SetBlock(chunk, px, py, pz, Block_Dirt);
 					}
 					break;

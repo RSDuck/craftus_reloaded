@@ -47,7 +47,7 @@ void Block_Deinit() { C3D_TexDelete(&textureMap.texture); }
 
 void* Block_GetTextureMap() { return &textureMap.texture; }
 
-void Block_GetTexture(Block block, Direction direction, int16_t* out_uv) {
+void Block_GetTexture(Block block, Direction direction, uint8_t metadata, int16_t* out_uv) {
 	Texture_MapIcon i;
 	switch (block) {
 		case Block_Air:
@@ -114,14 +114,14 @@ void Block_GetTexture(Block block, Direction direction, int16_t* out_uv) {
 	out_uv[1] = i.v;
 }
 
-uint16_t Block_GetColor(Block block, Direction direction) {
+uint16_t Block_GetColor(Block block, uint8_t metadata, Direction direction) {
 	if ((block == Block_Grass && direction == Direction_Top) || block == Block_Leaves) {
 		return SHADER_RGB(17, 26, 15);
 	}
 	return SHADER_RGB(31, 31, 31);
 }
 
-bool Block_Opaque(Block block) { return block != Block_Air && block != Block_Leaves && block != Block_Glass; }
+bool Block_Opaque(Block block, uint8_t metadata) { return block != Block_Air && block != Block_Leaves && block != Block_Glass; }
 
 const char* BlockNames[Blocks_Count] = {"Air",    "Stone", "Dirt",	 "Grass",  "Cobblestone", "Sand", "Log",
 					"Leaves", "Glass", "Stone Bricks", "Bricks", "Planks",      "Wool", "Bedrock"};

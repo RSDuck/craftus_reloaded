@@ -147,9 +147,6 @@ all: $(BUILD)
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
-
-	@makerom -f cia -o $(TARGET).cia -rsf $(TARGET).rsf -target t -exefslogo -elf $(TARGET).elf -icon $(TARGET).smdh -banner banner.bin
-	@echo built ... $(TARGET).cia
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
@@ -158,6 +155,9 @@ clean:
 run:
 	@echo running...
 	@3dslink $(TARGET).3dsx
+make_cia:
+	@makerom -f cia -o $(TARGET).cia -rsf $(TARGET).rsf -target t -exefslogo -elf $(TARGET).elf -icon $(TARGET).smdh -banner banner.bin
+	@echo built ... $(TARGET).cia
 
 #---------------------------------------------------------------------------------
 else

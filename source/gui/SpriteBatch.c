@@ -98,26 +98,26 @@ void SpriteBatch_PushQuadColor(int x, int y, int z, int w, int h, int rx, int ry
 	vec_push(&cmdList, ((Sprite){z, currentTexture, x * guiScale, y * guiScale, (x + w) * guiScale, y * guiScale, x * guiScale,
 				     (y + h) * guiScale, (x + w) * guiScale, (y + h) * guiScale, rx, ry, rx + rw, ry + rh, color}));
 }
-void SpriteBatch_PushIcon(Block block, int x, int y, int z) {
+void SpriteBatch_PushIcon(Block block, uint8_t metadata, int x, int y, int z) {
 	int16_t uvs[2];
 	C3D_Tex* texture = Block_GetTextureMap();
-	Block_GetTexture(block, Direction_Top, uvs);
-	int16_t color = Block_GetColor(block, Direction_Top);
+	Block_GetTexture(block, metadata, Direction_Top, uvs);
+	int16_t color = Block_GetColor(block, metadata, Direction_Top);
 	int16_t u = uvs[0] / 256;
 	int16_t v = uvs[1] / 256;
 	vec_push(&cmdList, ((Sprite){z, texture, (2 + x) * guiScale, (7 + y) * guiScale, (16 + x) * guiScale, (1 + y) * guiScale,
 				     (16 + x) * guiScale, (14 + y) * guiScale, (30 + x) * guiScale, (7 + y) * guiScale, u,
 				     v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE, v, color}));
-	Block_GetTexture(block, Direction_North, uvs);
-	color = Block_GetColor(block, Direction_North);
+	Block_GetTexture(block, metadata, Direction_North, uvs);
+	color = Block_GetColor(block, metadata, Direction_North);
 	u = uvs[0] / 256;
 	v = uvs[1] / 256;
 	vec_push(&cmdList, ((Sprite){z, texture, (2 + x) * guiScale, (7 + y) * guiScale, (16 + x) * guiScale, (14 + y) * guiScale,
 				     (2 + x) * guiScale, (25 + y) * guiScale, (16 + x) * guiScale, (31 + y) * guiScale, u,
 				     v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE, v, SHADER_RGB_MIX(SHADER_RGB(24, 24, 24), color)}));
 
-	Block_GetTexture(block, Direction_East, uvs);
-	color = Block_GetColor(block, Direction_East);
+	Block_GetTexture(block, metadata, Direction_East, uvs);
+	color = Block_GetColor(block, metadata, Direction_East);
 	u = uvs[0] / 256;
 	v = uvs[1] / 256;
 	vec_push(&cmdList, ((Sprite){z, texture, (16 + x) * guiScale, (14 + y) * guiScale, (30 + x) * guiScale, (7 + y) * guiScale,

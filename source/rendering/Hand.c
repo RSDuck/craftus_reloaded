@@ -33,8 +33,8 @@ void Hand_Draw(int projUniform, C3D_Mtx* projection, Block block, Player* player
 	memcpy(handVBO, cube_sides_lut, sizeof(cube_sides_lut));
 	for (int i = 0; i < 6; i++) {
 		int16_t iconUV[2];
-		Block_GetTexture(block, i, iconUV);
-		uint16_t color = Block_GetColor(block, i);
+		Block_GetTexture(block, i, 0, iconUV);
+		uint16_t color = Block_GetColor(block, 0, i);
 
 #define oneDivIconsPerRow (32768 / 8)
 #define halfTexel (6)

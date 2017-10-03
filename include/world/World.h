@@ -55,6 +55,8 @@ Chunk* World_GetChunk(World* world, int x, int z);
 
 Block World_GetBlock(World* world, int x, int y, int z);
 void World_SetBlock(World* world, int x, int y, int z, Block block);
+uint8_t World_GetMetadata(World* world, int x, int y, int z);
+void World_SetMetadata(World* world, int x, int y, int z, uint8_t metadata);
 
 void World_UpdateChunkCache(World* world, int orginX, int orginZ);
 

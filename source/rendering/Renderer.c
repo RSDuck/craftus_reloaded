@@ -164,7 +164,7 @@ void Renderer_Render() {
 		DebugUI_Draw();
 
 		SpriteBatch_SetScale(2);
-		SpriteBatch_PushIcon(player->blockInHand, 160 - 32, 60 - 16, 20);
+		SpriteBatch_PushIcon(player->blockInHand, 0, 160 - 32, 60 - 16, 20);
 	}
 
 	Gui_Frame();
