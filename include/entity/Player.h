@@ -4,6 +4,8 @@
 
 #include <world/World.h>
 
+#include <inventory/ItemStack.h>
+
 #include <misc/Raycast.h>
 #include <misc/VecMath.h>
 
@@ -30,7 +32,8 @@ typedef struct {
 
 	float breakPlaceTimeout;
 
-	Block blockInHand;
+	ItemStack inventory[12 + 16];
+	int inventorySlot;
 
 	Raycast_Result viewRayCast;
 	bool blockInSeight, blockInActionRange;
@@ -43,7 +46,7 @@ void Player_Update(Player* player);
 
 void Player_Move(Player* player, float dt, float3 accl);
 
-void Player_PlaceBlock(Player* player, Block block);
+void Player_PlaceBlock(Player* player);
 void Player_BreakBlock(Player* player);
 
 void Player_Jump(Player* player, float3 accl);

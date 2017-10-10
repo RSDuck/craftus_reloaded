@@ -12,7 +12,7 @@ extern const Vertex cube_sides_lut[6 * 6];
 void Hand_Init() { handVBO = linearAlloc(sizeof(cube_sides_lut)); }
 void Hand_Deinit() { linearFree(handVBO); }
 
-void Hand_Draw(int projUniform, C3D_Mtx* projection, Block block, Player* player) {
+void Hand_Draw(int projUniform, C3D_Mtx* projection, Block block, uint8_t metadata, Player* player) {
 	C3D_Mtx pm;
 	C3D_Mtx model;
 	Mtx_Identity(&model);
@@ -34,7 +34,7 @@ void Hand_Draw(int projUniform, C3D_Mtx* projection, Block block, Player* player
 	for (int i = 0; i < 6; i++) {
 		int16_t iconUV[2];
 		Block_GetTexture(block, i, 0, iconUV);
-		uint16_t color = Block_GetColor(block, 0, i);
+		uint16_t color = Block_GetColor(block, metadata, i);
 
 #define oneDivIconsPerRow (32768 / 8)
 #define halfTexel (6)

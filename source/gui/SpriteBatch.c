@@ -101,28 +101,28 @@ void SpriteBatch_PushQuadColor(int x, int y, int z, int w, int h, int rx, int ry
 void SpriteBatch_PushIcon(Block block, uint8_t metadata, int x, int y, int z) {
 	int16_t uvs[2];
 	C3D_Tex* texture = Block_GetTextureMap();
-	Block_GetTexture(block, metadata, Direction_Top, uvs);
+	Block_GetTexture(block, Direction_Top, metadata, uvs);
 	int16_t color = Block_GetColor(block, metadata, Direction_Top);
 	int16_t u = uvs[0] / 256;
 	int16_t v = uvs[1] / 256;
 	vec_push(&cmdList, ((Sprite){z, texture, (2 + x) * guiScale, (7 + y) * guiScale, (16 + x) * guiScale, (1 + y) * guiScale,
 				     (16 + x) * guiScale, (14 + y) * guiScale, (30 + x) * guiScale, (7 + y) * guiScale, u,
 				     v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE, v, color}));
-	Block_GetTexture(block, metadata, Direction_North, uvs);
+	Block_GetTexture(block, Direction_North, metadata, uvs);
 	color = Block_GetColor(block, metadata, Direction_North);
 	u = uvs[0] / 256;
 	v = uvs[1] / 256;
 	vec_push(&cmdList, ((Sprite){z, texture, (2 + x) * guiScale, (7 + y) * guiScale, (16 + x) * guiScale, (14 + y) * guiScale,
 				     (2 + x) * guiScale, (25 + y) * guiScale, (16 + x) * guiScale, (31 + y) * guiScale, u,
-				     v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE, v, SHADER_RGB_MIX(SHADER_RGB(24, 24, 24), color)}));
+				     v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE, v, SHADER_RGB_DARKEN(color, 9)}));
 
-	Block_GetTexture(block, metadata, Direction_East, uvs);
+	Block_GetTexture(block, Direction_East, metadata, uvs);
 	color = Block_GetColor(block, metadata, Direction_East);
 	u = uvs[0] / 256;
 	v = uvs[1] / 256;
 	vec_push(&cmdList, ((Sprite){z, texture, (16 + x) * guiScale, (14 + y) * guiScale, (30 + x) * guiScale, (7 + y) * guiScale,
 				     (16 + x) * guiScale, (31 + y) * guiScale, (30 + x) * guiScale, (25 + y) * guiScale, u,
-				     v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE, v, SHADER_RGB_MIX(SHADER_RGB(16, 16, 16), color)}));
+				     v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE, v, SHADER_RGB_DARKEN(color, 10)}));
 }
 
 int SpriteBatch_PushText(int x, int y, int z, int16_t color, bool shadow, int wrap, int* ySize, const char* fmt, ...) {

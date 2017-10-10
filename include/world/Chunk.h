@@ -115,8 +115,14 @@ inline void Chunk_SetBlock(Chunk* chunk, int x, int y, int z, Block block) {
 	++chunk->revision;*/  // durch das Setzen der Metadaten wird das sowieso erhöht
 }
 inline void Chunk_SetBlockAndMeta(Chunk* chunk, int x, int y, int z, Block block, uint8_t metadata) {
-	Chunk_SetBlock(chunk, x, y, z, block);
-	Chunk_SetMetadata(chunk, x, y, z, metadata);
+	Cluster* cluster = &chunk->clusters[y / CHUNK_SIZE];
+	cluster->blocks[x][y - (y / CHUNK_SIZE * CHUNK_SIZE)][z] = block;
+	metadata &= 0xf;
+	uint8_t* addr = &cluster->metadataLight[x][y - (y / CHUNK_SIZE * CHUNK_SIZE)][z];
+	*addr = (*addr & 0xf0) | metadata;
+	
+	++cluster->revision;
+	++chunk->revision;
 }
 
 bool Cluster_IsEmpty(Cluster* cluster);

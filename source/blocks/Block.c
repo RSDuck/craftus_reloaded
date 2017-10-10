@@ -114,10 +114,20 @@ void Block_GetTexture(Block block, Direction direction, uint8_t metadata, int16_
 	out_uv[1] = i.v;
 }
 
+#define extractR(c) ((c >> 16) & 0xff)
+#define extractG(c) (((c) >> 8) & 0xff)
+#define extractB(c) ((c)&0xff)
+#define toRGB16(c) SHADER_RGB(extractR(c), extractG(c), extractB(c))
 uint16_t Block_GetColor(Block block, uint8_t metadata, Direction direction) {
 	if ((block == Block_Grass && direction == Direction_Top) || block == Block_Leaves) {
 		return SHADER_RGB(17, 26, 15);
 	}
+	// white, orange, magenta, light blue, yellow, lime, pink, gray, silver, cyan, purple, blue, green, red, black
+	const uint16_t dies[] = {toRGB16(16777215), toRGB16(14188339), toRGB16(11685080), toRGB16(6724056),
+				 toRGB16(15066419), toRGB16(8375321),  toRGB16(15892389), toRGB16(5000268),
+				 toRGB16(10066329), toRGB16(5013401),  toRGB16(8339378),  toRGB16(3361970),
+				 toRGB16(6704179),  toRGB16(6717235),  toRGB16(10040115), toRGB16(1644825)};
+	if (block == Block_Wool) return dies[metadata];
 	return SHADER_RGB(31, 31, 31);
 }
 

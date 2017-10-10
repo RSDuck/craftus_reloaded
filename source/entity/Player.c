@@ -29,8 +29,23 @@ void Player_Init(Player* player) {
 
 	player->breakPlaceTimeout = 0.f;
 
-	player->blockInHand = Block_Stone;
-
+	player->inventorySlot = 0;
+	{
+		int l = 0;
+		player->inventory[l++] = (ItemStack){Block_Stone, 0, 1};
+		player->inventory[l++] = (ItemStack){Block_Dirt, 0, 1};
+		player->inventory[l++] = (ItemStack){Block_Grass, 0, 1};
+		player->inventory[l++] = (ItemStack){Block_Cobblestone, 0, 1};
+		player->inventory[l++] = (ItemStack){Block_Sand, 0, 1};
+		player->inventory[l++] = (ItemStack){Block_Log, 0, 1};
+		player->inventory[l++] = (ItemStack){Block_Leaves, 0, 1};
+		player->inventory[l++] = (ItemStack){Block_Glass, 0, 1};
+		player->inventory[l++] = (ItemStack){Block_Stonebrick, 0, 1};
+		player->inventory[l++] = (ItemStack){Block_Brick, 0, 1};
+		player->inventory[l++] = (ItemStack){Block_Planks, 0, 1};
+		for (int i = 0; i < 16; i++) player->inventory[l++] = (ItemStack){Block_Wool, i, 1};
+		player->inventory[l++] = (ItemStack){Block_Bedrock, 0, 1};
+	}
 	player->autoJumpEnabled = true;
 }
 
@@ -183,7 +198,7 @@ void Player_Move(Player* player, float dt, float3 accl) {
 	}
 }
 
-void Player_PlaceBlock(Player* player, Block block) {
+void Player_PlaceBlock(Player* player) {
 	if (player->world && player->blockInActionRange && player->breakPlaceTimeout < 0.f) {
 		const int* offset = DirectionToOffset[player->viewRayCast.direction];
 		if (AABB_Overlap(player->position.x - PLAYER_COLLISIONBOX_SIZE / 2.f, player->position.y,
@@ -191,8 +206,9 @@ void Player_PlaceBlock(Player* player, Block block) {
 				 PLAYER_COLLISIONBOX_SIZE, player->viewRayCast.x + offset[0], player->viewRayCast.y + offset[1],
 				 player->viewRayCast.z + offset[2], 1.f, 1.f, 1.f))
 			return;
-		World_SetBlock(player->world, player->viewRayCast.x + offset[0], player->viewRayCast.y + offset[1],
-			       player->viewRayCast.z + offset[2], block);
+		World_SetBlockAndMeta(player->world, player->viewRayCast.x + offset[0], player->viewRayCast.y + offset[1],
+				      player->viewRayCast.z + offset[2], player->inventory[player->inventorySlot].block,
+				      player->inventory[player->inventorySlot].meta);
 		player->breakPlaceTimeout = PLAYER_PLACE_REPLACE_TIMEOUT;
 	}
 }

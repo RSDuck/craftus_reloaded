@@ -278,7 +278,7 @@ void PlayerController_Update(PlayerController* ctrl, InputData input, float dt) 
 
 	float placeBlock = IsKeyDown(ctrl->controlScheme.placeBlock, &agnosticInput);
 	float breakBlock = IsKeyDown(ctrl->controlScheme.breakBlock, &agnosticInput);
-	if (placeBlock > 0.f) Player_PlaceBlock(player, player->blockInHand);
+	if (placeBlock > 0.f) Player_PlaceBlock(player);
 	if (breakBlock > 0.f) Player_BreakBlock(player);
 
 	if (jump > 0.f) Player_Jump(player, movement);
@@ -297,8 +297,8 @@ void PlayerController_Update(PlayerController* ctrl, InputData input, float dt) 
 
 	bool switchBlockLeft = WasKeyPressed(ctrl->controlScheme.switchBlockLeft, &agnosticInput);
 	bool switchBlockRight = WasKeyPressed(ctrl->controlScheme.switchBlockRight, &agnosticInput);
-	if (switchBlockLeft && --player->blockInHand == 0) player->blockInHand = Blocks_Count - 1;
-	if (switchBlockRight && ++player->blockInHand == Blocks_Count) player->blockInHand = 1;
+	if (switchBlockLeft && --player->inventorySlot == -1) player->inventorySlot = sizeof(player->inventory) / sizeof(ItemStack) - 1;
+	if (switchBlockRight && ++player->inventorySlot == sizeof(player->inventory) / sizeof(ItemStack)) player->inventorySlot = 0;
 
 	if (ctrl->openedCmd) {
 		dt = 0.f;

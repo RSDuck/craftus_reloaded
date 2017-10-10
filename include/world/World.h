@@ -3,9 +3,10 @@
 #include <world/Chunk.h>
 #include <world/WorkQueue.h>
 
-#include <misc/Xorshift.h>
 #include <misc/NumberUtils.h>
+#include <misc/Xorshift.h>
 #include <vec/vec.h>
+
 
 #define CHUNKCACHE_SIZE (9)
 
@@ -58,6 +59,8 @@ void World_SetBlock(World* world, int x, int y, int z, Block block);
 uint8_t World_GetMetadata(World* world, int x, int y, int z);
 void World_SetMetadata(World* world, int x, int y, int z, uint8_t metadata);
 
+void World_SetBlockAndMeta(World* world, int x, int y, int z, Block block, uint8_t metadata);
+
 void World_UpdateChunkCache(World* world, int orginX, int orginZ);
 
-int World_GetHeight(World* world, int x, int z);	
+int World_GetHeight(World* world, int x, int z);

@@ -85,6 +85,13 @@ Block World_GetBlock(World* world, int x, int y, int z) {
 	\
 }
 
+#define NOTIFY_ALL_NEIGHTBORS                                                                        \
+	NOTIFY_NEIGHTBOR(lX, 0, -1, 0)                                                               \
+	NOTIFY_NEIGHTBOR(lX, 15, 1, 0) NOTIFY_NEIGHTBOR(lZ, 0, 0, -1)                                \
+	    NOTIFY_NEIGHTBOR(lZ, 15, 0, 1) if (WorldToLocalCoord(y) == 0 && y / CHUNK_SIZE - 1 >= 0) \
+		Chunk_RequestGraphicsUpdate(chunk, y / CHUNK_SIZE - 1);                              \
+	if (WorldToLocalCoord(y) == 15 && y / CHUNK_SIZE + 1 < CLUSTER_PER_CHUNK) Chunk_RequestGraphicsUpdate(chunk, y / CHUNK_SIZE + 1);
+
 void World_SetBlock(World* world, int x, int y, int z, Block block) {
 	if (y < 0 || y >= CHUNK_HEIGHT) return;
 	int cX = WorldToChunkCoord(x);
@@ -95,14 +102,21 @@ void World_SetBlock(World* world, int x, int y, int z, Block block) {
 		int lZ = WorldToLocalCoord(z);
 		Chunk_SetBlock(chunk, lX, y, lZ, block);
 
-		NOTIFY_NEIGHTBOR(lX, 0, -1, 0)
-		NOTIFY_NEIGHTBOR(lX, 15, 1, 0)
-		NOTIFY_NEIGHTBOR(lZ, 0, 0, -1)
-		NOTIFY_NEIGHTBOR(lZ, 15, 0, 1)
+		NOTIFY_ALL_NEIGHTBORS
+	}
+}
 
-		if (WorldToLocalCoord(y) == 0 && y / CHUNK_SIZE - 1 >= 0) Chunk_RequestGraphicsUpdate(chunk, y / CHUNK_SIZE - 1);
-		if (WorldToLocalCoord(y) == 15 && y / CHUNK_SIZE + 1 < CLUSTER_PER_CHUNK)
-			Chunk_RequestGraphicsUpdate(chunk, y / CHUNK_SIZE + 1);
+void World_SetBlockAndMeta(World* world, int x, int y, int z, Block block, uint8_t metadata) {
+	if (y < 0 || y >= CHUNK_HEIGHT) return;
+	int cX = WorldToChunkCoord(x);
+	int cZ = WorldToChunkCoord(z);
+	Chunk* chunk = World_GetChunk(world, cX, cZ);
+	if (chunk) {
+		int lX = WorldToLocalCoord(x);
+		int lZ = WorldToLocalCoord(z);
+		Chunk_SetBlockAndMeta(chunk, lX, y, lZ, block, metadata);
+
+		NOTIFY_ALL_NEIGHTBORS
 	}
 }
 
@@ -123,14 +137,7 @@ void World_SetMetadata(World* world, int x, int y, int z, uint8_t metadata) {
 		int lZ = WorldToLocalCoord(z);
 		Chunk_SetMetadata(chunk, lX, y, lZ, metadata);
 
-		NOTIFY_NEIGHTBOR(lX, 0, -1, 0)
-		NOTIFY_NEIGHTBOR(lX, 15, 1, 0)
-		NOTIFY_NEIGHTBOR(lZ, 0, 0, -1)
-		NOTIFY_NEIGHTBOR(lZ, 15, 0, 1)
-
-		if (WorldToLocalCoord(y) == 0 && y / CHUNK_SIZE - 1 >= 0) Chunk_RequestGraphicsUpdate(chunk, y / CHUNK_SIZE - 1);
-		if (WorldToLocalCoord(y) == 15 && y / CHUNK_SIZE + 1 < CLUSTER_PER_CHUNK)
-			Chunk_RequestGraphicsUpdate(chunk, y / CHUNK_SIZE + 1);
+		NOTIFY_ALL_NEIGHTBORS
 	}
 }
 

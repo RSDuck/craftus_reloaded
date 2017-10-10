@@ -12,7 +12,6 @@
 #include <rendering/TextureMap.h>
 #include <rendering/WorldRenderer.h>
 
-
 #include <citro3d.h>
 
 #include <world_shbin.h>
@@ -161,10 +160,14 @@ void Renderer_Render() {
 	if (*gamestate == GameState_SelectWorld)
 		WorldSelect_Render();
 	else {
-		DebugUI_Draw();
 
 		SpriteBatch_SetScale(2);
-		SpriteBatch_PushIcon(player->blockInHand, 0, 160 - 32, 60 - 16, 20);
+		DebugUI_Text("%s", BlockNames[player->inventory[player->inventorySlot].block]);
+		SpriteBatch_PushIcon(player->inventory[player->inventorySlot].block, player->inventory[player->inventorySlot].meta,
+					 160 - 32, 60 - 16, 20);
+ 
+		DebugUI_Draw();
+					 
 	}
 
 	Gui_Frame();
