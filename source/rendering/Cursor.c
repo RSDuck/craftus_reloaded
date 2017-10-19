@@ -4,16 +4,18 @@
 
 #include <misc/NumberUtils.h>
 
-static Vertex* cursorVBO;
+static WorldVertex* cursorVBO;
 
-extern const Vertex cube_sides_lut[6 * 6];
+extern const WorldVertex cube_sides_lut[6 * 6];
 
 void Cursor_Init() {
 	cursorVBO = linearAlloc(sizeof(cube_sides_lut));
 	memcpy(cursorVBO, cube_sides_lut, sizeof(cube_sides_lut));
 
 	for (int i = 0; i < 6 * 6; i++) {
-		cursorVBO[i].uvc[2] = (31 << 10 | 31 << 5 | 31);
+		cursorVBO[i].rgb[0] = 255;
+		cursorVBO[i].rgb[1] = 255;
+		cursorVBO[i].rgb[2] = 255;
 	}
 }
 
@@ -28,14 +30,17 @@ void Cursor_Draw(int projUniform, C3D_Mtx* projectionview, World* world, int x, 
 	Mtx_Multiply(&mvp, projectionview, &model);
 
 	size_t vertices = 0;
-	Vertex* vtx = cursorVBO;
+	WorldVertex* vtx = cursorVBO;
 	for (int i = 0; i < 6; i++) {
 		const int* offset = DirectionToOffset[i];
 		if (World_GetBlock(world, x + offset[0], y + offset[1], z + offset[2]) == Block_Air) {
-			memcpy(vtx, &cube_sides_lut[i * 6], sizeof(Vertex) * 6);
-			int16_t color = i == highlight ? SHADER_RGB(8, 8, 8) : SHADER_RGB(4, 4, 4);
-			for (int j = 0; j < 6; j++) 
-				vtx[j].uvc[2] = color;
+			memcpy(vtx, &cube_sides_lut[i * 6], sizeof(WorldVertex) * 6);
+			uint8_t color = i == highlight ? 65 : 32;
+			for (int j = 0; j < 6; j++) {
+				vtx[j].rgb[0] = color;
+				vtx[j].rgb[1] = color;
+				vtx[j].rgb[2] = color;
+			}
 			vtx += 6;
 			vertices += 6;
 		}
@@ -54,11 +59,11 @@ void Cursor_Draw(int projUniform, C3D_Mtx* projectionview, World* world, int x, 
 
 	C3D_BufInfo* bufInfo = C3D_GetBufInfo();
 	BufInfo_Init(bufInfo);
-	BufInfo_Add(bufInfo, cursorVBO, sizeof(Vertex), 2, 0x10);
+	BufInfo_Add(bufInfo, cursorVBO, sizeof(WorldVertex), 4, 0x3210);
 
 	C3D_DrawArrays(GPU_TRIANGLES, 0, vertices);
 
 	C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
 
-	C3D_DepthMap(true, -1.f, 0.0f);	
+	C3D_DepthMap(true, -1.f, 0.0f);
 }

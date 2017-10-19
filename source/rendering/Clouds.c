@@ -9,15 +9,15 @@
 
 #include <stdio.h>
 
-static Vertex vertices[] = {{{-1, 0, -1}, {0, 0, INT16_MAX}},
-			    {{1, 0, -1}, {INT16_MAX, 0, INT16_MAX}},
-			    {{1, 0, 1}, {INT16_MAX, INT16_MAX, INT16_MAX}},
-			    {{1, 0, 1}, {INT16_MAX, INT16_MAX, INT16_MAX}},
-			    {{-1, 0, 1}, {0, INT16_MAX, INT16_MAX}},
-			    {{-1, 0, -1}, {0, 0, INT16_MAX}}};
+static WorldVertex vertices[] = {{{-1, 0, -1}, {0, 0}, {255, 255, 255}, {0, 0, 0}},
+				 {{1, 0, -1}, {INT16_MAX, 0}, {255, 255, 255}, {0, 0, 0}},
+				 {{1, 0, 1}, {INT16_MAX, INT16_MAX}, {255, 255, 255}, {0, 0, 0}},
+				 {{1, 0, 1}, {INT16_MAX, INT16_MAX}, {255, 255, 255}, {0, 0, 0}},
+				 {{-1, 0, 1}, {0, INT16_MAX}, {255, 255, 255}, {0, 0, 0}},
+				 {{-1, 0, -1}, {0, 0}, {255, 255, 255}, {0, 0, 0}}};
 
 static C3D_Tex texture;
-static Vertex* cloudVBO;
+static WorldVertex* cloudVBO;
 
 static int wrap = 0;
 
@@ -63,28 +63,28 @@ void Clouds_Render(int projUniform, C3D_Mtx* projectionview, World* world, float
 
 	const int stepX = 4;
 	const int stepZ = 6;
-	if (((int)cloudVBO[0].uvc[0]) - stepX < -INT16_MAX) {
+	if (((int)cloudVBO[0].uv[0]) - stepX < -INT16_MAX) {
 		for (int i = 0; i < 6; i++) {
 			if (cloudVBO[i].xyz[0] == -1)
-				cloudVBO[i].uvc[0] = 0;
+				cloudVBO[i].uv[0] = 0;
 			else
-				cloudVBO[i].uvc[0] = INT16_MAX;
+				cloudVBO[i].uv[0] = INT16_MAX;
 		}
 	} else {
 		for (int i = 0; i < 6; i++) {
-			cloudVBO[i].uvc[0] -= stepX;
+			cloudVBO[i].uv[0] -= stepX;
 		}
 	}
-	if (((int)cloudVBO[0].uvc[1]) + stepZ > INT16_MAX) {
+	if (((int)cloudVBO[0].uv[1]) + stepZ > INT16_MAX) {
 		for (int i = 0; i < 6; i++) {
 			if (cloudVBO[i].xyz[2] == 1)
-				cloudVBO[i].uvc[1] = -INT16_MAX;
+				cloudVBO[i].uv[1] = -INT16_MAX;
 			else
-				cloudVBO[i].uvc[1] = 0;
+				cloudVBO[i].uv[1] = 0;
 		}
 	} else {
 		for (int i = 0; i < 6; i++) {
-			cloudVBO[i].uvc[1] += stepZ;
+			cloudVBO[i].uv[1] += stepZ;
 		}
 	}
 	GSPGPU_FlushDataCache(cloudVBO, sizeof(vertices));
@@ -96,7 +96,7 @@ void Clouds_Render(int projUniform, C3D_Mtx* projectionview, World* world, float
 
 	C3D_BufInfo* bufInfo = C3D_GetBufInfo();
 	BufInfo_Init(bufInfo);
-	BufInfo_Add(bufInfo, cloudVBO, sizeof(Vertex), 2, 0x10);
+	BufInfo_Add(bufInfo, cloudVBO, sizeof(WorldVertex), 4, 0x3210);
 
 	C3D_DrawArrays(GPU_TRIANGLES, 0, 6);
 

@@ -117,18 +117,27 @@ void Block_GetTexture(Block block, Direction direction, uint8_t metadata, int16_
 #define extractR(c) ((c >> 16) & 0xff)
 #define extractG(c) (((c) >> 8) & 0xff)
 #define extractB(c) ((c)&0xff)
-#define toRGB16(c) SHADER_RGB(extractR(c), extractG(c), extractB(c))
-uint16_t Block_GetColor(Block block, uint8_t metadata, Direction direction) {
+/*#define toRGB16(c) \
+	{ extractR(c), extractG(c), extractB(c) }*/
+void Block_GetColor(Block block, uint8_t metadata, Direction direction, uint8_t out_rgb[]) {
 	if ((block == Block_Grass && direction == Direction_Top) || block == Block_Leaves) {
-		return SHADER_RGB(17, 26, 15);
+		out_rgb[0] = 140;
+		out_rgb[1] = 214;
+		out_rgb[2] = 123;
+		return;
 	}
 	// white, orange, magenta, light blue, yellow, lime, pink, gray, silver, cyan, purple, blue, green, red, black
-	const uint16_t dies[] = {toRGB16(16777215), toRGB16(14188339), toRGB16(11685080), toRGB16(6724056),
-				 toRGB16(15066419), toRGB16(8375321),  toRGB16(15892389), toRGB16(5000268),
-				 toRGB16(10066329), toRGB16(5013401),  toRGB16(8339378),  toRGB16(3361970),
-				 toRGB16(6704179),  toRGB16(6717235),  toRGB16(10040115), toRGB16(1644825)};
-	if (block == Block_Wool) return dies[metadata];
-	return SHADER_RGB(31, 31, 31);
+	const uint32_t dies[] = {(16777215), (14188339), (11685080), (6724056), (15066419), (8375321), (15892389), (5000268),
+				 (10066329), (5013401),  (8339378),  (3361970), (6704179),  (6717235), (10040115), (1644825)};
+	if (block == Block_Wool) {
+		out_rgb[0] = extractR(dies[metadata]);
+		out_rgb[1] = extractG(dies[metadata]);
+		out_rgb[2] = extractB(dies[metadata]);
+	} else {
+		out_rgb[0] = 255;
+		out_rgb[1] = 255;
+		out_rgb[2] = 255;
+	}
 }
 
 bool Block_Opaque(Block block, uint8_t metadata) { return block != Block_Air && block != Block_Leaves && block != Block_Glass; }

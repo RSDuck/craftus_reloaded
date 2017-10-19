@@ -20,7 +20,7 @@ typedef struct {
 
 static vec_t(Sprite) cmdList;
 static C3D_Tex* currentTexture = NULL;
-static Vertex* vertexList[2];
+static GuiVertex* vertexList[2];
 static int projUniform;
 
 static Font* font;
@@ -35,8 +35,8 @@ static int guiScale = 2;
 void SpriteBatch_Init(int projUniform_) {
 	vec_init(&cmdList);
 
-	vertexList[0] = linearAlloc(sizeof(Vertex) * 256);
-	vertexList[1] = linearAlloc(sizeof(Vertex) * (4096 + 1024));
+	vertexList[0] = linearAlloc(sizeof(GuiVertex) * 256);
+	vertexList[1] = linearAlloc(sizeof(GuiVertex) * (4096 + 1024));
 
 	projUniform = projUniform_;
 
@@ -100,29 +100,33 @@ void SpriteBatch_PushQuadColor(int x, int y, int z, int w, int h, int rx, int ry
 }
 void SpriteBatch_PushIcon(Block block, uint8_t metadata, int x, int y, int z) {
 	int16_t uvs[2];
+	uint8_t color[3];
 	C3D_Tex* texture = Block_GetTextureMap();
 	Block_GetTexture(block, Direction_Top, metadata, uvs);
-	int16_t color = Block_GetColor(block, metadata, Direction_Top);
+	Block_GetColor(block, metadata, Direction_Top, color);
 	int16_t u = uvs[0] / 256;
 	int16_t v = uvs[1] / 256;
-	vec_push(&cmdList, ((Sprite){z, texture, (2 + x) * guiScale, (7 + y) * guiScale, (16 + x) * guiScale, (1 + y) * guiScale,
-				     (16 + x) * guiScale, (14 + y) * guiScale, (30 + x) * guiScale, (7 + y) * guiScale, u,
-				     v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE, v, color}));
+	vec_push(&cmdList,
+		 ((Sprite){z, texture, (2 + x) * guiScale, (7 + y) * guiScale, (16 + x) * guiScale, (1 + y) * guiScale, (16 + x) * guiScale,
+			   (14 + y) * guiScale, (30 + x) * guiScale, (7 + y) * guiScale, u, v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE, v,
+			   SHADER_RGB(color[0] >> 3, color[1] >> 3, color[2] >> 3)}));
 	Block_GetTexture(block, Direction_North, metadata, uvs);
-	color = Block_GetColor(block, metadata, Direction_North);
+	Block_GetColor(block, metadata, Direction_North, color);
 	u = uvs[0] / 256;
 	v = uvs[1] / 256;
-	vec_push(&cmdList, ((Sprite){z, texture, (2 + x) * guiScale, (7 + y) * guiScale, (16 + x) * guiScale, (14 + y) * guiScale,
-				     (2 + x) * guiScale, (25 + y) * guiScale, (16 + x) * guiScale, (31 + y) * guiScale, u,
-				     v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE, v, SHADER_RGB_DARKEN(color, 9)}));
+	vec_push(&cmdList,
+		 ((Sprite){z, texture, (2 + x) * guiScale, (7 + y) * guiScale, (16 + x) * guiScale, (14 + y) * guiScale, (2 + x) * guiScale,
+			   (25 + y) * guiScale, (16 + x) * guiScale, (31 + y) * guiScale, u, v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE, v,
+			   SHADER_RGB_DARKEN(SHADER_RGB(color[0] >> 3, color[1] >> 3, color[2] >> 3), 11)}));
 
 	Block_GetTexture(block, Direction_East, metadata, uvs);
-	color = Block_GetColor(block, metadata, Direction_East);
+	Block_GetColor(block, metadata, Direction_East, color);
 	u = uvs[0] / 256;
 	v = uvs[1] / 256;
-	vec_push(&cmdList, ((Sprite){z, texture, (16 + x) * guiScale, (14 + y) * guiScale, (30 + x) * guiScale, (7 + y) * guiScale,
-				     (16 + x) * guiScale, (31 + y) * guiScale, (30 + x) * guiScale, (25 + y) * guiScale, u,
-				     v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE, v, SHADER_RGB_DARKEN(color, 10)}));
+	vec_push(&cmdList,
+		 ((Sprite){z, texture, (16 + x) * guiScale, (14 + y) * guiScale, (30 + x) * guiScale, (7 + y) * guiScale,
+			   (16 + x) * guiScale, (31 + y) * guiScale, (30 + x) * guiScale, (25 + y) * guiScale, u, v + TEXTURE_TILESIZE,
+			   u + TEXTURE_TILESIZE, v, SHADER_RGB_DARKEN(SHADER_RGB(color[0] >> 3, color[1] >> 3, color[2] >> 3), 13)}));
 }
 
 int SpriteBatch_PushText(int x, int y, int z, int16_t color, bool shadow, int wrap, int* ySize, const char* fmt, ...) {
@@ -240,7 +244,7 @@ void SpriteBatch_Render(gfxScreen_t screen) {
 	C3D_TexEnvOp(env, C3D_Both, 0, 0, 0);
 	C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
 
-	Vertex* usedVertexList = vertexList[screen];
+	GuiVertex* usedVertexList = vertexList[screen];
 
 	int verticesTotal = 0;
 
@@ -258,20 +262,20 @@ void SpriteBatch_Render(gfxScreen_t screen) {
 			int16_t u0 = (int16_t)((float)cmd.u0 * divW), v0 = (int16_t)((float)cmd.v0 * divH);
 			int16_t u1 = (int16_t)((float)cmd.u1 * divW), v1 = (int16_t)((float)cmd.v1 * divH);
 
-			usedVertexList[vtx++] = (Vertex){{cmd.x3, cmd.y3, 0}, {u1, v1, color}};
-			usedVertexList[vtx++] = (Vertex){{cmd.x1, cmd.y1, 0}, {u1, v0, color}};
-			usedVertexList[vtx++] = (Vertex){{cmd.x0, cmd.y0, 0}, {u0, v0, color}};
+			usedVertexList[vtx++] = (GuiVertex){{cmd.x3, cmd.y3, 0}, {u1, v1, color}};
+			usedVertexList[vtx++] = (GuiVertex){{cmd.x1, cmd.y1, 0}, {u1, v0, color}};
+			usedVertexList[vtx++] = (GuiVertex){{cmd.x0, cmd.y0, 0}, {u0, v0, color}};
 
-			usedVertexList[vtx++] = (Vertex){{cmd.x0, cmd.y0, 0}, {u0, v0, color}};
-			usedVertexList[vtx++] = (Vertex){{cmd.x2, cmd.y2, 0}, {u0, v1, color}};
-			usedVertexList[vtx++] = (Vertex){{cmd.x3, cmd.y3, 0}, {u1, v1, color}};
+			usedVertexList[vtx++] = (GuiVertex){{cmd.x0, cmd.y0, 0}, {u0, v0, color}};
+			usedVertexList[vtx++] = (GuiVertex){{cmd.x2, cmd.y2, 0}, {u0, v1, color}};
+			usedVertexList[vtx++] = (GuiVertex){{cmd.x3, cmd.y3, 0}, {u1, v1, color}};
 		}
 
 		C3D_TexBind(0, texture);
 
 		C3D_BufInfo* bufInfo = C3D_GetBufInfo();
 		BufInfo_Init(bufInfo);
-		BufInfo_Add(bufInfo, usedVertexList + vtxStart, sizeof(Vertex), 2, 0x10);
+		BufInfo_Add(bufInfo, usedVertexList + vtxStart, sizeof(GuiVertex), 2, 0x10);
 
 		C3D_DrawArrays(GPU_TRIANGLES, 0, vtx - vtxStart);
 

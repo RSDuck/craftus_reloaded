@@ -5,9 +5,9 @@
 
 #include <string.h>
 
-static Vertex* handVBO;
+static WorldVertex* handVBO;
 
-extern const Vertex cube_sides_lut[6 * 6];
+extern const WorldVertex cube_sides_lut[6 * 6];
 
 void Hand_Init() { handVBO = linearAlloc(sizeof(cube_sides_lut)); }
 void Hand_Deinit() { linearFree(handVBO); }
@@ -33,17 +33,20 @@ void Hand_Draw(int projUniform, C3D_Mtx* projection, Block block, uint8_t metada
 	memcpy(handVBO, cube_sides_lut, sizeof(cube_sides_lut));
 	for (int i = 0; i < 6; i++) {
 		int16_t iconUV[2];
+		uint8_t color[3];
 		Block_GetTexture(block, i, 0, iconUV);
-		uint16_t color = Block_GetColor(block, metadata, i);
+		Block_GetColor(block, metadata, i, color);
 
 #define oneDivIconsPerRow (32768 / 8)
 #define halfTexel (6)
 
 		for (int j = 0; j < 6; j++) {
-			handVBO[i * 6 + j].uvc[0] = (handVBO[i * 6 + j].uvc[0] == 1 ? (oneDivIconsPerRow - 1) : 1) + iconUV[0];
-			handVBO[i * 6 + j].uvc[1] = (handVBO[i * 6 + j].uvc[1] == 1 ? (oneDivIconsPerRow - 1) : 1) + iconUV[1];
+			handVBO[i * 6 + j].uv[0] = (handVBO[i * 6 + j].uv[0] == 1 ? (oneDivIconsPerRow - 1) : 1) + iconUV[0];
+			handVBO[i * 6 + j].uv[1] = (handVBO[i * 6 + j].uv[1] == 1 ? (oneDivIconsPerRow - 1) : 1) + iconUV[1];
 
-			handVBO[i * 6 + j].uvc[2] = color;
+			handVBO[i * 6 + j].rgb[0] = color[0];
+			handVBO[i * 6 + j].rgb[1] = color[1];
+			handVBO[i * 6 + j].rgb[2] = color[2];
 		}
 	}
 
@@ -51,7 +54,7 @@ void Hand_Draw(int projUniform, C3D_Mtx* projection, Block block, uint8_t metada
 
 	C3D_BufInfo* bufInfo = C3D_GetBufInfo();
 	BufInfo_Init(bufInfo);
-	BufInfo_Add(bufInfo, handVBO, sizeof(Vertex), 2, 0x10);
+	BufInfo_Add(bufInfo, handVBO, sizeof(WorldVertex), 4, 0x3210);
 
 	C3D_DrawArrays(GPU_TRIANGLES, 0, 6 * 6);
 

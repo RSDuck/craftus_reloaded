@@ -11,61 +11,61 @@
 
 #include <3ds.h>
 
-const Vertex cube_sides_lut[] = {
+const WorldVertex cube_sides_lut[] = {
     // Fourth face (MX)
     // First triangle
-    {{0, 0, 0}, {0, 0, 255}},
-    {{0, 0, 1}, {1, 0, 255}},
-    {{0, 1, 1}, {1, 1, 255}},
+    {{0, 0, 0}, {0, 0}, {255, 255, 255}, {0, 0, 0}},
+    {{0, 0, 1}, {1, 0}, {255, 255, 255}, {0, 0, 0}},
+    {{0, 1, 1}, {1, 1}, {255, 255, 255}, {0, 0, 0}},
     // Second triangle
-    {{0, 1, 1}, {1, 1, 255}},
-    {{0, 1, 0}, {0, 1, 255}},
-    {{0, 0, 0}, {0, 0, 255}},
+    {{0, 1, 1}, {1, 1}, {255, 255, 255}, {0, 0, 0}},
+    {{0, 1, 0}, {0, 1}, {255, 255, 255}, {0, 0, 0}},
+    {{0, 0, 0}, {0, 0}, {255, 255, 255}, {0, 0, 0}},
     // Third face (PX)
     // First triangle
-    {{1, 0, 0}, {1, 0, 255}},
-    {{1, 1, 0}, {1, 1, 255}},
-    {{1, 1, 1}, {0, 1, 255}},
+    {{1, 0, 0}, {1, 0}, {255, 255, 255}, {0, 0, 0}},
+    {{1, 1, 0}, {1, 1}, {255, 255, 255}, {0, 0, 0}},
+    {{1, 1, 1}, {0, 1}, {255, 255, 255}, {0, 0, 0}},
     // Second triangle
-    {{1, 1, 1}, {0, 1, 255}},
-    {{1, 0, 1}, {0, 0, 255}},
-    {{1, 0, 0}, {1, 0, 255}},
+    {{1, 1, 1}, {0, 1}, {255, 255, 255}, {0, 0, 0}},
+    {{1, 0, 1}, {0, 0}, {255, 255, 255}, {0, 0, 0}},
+    {{1, 0, 0}, {1, 0}, {255, 255, 255}, {0, 0, 0}},
     // Sixth face (MY)
     // First triangle
-    {{0, 0, 0}, {0, 1, 255}},
-    {{1, 0, 0}, {1, 1, 255}},
-    {{1, 0, 1}, {1, 0, 255}},
+    {{0, 0, 0}, {0, 1}},
+    {{1, 0, 0}, {1, 1}},
+    {{1, 0, 1}, {1, 0}, {255, 255, 255}, {0, 0, 0}},
     // Second triangle
-    {{1, 0, 1}, {1, 0, 255}},
-    {{0, 0, 1}, {0, 0, 255}},
-    {{0, 0, 0}, {0, 1, 255}},
+    {{1, 0, 1}, {1, 0}, {255, 255, 255}, {0, 0, 0}},
+    {{0, 0, 1}, {0, 0}, {255, 255, 255}, {0, 0, 0}},
+    {{0, 0, 0}, {0, 1}, {255, 255, 255}, {0, 0, 0}},
     // Fifth face (PY)
     // First triangle
-    {{0, 1, 0}, {0, 1, 255}},
-    {{0, 1, 1}, {0, 0, 255}},
-    {{1, 1, 1}, {1, 0, 255}},
+    {{0, 1, 0}, {0, 1}, {255, 255, 255}, {0, 0, 0}},
+    {{0, 1, 1}, {0, 0}, {255, 255, 255}, {0, 0, 0}},
+    {{1, 1, 1}, {1, 0}, {255, 255, 255}, {0, 0, 0}},
     // Second triangle
-    {{1, 1, 1}, {1, 0, 255}},
-    {{1, 1, 0}, {1, 1, 255}},
-    {{0, 1, 0}, {0, 1, 255}},
+    {{1, 1, 1}, {1, 0}, {255, 255, 255}, {0, 0, 0}},
+    {{1, 1, 0}, {1, 1}, {255, 255, 255}, {0, 0, 0}},
+    {{0, 1, 0}, {0, 1}, {255, 255, 255}, {0, 0, 0}},
     // Second face (MZ)
     // First triangle
-    {{0, 0, 0}, {1, 0, 255}},
-    {{0, 1, 0}, {1, 1, 255}},
-    {{1, 1, 0}, {0, 1, 255}},
+    {{0, 0, 0}, {1, 0}, {255, 255, 255}, {0, 0, 0}},
+    {{0, 1, 0}, {1, 1}, {255, 255, 255}, {0, 0, 0}},
+    {{1, 1, 0}, {0, 1}, {255, 255, 255}, {0, 0, 0}},
     // Second triangle
-    {{1, 1, 0}, {0, 1, 255}},
-    {{1, 0, 0}, {0, 0, 255}},
-    {{0, 0, 0}, {1, 0, 255}},
+    {{1, 1, 0}, {0, 1}, {255, 255, 255}, {0, 0, 0}},
+    {{1, 0, 0}, {0, 0}, {255, 255, 255}, {0, 0, 0}},
+    {{0, 0, 0}, {1, 0}, {255, 255, 255}, {0, 0, 0}},
     // First face (PZ)
     // First triangle
-    {{0, 0, 1}, {0, 0, 255}},
-    {{1, 0, 1}, {1, 0, 255}},
-    {{1, 1, 1}, {1, 1, 255}},
+    {{0, 0, 1}, {0, 0}, {255, 255, 255}, {0, 0, 0}},
+    {{1, 0, 1}, {1, 0}, {255, 255, 255}, {0, 0, 0}},
+    {{1, 1, 1}, {1, 1}, {255, 255, 255}, {0, 0, 0}},
     // Second triangle
-    {{1, 1, 1}, {1, 1, 255}},
-    {{0, 1, 1}, {0, 1, 255}},
-    {{0, 0, 1}, {0, 0, 255}},
+    {{1, 1, 1}, {1, 1}, {255, 255, 255}, {0, 0, 0}},
+    {{0, 1, 1}, {0, 1}, {255, 255, 255}, {0, 0, 0}},
+    {{0, 0, 1}, {0, 0}, {255, 255, 255}, {0, 0, 0}},
 };
 
 typedef struct {
@@ -321,12 +321,12 @@ void PolyGen_GeneratePolygons(WorkQueue* queue, WorkerItem item, void* this) {
 
 			if (currentFace) {
 				VBO_Block memBlock;
-				if (verticesTotal > 0) memBlock = VBO_Alloc(verticesTotal * sizeof(Vertex));
+				if (verticesTotal > 0) memBlock = VBO_Alloc(verticesTotal * sizeof(WorldVertex));
 				VBO_Block transparentMem;
-				if (transparentFaces > 0) transparentMem = VBO_Alloc(transparentVertices * sizeof(Vertex));
+				if (transparentFaces > 0) transparentMem = VBO_Alloc(transparentVertices * sizeof(WorldVertex));
 
-				Vertex* opaqueData = memBlock.memory;
-				Vertex* transparentData = transparentMem.memory;
+				WorldVertex* opaqueData = memBlock.memory;
+				WorldVertex* transparentData = transparentMem.memory;
 				for (int j = 0; j < currentFace; j++) {
 					Face face = faceBuffer[j];
 
@@ -337,22 +337,25 @@ void PolyGen_GeneratePolygons(WorkQueue* queue, WorkerItem item, void* this) {
 					int16_t iconUV[2];
 					Block_GetTexture(face.block, face.direction, face.metadata, iconUV);
 
-					Vertex* data = face.transparent ? transparentData : opaqueData;
-					memcpy(data, &cube_sides_lut[face.direction * 6], sizeof(Vertex) * 6);
+					WorldVertex* data = face.transparent ? transparentData : opaqueData;
+					memcpy(data, &cube_sides_lut[face.direction * 6], sizeof(WorldVertex) * 6);
 
 #define oneDivIconsPerRow (32768 / 8)
 #define halfTexel (6)
 
-					uint16_t color = Block_GetColor(face.block, face.metadata, face.direction);
+					uint8_t color[3];
+					Block_GetColor(face.block, face.metadata, face.direction, color);
 
 					for (int k = 0; k < 6; k++) {
 						data[k].xyz[0] += offsetX;
 						data[k].xyz[1] += offsetY;
 						data[k].xyz[2] += offsetZ;
-						data[k].uvc[0] = (data[k].uvc[0] == 1 ? (oneDivIconsPerRow - 1) : 1) + iconUV[0];
-						data[k].uvc[1] = (data[k].uvc[1] == 1 ? (oneDivIconsPerRow - 1) : 1) + iconUV[1];
+						data[k].uv[0] = (data[k].uv[0] == 1 ? (oneDivIconsPerRow - 1) : 1) + iconUV[0];
+						data[k].uv[1] = (data[k].uv[1] == 1 ? (oneDivIconsPerRow - 1) : 1) + iconUV[1];
 
-						data[k].uvc[2] = color;
+						data[k].rgb[0] = color[0];
+						data[k].rgb[1] = color[1];
+						data[k].rgb[2] = color[2];
 					}
 					if (face.transparent)
 						transparentData += 6;

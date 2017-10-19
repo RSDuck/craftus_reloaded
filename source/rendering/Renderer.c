@@ -14,6 +14,7 @@
 
 #include <citro3d.h>
 
+#include <gui_shbin.h>
 #include <world_shbin.h>
 
 #define DISPLAY_TRANSFER_FLAGS                                                                                                          \
@@ -24,9 +25,11 @@ GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO))
 static C3D_RenderTarget* renderTargets[2];
 static C3D_RenderTarget* lowerScreen;
 
-static DVLB_s* world_dvlb;
-static shaderProgram_s world_shader;
-static int world_shader_uLocProjection;
+static DVLB_s *world_dvlb, *gui_dvlb;
+static shaderProgram_s world_shader, gui_shader;
+static int world_shader_uLocProjection, gui_shader_uLocProjection;
+
+static C3D_AttrInfo world_vertexAttribs, gui_vertexAttribs;
 
 static C3D_Tex logoTex;
 
@@ -58,20 +61,28 @@ void Renderer_Init(World* world_, Player* player_, WorkQueue* queue, GameState* 
 	world_dvlb = DVLB_ParseFile((u32*)world_shbin, world_shbin_size);
 	shaderProgramInit(&world_shader);
 	shaderProgramSetVsh(&world_shader, &world_dvlb->DVLE[0]);
-	C3D_BindProgram(&world_shader);
-
 	world_shader_uLocProjection = shaderInstanceGetUniformLocation(world_shader.vertexShader, "projection");
 
-	C3D_AttrInfo* attrInfo = C3D_GetAttrInfo();
-	AttrInfo_Init(attrInfo);
-	AttrInfo_AddLoader(attrInfo, 0, GPU_SHORT, 3);
-	AttrInfo_AddLoader(attrInfo, 1, GPU_SHORT, 3);
+	gui_dvlb = DVLB_ParseFile((u32*)gui_shbin, gui_shbin_size);
+	shaderProgramInit(&gui_shader);
+	shaderProgramSetVsh(&gui_shader, &gui_dvlb->DVLE[0]);
+	gui_shader_uLocProjection = shaderInstanceGetUniformLocation(gui_shader.vertexShader, "projection");
+
+	AttrInfo_Init(&world_vertexAttribs);
+	AttrInfo_AddLoader(&world_vertexAttribs, 0, GPU_SHORT, 3);
+	AttrInfo_AddLoader(&world_vertexAttribs, 1, GPU_SHORT, 2);
+	AttrInfo_AddLoader(&world_vertexAttribs, 2, GPU_UNSIGNED_BYTE, 3);
+	AttrInfo_AddLoader(&world_vertexAttribs, 3, GPU_UNSIGNED_BYTE, 3);
+
+	AttrInfo_Init(&gui_vertexAttribs);
+	AttrInfo_AddLoader(&gui_vertexAttribs, 0, GPU_SHORT, 3);
+	AttrInfo_AddLoader(&gui_vertexAttribs, 1, GPU_SHORT, 3);
 
 	PolyGen_Init(world, player_);
 
 	WorldRenderer_Init(player, world, workqueue, world_shader_uLocProjection);
 
-	SpriteBatch_Init(world_shader_uLocProjection);
+	SpriteBatch_Init(gui_shader_uLocProjection);
 
 	Gui_Init();
 
@@ -94,6 +105,8 @@ void Renderer_Deinit() {
 
 	SpriteBatch_Deinit();
 
+	shaderProgramFree(&gui_shader);
+	DVLB_Free(gui_dvlb);
 	shaderProgramFree(&world_shader);
 	DVLB_Free(world_dvlb);
 
@@ -116,6 +129,9 @@ void Renderer_Render() {
 		C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, 0);
 		C3D_TexEnvOp(env, C3D_Both, 0, 0, 0);
 		C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+
+		C3D_BindProgram(&world_shader);
+		C3D_SetAttrInfo(&world_vertexAttribs);
 
 		if (*gamestate == GameState_Playing) {
 			C3D_TexBind(0, Block_GetTextureMap());
@@ -148,6 +164,9 @@ void Renderer_Render() {
 			SpriteBatch_PushText(0, 0, 0, INT16_MAX, true, INT_MAX, NULL, "v" CRAFTUS_VERSION_STR);
 		}
 
+		C3D_BindProgram(&gui_shader);
+		C3D_SetAttrInfo(&gui_vertexAttribs);
+
 		SpriteBatch_Render(GFX_TOP);
 
 		if (iod <= 0.f) break;
@@ -160,14 +179,12 @@ void Renderer_Render() {
 	if (*gamestate == GameState_SelectWorld)
 		WorldSelect_Render();
 	else {
-
 		SpriteBatch_SetScale(2);
 		DebugUI_Text("%s", BlockNames[player->inventory[player->inventorySlot].block]);
 		SpriteBatch_PushIcon(player->inventory[player->inventorySlot].block, player->inventory[player->inventorySlot].meta,
-					 160 - 32, 60 - 16, 20);
- 
+				     160 - 32, 60 - 16, 20);
+
 		DebugUI_Draw();
-					 
 	}
 
 	Gui_Frame();

@@ -1,14 +1,9 @@
 ; Constants
-.constf myconst(0.0, 1.0, 0.0000305185094759, 0.00001525902189)
-.constf myconst2(0.0009765625, 0.03125, 32.0, 0.03225806451)
+.constf myconst(0.0, 1.0, 0.0000305185094759, 0.00392156862745)
 ;.alias  zeros 	myconst.xxxx ; Vector full of zeros
 .alias  ones  	myconst.yyyy ; Vector full of ones
 .alias	div2p15	myconst.zzzz
-;.alias	half	myconst.wwww
-;.alias	div1024	myconst2.xxxx
-.alias	div32	myconst2.yyyy
-.alias	thirtytwo	myconst2.zzzz
-.alias	div31	myconst2.wwww
+.alias	div255	myconst.wwww
 
 ; Uniforms
 .fvec projection[4]
@@ -21,11 +16,14 @@
 
 ; Inputs
 .alias in_xyz		v0
-.alias in_uvc 		v1
+.alias in_uv 		v1
+.alias in_rgb		v2
+.alias in_fxyz		v3
 
 .entry vmain
 .proc vmain
-	mov r0.xyz, in_xyz.xyz
+	mul r0.xyz, div255, in_fxyz.xyz
+	add r0.xyz, in_xyz.xyz, r0.xyz
 	mov r0.w, ones
 
 	dp4 out_position.x, projection[0], r0
@@ -33,21 +31,9 @@
 	dp4 out_position.z, projection[2], r0
 	dp4 out_position.w, projection[3], r0
 
-	mul out_uv, div2p15, in_uvc.xy
+	mul out_uv, div2p15, in_uv.xy
 
-	mov r0.xyz, in_uvc.zzz
-	mul r0.xy, myconst2.xy, r0.xy
-	flr r0.xy, r0.xy
-
-	;r = (x >> 10) = floor(x / 1024)
-	;b = (x >> 5) & 31 = frac(floor(x / 32)/32)*32
-	;g = (x >> 0) & 31 = frac(x/32)*32
-	mul r0, div32, r0
-	flr r1, r0
-	add r0, r0, -r1
-	mul r0, thirtytwo, r0
-
-	mul out_color.xyz, div31, r0.xyz
+	mul out_color.xyz, div255, in_rgb.xyz
 	mov out_color.w, ones
 
 	end

@@ -109,7 +109,7 @@ static void renderWorld() {
 
 			C3D_BufInfo bufInfo;
 			BufInfo_Init(&bufInfo);
-			BufInfo_Add(&bufInfo, cluster->vbo.memory, sizeof(Vertex), 2, 0x10);
+			BufInfo_Add(&bufInfo, cluster->vbo.memory, sizeof(WorldVertex), 4, 0x3210);
 			C3D_SetBufInfo(&bufInfo);
 			C3D_DrawArrays(GPU_TRIANGLES, 0, cluster->vertices);
 
@@ -177,7 +177,7 @@ static void renderWorld() {
 	vec_foreach_ptr_rev(&transparentClusters, render, i) {
 		C3D_BufInfo bufInfo;
 		BufInfo_Init(&bufInfo);
-		BufInfo_Add(&bufInfo, render->cluster->transparentVBO.memory, sizeof(Vertex), 2, 0x10);
+		BufInfo_Add(&bufInfo, render->cluster->transparentVBO.memory, sizeof(WorldVertex), 4, 0x3210);
 		C3D_SetBufInfo(&bufInfo);
 		C3D_DrawArrays(GPU_TRIANGLES, 0, render->cluster->transparentVertices);
 
