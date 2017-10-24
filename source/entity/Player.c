@@ -2,7 +2,7 @@
 
 #include <misc/Collision.h>
 
-void Player_Init(Player* player) {
+void Player_Init(Player* player, World* world) {
 	player->position = f3_new(0.f, 0.f, 0.f);
 
 	player->bobbing = 0.f;
@@ -11,7 +11,7 @@ void Player_Init(Player* player) {
 
 	player->grounded = false;
 	player->sprinting = false;
-	player->world = NULL;
+	player->world = world;
 
 	player->fovAdd = 0.f;
 	player->crouchAdd = 0.f;
@@ -48,8 +48,6 @@ void Player_Init(Player* player) {
 	}
 	player->autoJumpEnabled = true;
 }
-
-void Player_Spawn(Player* player, World* world) { player->world = world; }
 
 void Player_Update(Player* player) {
 	player->view = f3_new(-sinf(player->yaw) * cosf(player->pitch), sinf(player->pitch), -cosf(player->yaw) * cosf(player->pitch));

@@ -26,6 +26,8 @@ typedef struct {
 void ChunkWorker_Init(ChunkWorker* chunkworker);
 void ChunkWorker_Deinit(ChunkWorker* chunkworker);
 
+void ChunkWorker_Finish(ChunkWorker* chunkworker);
+
 void ChunkWorker_AddHandler(ChunkWorker* chunkworker, WorkerItemType type, WorkerFuncObj obj);
 void ChunkWorker_SetHandlerActive(ChunkWorker* chunkworker, WorkerItemType type, void* this, bool active);
 

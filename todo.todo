@@ -1,7 +1,7 @@
 Speichern/Weltenformat:
     ✔ Spezifikation festlegen @done (9.8.2017, 13:30:33)
     ✔ Zusätzlich noch eine ForceVBOUpdate Flag einbauen, damit die Revision die tatsächliche Revision ist @done (10.8.2017, 16:08:12)
-    ☐ Spieler und Welt bis zum letzten Moment auseinander halten @0.2
+    ✔ Spieler und Welt bis zum letzten Moment auseinander halten @0.2 @done (2017-10-22 23:59:24)
     ✔ Superchunks implementieren @done (11.8.2017, 15:05:55)
     ✔ Flag für leere Cluster einbauen um Speicher zu sparen @0.2 @done (12.8.2017, 19:21:31)
     ✔ Heightmaps für Chunks generieren @0.2 @done (12.8.2017, 19:21:34)
@@ -16,7 +16,7 @@ GUI:
     ✔ Blockicons @done (12.8.2017, 15:42:49)
     ✔ Keine absoluten Werte mehr benutzen @done (2017-9-22 18:38:07)
         ✔ Gui Framework zum automatischen Positionieren @done (2017-9-22 18:38:04)
-    ☐ Grundlage für Inventare schaffen @high @0.3
+    ✔ Grundlage für Inventare schaffen @high @0.3 @done (2017-10-22 23:55:51)
     ☐ Mehr/bessere Informationen auf dem unteren Bildschirm @0.3
 
 Alles mögliche:
@@ -25,7 +25,7 @@ Alles mögliche:
     ✔ Hand @done (2017-9-18 21:46:42)
     ✔ Menü zum auswählen der Welt @done (21.8.2017, 15:18:49)
     ✔ Welt löschen einbauen @done (21.8.2017, 19:32:26)
-    ☐ Welt wechseln @low @0.3
+    ✔ Welt wechseln @low @0.3 @done (2017-10-24 16:05:18)
     ✔ "Neue Welt erstellen" implementieren @done (21.8.2017, 18:19:32)
     ✔ Block Metadaten @high @0.3 @done (2017-10-3 15:57:08)
 
@@ -45,7 +45,7 @@ Gameplay:
 Rendering:
     ✔ Transparente Blöcke korrekt rendern @0.2 @done (17.8.2017, 20:34:12)
     ☐ Beleuchtung @low
-    ☐ Seperaten Shader für Welt und UI, um partielle Blöcke zu unterstützen @low
+    ✔ Seperaten Shader für Welt und UI, um partielle Blöcke zu unterstützen @low @done (2017-10-22 23:55:47)
     ✔ Cursor verbessern(nicht mehr hinter anderen Blöcken sichtbar sein, Farbe anpassen) @done (2017-9-16 15:13:26)
 
 PC Port:

@@ -17,7 +17,8 @@ void ChunkWorker_Init(ChunkWorker* chunkworker) {
 	bool isNew3ds = false;
 	APT_CheckNew3DS(&isNew3ds);
 	svcGetThreadPriority(&prio, CUR_THREAD_HANDLE);
-	chunkworker->thread = threadCreate(&ChunkWorker_Mainloop, (void*)chunkworker, CHUNKWORKER_THREAD_STACKSIZE, prio - 1, isNew3ds ? 2 : 1, false);
+	chunkworker->thread =
+	    threadCreate(&ChunkWorker_Mainloop, (void*)chunkworker, CHUNKWORKER_THREAD_STACKSIZE, prio - 1, isNew3ds ? 2 : 1, false);
 	if (!chunkworker->thread) {
 		Crash("Couldn't create worker thread");
 	}
@@ -37,6 +38,11 @@ void ChunkWorker_Deinit(ChunkWorker* chunkworker) {
 	for (int i = 0; i < WorkerItemTypes_Count; i++) {
 		vec_deinit(&chunkworker->handler[i]);
 	}
+}
+
+void ChunkWorker_Finish(ChunkWorker* chunkworker) {
+	LightEvent_Signal(&chunkworker->queue.itemAddedEvent);	
+	while (chunkworker->working || chunkworker->queue.queue.length > 0) svcSleepThread(1000000);
 }
 
 void ChunkWorker_AddHandler(ChunkWorker* chunkworker, WorkerItemType type, WorkerFuncObj obj) {

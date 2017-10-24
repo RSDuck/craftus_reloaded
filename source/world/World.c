@@ -16,10 +16,17 @@ void World_Init(World* world, WorkQueue* workqueue) {
 	world->genSettings.seed = 28112000;
 	world->genSettings.type = WorldGen_SuperFlat;
 
+	vec_init(&world->freeChunks);
+
+	World_Reset(world);
+}
+
+void World_Reset(World* world) {
 	world->cacheTranslationX = 0;
 	world->cacheTranslationZ = 0;
 
-	vec_init(&world->freeChunks);
+	vec_clear(&world->freeChunks);
+
 	for (size_t i = 0; i < CHUNKPOOL_SIZE; i++) {
 		world->chunkPool[i].x = INT_MAX;
 		world->chunkPool[i].z = INT_MAX;
@@ -85,11 +92,12 @@ Block World_GetBlock(World* world, int x, int y, int z) {
 	\
 }
 
-#define NOTIFY_ALL_NEIGHTBORS                                                                        \
-	NOTIFY_NEIGHTBOR(lX, 0, -1, 0)                                                               \
-	NOTIFY_NEIGHTBOR(lX, 15, 1, 0) NOTIFY_NEIGHTBOR(lZ, 0, 0, -1)                                \
-	    NOTIFY_NEIGHTBOR(lZ, 15, 0, 1) if (WorldToLocalCoord(y) == 0 && y / CHUNK_SIZE - 1 >= 0) \
-		Chunk_RequestGraphicsUpdate(chunk, y / CHUNK_SIZE - 1);                              \
+#define NOTIFY_ALL_NEIGHTBORS                                                                                             \
+	NOTIFY_NEIGHTBOR(lX, 0, -1, 0)                                                                                    \
+	NOTIFY_NEIGHTBOR(lX, 15, 1, 0)                                                                                    \
+	NOTIFY_NEIGHTBOR(lZ, 0, 0, -1)                                                                                    \
+	NOTIFY_NEIGHTBOR(lZ, 15, 0, 1)                                                                                    \
+	if (WorldToLocalCoord(y) == 0 && y / CHUNK_SIZE - 1 >= 0) Chunk_RequestGraphicsUpdate(chunk, y / CHUNK_SIZE - 1); \
 	if (WorldToLocalCoord(y) == 15 && y / CHUNK_SIZE + 1 < CLUSTER_PER_CHUNK) Chunk_RequestGraphicsUpdate(chunk, y / CHUNK_SIZE + 1);
 
 void World_SetBlock(World* world, int x, int y, int z, Block block) {

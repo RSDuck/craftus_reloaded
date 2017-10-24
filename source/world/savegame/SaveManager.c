@@ -116,6 +116,7 @@ void SaveManager_Unload(SaveManager* mgr) {
 		SuperChunk_Deinit(mgr->superchunks.data[i]);
 		free(mgr->superchunks.data[i]);
 	}
+	vec_clear(&mgr->superchunks);
 }
 
 static SuperChunk* fetchSuperChunk(SaveManager* mgr, int x, int z) {

@@ -50,8 +50,6 @@ void SuperChunk_Init(SuperChunk* superchunk, int x, int z) {
 		mpack_tree_init_pool(&tree, fileBuffer, size, nodeDataPool, nodeDataPoolSize);
 		mpack_node_t root = mpack_tree_root(&tree);
 
-		printf("Loaded tree\n");
-
 		mpack_node_t chunkIndices = mpack_node_map_cstr(root, "chunkIndices");
 		for (int i = 0; i < SUPERCHUNK_SIZE * SUPERCHUNK_SIZE; i++) {
 			mpack_node_t chunkInfo = mpack_node_array_at(chunkIndices, i);

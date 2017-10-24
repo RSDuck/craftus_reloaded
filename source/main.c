@@ -64,9 +64,7 @@ int main() {
 	World* world = (World*)malloc(sizeof(World));
 	Player player;
 	PlayerController playerCtrl;
-	Player_Init(&player);
-	player.position.y = 80.f;
-	Player_Spawn(&player, world);
+	Player_Init(&player, world);
 	PlayerController_Init(&playerCtrl, &player);
 
 	SuperFlatGen_Init(&flatGen, world);
@@ -109,8 +107,27 @@ int main() {
 		}
 
 		hidScanInput();
-		u32 keysdown = hidKeysHeld();
-		if (keysdown & KEY_START) break;
+		u32 keysheld = hidKeysHeld(), keysdown = hidKeysDown();
+		if (keysdown & KEY_START) {
+			if (gamestate == GameState_SelectWorld)
+				break;
+			else if (gamestate == GameState_Playing) {
+				for (int i = 0; i < CHUNKCACHE_SIZE; i++) {
+					for (int j = 0; j < CHUNKCACHE_SIZE; j++) {
+						World_UnloadChunk(world, world->chunkCache[i][j]);
+					}
+				}
+				ChunkWorker_Finish(&chunkWorker);
+				World_Reset(world);
+
+				SaveManager_Unload(&savemgr);
+				gamestate = GameState_SelectWorld;
+
+				WorldSelect_ScanWorlds();
+
+				lastTime = svcGetSystemTick();
+			}
+		}
 
 		circlePosition circlePos;
 		hidCircleRead(&circlePos);
@@ -121,8 +138,8 @@ int main() {
 		touchPosition touchPos;
 		hidTouchRead(&touchPos);
 
-		InputData inputData = (InputData){keysdown,    hidKeysDown(), hidKeysUp(),  circlePos.dx, circlePos.dy,
-						  touchPos.px, touchPos.py,   cstickPos.dx, cstickPos.dy};
+		InputData inputData = (InputData){keysheld,    keysdown,    hidKeysUp(),  circlePos.dx, circlePos.dy,
+						  touchPos.px, touchPos.py, cstickPos.dx, cstickPos.dy};
 
 		if (gamestate == GameState_Playing) {
 			while (timeAccum >= 1.f / 20.f) {
@@ -143,6 +160,7 @@ int main() {
 			if (WorldSelect_Update(path, name, &worldType, &newWorld)) {
 				strcpy(world->name, name);
 				world->genSettings.type = worldType;
+
 				SaveManager_Load(&savemgr, path);
 
 				ChunkWorker_SetHandlerActive(&chunkWorker, WorkerItemType_BaseGen, &flatGen,
@@ -185,17 +203,8 @@ int main() {
 		Gui_InputData(inputData);
 	}
 
-	if (gamestate == GameState_Playing) {
-		for (int i = 0; i < CHUNKCACHE_SIZE; i++) {
-			for (int j = 0; j < CHUNKCACHE_SIZE; j++) {
-				World_UnloadChunk(world, world->chunkCache[i][j]);
-			}
-		}
-	}
-
 	ChunkWorker_Deinit(&chunkWorker);
 
-	if (gamestate == GameState_Playing) SaveManager_Unload(&savemgr);
 	SaveManager_Deinit(&savemgr);
 
 	SuperChunk_DeinitPools();

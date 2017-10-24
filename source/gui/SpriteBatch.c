@@ -36,7 +36,7 @@ void SpriteBatch_Init(int projUniform_) {
 	vec_init(&cmdList);
 
 	vertexList[0] = linearAlloc(sizeof(GuiVertex) * 256);
-	vertexList[1] = linearAlloc(sizeof(GuiVertex) * (4096 + 1024));
+	vertexList[1] = linearAlloc(sizeof(GuiVertex) *2 * (4096 + 1024));
 
 	projUniform = projUniform_;
 

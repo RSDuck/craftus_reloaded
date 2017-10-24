@@ -39,8 +39,7 @@ typedef struct {
 	bool blockInSeight, blockInActionRange;
 } Player;
 
-void Player_Init(Player* player);
-void Player_Spawn(Player* player, World* world);
+void Player_Init(Player* player, World* world);
 
 void Player_Update(Player* player);
 

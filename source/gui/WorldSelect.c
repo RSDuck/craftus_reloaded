@@ -24,8 +24,7 @@ typedef struct {
 
 static vec_t(WorldInfo) worlds;
 
-// TODO: Ordner nicht in SaveManager_Init erstellen
-static void scanworlds() {
+void WorldSelect_ScanWorlds() {
 	vec_clear(&worlds);
 
 	DIR* directory = opendir("sdmc:/craftus/saves");
@@ -42,7 +41,7 @@ static void scanworlds() {
 			mpack_node_t root = mpack_tree_root(&tree);
 
 			char name[WORLD_NAME_SIZE];
-			mpack_node_copy_utf8_cstr(mpack_node_map_cstr(root, "name"), name, 12);
+			mpack_node_copy_utf8_cstr(mpack_node_map_cstr(root, "name"), name, WORLD_NAME_SIZE);
 
 			if (mpack_tree_destroy(&tree) != mpack_ok) {
 				continue;
@@ -88,7 +87,7 @@ static void delete_folder(const char* path) {
 void WorldSelect_Init() {
 	vec_init(&worlds);
 
-	scanworlds();
+	WorldSelect_ScanWorlds();
 }
 
 void WorldSelect_Deinit() { vec_deinit(&worlds); }
@@ -201,9 +200,11 @@ void WorldSelect_Render() {
 
 bool WorldSelect_Update(char* out_worldpath, char* out_name, WorldGenType* worldType, bool* newWorld) {
 	if (clicked_new_world) {
+		clicked_new_world = false;
 		menustate = MenuState_WorldOptions;
 	}
 	if (confirmed_world_options) {
+		confirmed_world_options = false;
 		*worldType = worldGenType;
 
 		static SwkbdState swkbd;
@@ -221,6 +222,7 @@ bool WorldSelect_Update(char* out_worldpath, char* out_name, WorldGenType* world
 #endif
 
 		strcpy(out_name, name);
+		menustate = MenuState_SelectWorld;
 		if (button == SWKBD_BUTTON_CONFIRM) {
 			strcpy(out_worldpath, out_name);
 
@@ -244,48 +246,45 @@ bool WorldSelect_Update(char* out_worldpath, char* out_name, WorldGenType* world
 				if (!alreadyExisting) break;
 
 				out_worldpath[length] = '_';
-				out_worldpath[length + alreadyExisting] = '\0';
-				length += alreadyExisting;
+				out_worldpath[length + 1] = '\0';
+				++length;
 			}
 
 			*newWorld = true;
 
 			return true;
-		} else {
-			menustate = MenuState_SelectWorld;
 		}
 	}
 	if (clicked_play && selectedWorld != -1) {
+		clicked_play = false;
+		strcpy(out_name, worlds.data[selectedWorld].name);
 		strcpy(out_worldpath, worlds.data[selectedWorld].path);
 
 		*newWorld = false;
+		menustate = MenuState_SelectWorld;
 		return true;
 	}
 	if (clicked_delete_world && selectedWorld != -1) {
+		clicked_delete_world = false;
 		menustate = MenuState_ConfirmDeletion;
 	}
 	if (confirmed_deletion) {
+		confirmed_deletion = false;
 		char buffer[256];
 		sprintf(buffer, "sdmc:/craftus/saves/%s", worlds.data[selectedWorld].path);
 		delete_folder(buffer);
 
-		scanworlds();
+		WorldSelect_ScanWorlds();
 		menustate = MenuState_SelectWorld;
 	}
 	if (canceled_deletion) {
+		canceled_deletion = false;
 		menustate = MenuState_SelectWorld;
 	}
 	if (canceled_world_options) {
+		canceled_world_options = false;
 		menustate = MenuState_SelectWorld;
 	}
-
-	clicked_new_world = false;
-	clicked_play = false;
-	clicked_delete_world = false;
-	canceled_deletion = false;
-	confirmed_deletion = false;
-	confirmed_world_options = false;
-	canceled_world_options = false;
 
 	return false;
 }

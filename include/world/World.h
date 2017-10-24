@@ -47,6 +47,8 @@ inline static int WorldToLocalCoord(int x) { return x - WorldToChunkCoord(x) * C
 
 void World_Init(World* world, WorkQueue* workqueue);
 
+void World_Reset(World* world);
+
 void World_Tick(World* world);
 
 Chunk* World_LoadChunk(World* world, int x, int z);
