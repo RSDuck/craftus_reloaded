@@ -184,8 +184,9 @@ void Renderer_Render() {
 	else {
 		SpriteBatch_SetScale(2);
 		player->quickSelectBarSlots = Inventory_QuickSelectCalcSlots(160);
-		Inventory_DrawQuickSelect(160 / 2 - Inventory_QuickSelectCalcWidth(slots) / 2, 120 - INVENTORY_QUICKSELECT_HEIGHT,
-					  player->quickSelectBar, player->quickSelectBarSlots, &player->quickSelectBarSlot);
+		Inventory_DrawQuickSelect(160 / 2 - Inventory_QuickSelectCalcWidth(player->quickSelectBarSlots) / 2,
+					  120 - INVENTORY_QUICKSELECT_HEIGHT, player->quickSelectBar, player->quickSelectBarSlots,
+					  &player->quickSelectBarSlot);
 		Inventory_Draw(0, 0, 160, player->inventory, sizeof(player->inventory) / sizeof(ItemStack));
 
 		if (showDebugInfo) DebugUI_Draw();

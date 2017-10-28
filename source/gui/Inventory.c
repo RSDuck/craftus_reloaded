@@ -4,14 +4,12 @@
 #include <gui/SpriteBatch.h>
 #include <rendering/VertexFmt.h>
 
-static float doubleClickTimer = -1.f;
 static ItemStack *sourceStack = NULL, *proposedSourceStack = NULL;
 
 static void clickAtStack(ItemStack* stack) {
 	if (sourceStack == NULL && stack != proposedSourceStack) {
 		proposedSourceStack = stack;
-		doubleClickTimer = 0.25f;
-	} else if (proposedSourceStack == stack && doubleClickTimer > 0.f) {
+	} else if (proposedSourceStack == stack) {
 		sourceStack = stack;
 		proposedSourceStack = NULL;
 	} else if (sourceStack != NULL) {
