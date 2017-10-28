@@ -29,7 +29,8 @@ void Player_Init(Player* player, World* world) {
 
 	player->breakPlaceTimeout = 0.f;
 
-	player->inventorySlot = 0;
+	player->quickSelectBarSlots = INVENTORY_QUICKSELECT_MAXSLOTS;
+	player->quickSelectBarSlot = 0;
 	{
 		int l = 0;
 		player->inventory[l++] = (ItemStack){Block_Stone, 0, 1};
@@ -45,7 +46,10 @@ void Player_Init(Player* player, World* world) {
 		player->inventory[l++] = (ItemStack){Block_Planks, 0, 1};
 		for (int i = 0; i < 16; i++) player->inventory[l++] = (ItemStack){Block_Wool, i, 1};
 		player->inventory[l++] = (ItemStack){Block_Bedrock, 0, 1};
+
+		for (int i = 0; i < INVENTORY_QUICKSELECT_MAXSLOTS; i++) player->quickSelectBar[i] = (ItemStack){Block_Air, 0, 0};
 	}
+
 	player->autoJumpEnabled = true;
 }
 
@@ -205,17 +209,17 @@ void Player_PlaceBlock(Player* player) {
 				 player->viewRayCast.z + offset[2], 1.f, 1.f, 1.f))
 			return;
 		World_SetBlockAndMeta(player->world, player->viewRayCast.x + offset[0], player->viewRayCast.y + offset[1],
-				      player->viewRayCast.z + offset[2], player->inventory[player->inventorySlot].block,
-				      player->inventory[player->inventorySlot].meta);
-		player->breakPlaceTimeout = PLAYER_PLACE_REPLACE_TIMEOUT;
+				      player->viewRayCast.z + offset[2], player->quickSelectBar[player->quickSelectBarSlot].block,
+				      player->quickSelectBar[player->quickSelectBarSlot].meta);
 	}
+	if (player->breakPlaceTimeout < 0.f) player->breakPlaceTimeout = PLAYER_PLACE_REPLACE_TIMEOUT;
 }
 
 void Player_BreakBlock(Player* player) {
 	if (player->world && player->blockInActionRange && player->breakPlaceTimeout < 0.f) {
 		World_SetBlock(player->world, player->viewRayCast.x, player->viewRayCast.y, player->viewRayCast.z, Block_Air);
-		player->breakPlaceTimeout = PLAYER_PLACE_REPLACE_TIMEOUT;
 	}
+	if (player->breakPlaceTimeout < 0.f) player->breakPlaceTimeout = PLAYER_PLACE_REPLACE_TIMEOUT;
 }
 
 void Player_Teleport(Player* player, float x, float y, float z) {

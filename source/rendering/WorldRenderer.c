@@ -3,6 +3,7 @@
 #include <rendering/VertexFmt.h>
 
 #include <rendering/Cursor.h>
+#include <blocks/Block.h>
 
 #include <gui/DebugUI.h>
 
@@ -193,8 +194,8 @@ static void renderWorld() {
 void WorldRenderer_Render(float iod) {
 	Camera_Update(&camera, player, iod);
 
-	Hand_Draw(projectionUniform, &camera.projection, player->inventory[player->inventorySlot].block,
-		  player->inventory[player->inventorySlot].meta, player);
+	Hand_Draw(projectionUniform, &camera.projection, player->quickSelectBar[player->quickSelectBarSlot], player);
+	C3D_TexBind(0, Block_GetTextureMap());
 
 	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, projectionUniform, &camera.vp);
 

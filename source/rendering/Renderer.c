@@ -3,6 +3,7 @@
 #include <blocks/Block.h>
 #include <gui/DebugUI.h>
 #include <gui/Gui.h>
+#include <gui/Inventory.h>
 #include <gui/SpriteBatch.h>
 #include <gui/WorldSelect.h>
 #include <rendering/Camera.h>
@@ -38,6 +39,8 @@ static Player* player;
 static WorkQueue* workqueue;
 
 static GameState* gamestate;
+
+extern bool showDebugInfo;
 
 void Renderer_Init(World* world_, Player* player_, WorkQueue* queue, GameState* gamestate_) {
 	world = world_;
@@ -180,11 +183,12 @@ void Renderer_Render() {
 		WorldSelect_Render();
 	else {
 		SpriteBatch_SetScale(2);
-		DebugUI_Text("%s", BlockNames[player->inventory[player->inventorySlot].block]);
-		SpriteBatch_PushIcon(player->inventory[player->inventorySlot].block, player->inventory[player->inventorySlot].meta,
-				     160 - 32, 60 - 16, 20);
+		player->quickSelectBarSlots = Inventory_QuickSelectCalcSlots(160);
+		Inventory_DrawQuickSelect(160 / 2 - Inventory_QuickSelectCalcWidth(slots) / 2, 120 - INVENTORY_QUICKSELECT_HEIGHT,
+					  player->quickSelectBar, player->quickSelectBarSlots, &player->quickSelectBarSlot);
+		Inventory_Draw(0, 0, 160, player->inventory, sizeof(player->inventory) / sizeof(ItemStack));
 
-		DebugUI_Draw();
+		if (showDebugInfo) DebugUI_Draw();
 	}
 
 	Gui_Frame();

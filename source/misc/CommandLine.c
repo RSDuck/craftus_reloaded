@@ -22,14 +22,19 @@ void CommandLine_Activate(World* world, Player* player) {
 void CommandLine_Execute(World* world, Player* player, const char* text) {
 	int length = strlen(text);
 	if (length >= 1 && text[0] == '/') {
-		if (length >= 9 && text[1] == 't' && text[2] == 'p' && text[3] == ' ') {
+		if (length >= 9) {
 			float x, y, z;
-			if (sscanf(&text[4], "%f %f %f", &x, &y, &z) == 3) {
+			if (sscanf(&text[1], "tp %f %f %f", &x, &y, &z) == 3) {
 				player->position.x = x;
 				player->position.y = y;
 				player->position.z = z;
 				DebugUI_Log("teleported to %f, %f %f", x, y, z);
+				return;
 			}
+		}
+		if (length == 2 && text[1] == 'd') {
+			extern bool showDebugInfo;
+			showDebugInfo ^= true;
 		}
 	}
 }

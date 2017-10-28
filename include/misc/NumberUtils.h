@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdbool.h>
 
+// side effects!!!
 #ifndef MAX
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
@@ -36,4 +37,6 @@ static inline bool AABB_Overlap(float x0, float y0, float z0, float w0, float h0
 #define DEG_TO_RAD (M_PI * 2.f / 360.f)
 #define RAD_TO_DEG ((1.f / M_PI) * 180.f)
 
+#ifdef _3DS
 #define TICKS_PER_MSEC 268111.856
+#endif

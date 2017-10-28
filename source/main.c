@@ -35,6 +35,8 @@ void exitHandler() {
 	}
 }
 
+bool showDebugInfo = false;  // muss noch besser gemacht werden, vlt. über eine Options Struktur wo auch andere Einstellungen drinne sind
+
 int main() {
 	GameState gamestate = GameState_SelectWorld;
 

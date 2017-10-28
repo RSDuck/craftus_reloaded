@@ -297,8 +297,8 @@ void PlayerController_Update(PlayerController* ctrl, InputData input, float dt) 
 
 	bool switchBlockLeft = WasKeyPressed(ctrl->controlScheme.switchBlockLeft, &agnosticInput);
 	bool switchBlockRight = WasKeyPressed(ctrl->controlScheme.switchBlockRight, &agnosticInput);
-	if (switchBlockLeft && --player->inventorySlot == -1) player->inventorySlot = sizeof(player->inventory) / sizeof(ItemStack) - 1;
-	if (switchBlockRight && ++player->inventorySlot == sizeof(player->inventory) / sizeof(ItemStack)) player->inventorySlot = 0;
+	if (switchBlockLeft && --player->quickSelectBarSlot == -1) player->quickSelectBarSlot = player->quickSelectBarSlots - 1;
+	if (switchBlockRight && ++player->quickSelectBarSlot == player->quickSelectBarSlots) player->quickSelectBarSlot = 0;
 
 	if (ctrl->openedCmd) {
 		dt = 0.f;
