@@ -43,10 +43,10 @@ void releaseWorld(ChunkWorker* chunkWorker, SaveManager* savemgr, World* world) 
 			World_UnloadChunk(world, world->chunkCache[i][j]);
 		}
 	}
-	ChunkWorker_Finish(&chunkWorker);
+	ChunkWorker_Finish(chunkWorker);
 	World_Reset(world);
 
-	SaveManager_Unload(&savemgr);
+	SaveManager_Unload(savemgr);
 }
 
 int main() {
