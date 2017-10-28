@@ -37,6 +37,18 @@ void exitHandler() {
 
 bool showDebugInfo = false;  // muss noch besser gemacht werden, vlt. über eine Options Struktur wo auch andere Einstellungen drinne sind
 
+void releaseWorld(ChunkWorker* chunkWorker, SaveManager* savemgr, World* world) {
+	for (int i = 0; i < CHUNKCACHE_SIZE; i++) {
+		for (int j = 0; j < CHUNKCACHE_SIZE; j++) {
+			World_UnloadChunk(world, world->chunkCache[i][j]);
+		}
+	}
+	ChunkWorker_Finish(&chunkWorker);
+	World_Reset(world);
+
+	SaveManager_Unload(&savemgr);
+}
+
 int main() {
 	GameState gamestate = GameState_SelectWorld;
 
@@ -114,15 +126,8 @@ int main() {
 			if (gamestate == GameState_SelectWorld)
 				break;
 			else if (gamestate == GameState_Playing) {
-				for (int i = 0; i < CHUNKCACHE_SIZE; i++) {
-					for (int j = 0; j < CHUNKCACHE_SIZE; j++) {
-						World_UnloadChunk(world, world->chunkCache[i][j]);
-					}
-				}
-				ChunkWorker_Finish(&chunkWorker);
-				World_Reset(world);
+				releaseWorld(&chunkWorker, &savemgr, world);
 
-				SaveManager_Unload(&savemgr);
 				gamestate = GameState_SelectWorld;
 
 				WorldSelect_ScanWorlds();
@@ -204,6 +209,8 @@ int main() {
 		}
 		Gui_InputData(inputData);
 	}
+
+	if (gamestate == GameState_Playing) releaseWorld(&chunkWorker, &savemgr, world);
 
 	ChunkWorker_Deinit(&chunkWorker);
 
