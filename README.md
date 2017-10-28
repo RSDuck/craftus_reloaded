@@ -2,18 +2,20 @@
 
 It's been a while since I started developing this version of Craftus. I started to do a rewrite, because the old Craftus was beyond fixable. Probably 15% is copied from the old Craftus the remaining part is rewritten.
 
-![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/5.png)|![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/6.png)
-----|----
-![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/1.png)|![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/4.png)
+![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/15t.png)|![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/17t.png)|![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/16t.png)
+----|----|----
+<center>![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/15b.png)</center>|<center>![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/17b.png)</center>|<center>![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/16b.png)</center>
 
 
 ## Features
 
 * An infinte world(in theory)
-* An awesome flat world
+* Two different world generators
 * Blocks, of multiple variants, can be broken and placed down to build structures
-* Saving and loading the world
+* A basic inventory system
+* Saving and loading, multiple worlds
 * Clouds and menus
+* Sneaking and Flying
 
 ## Known bugs
 
