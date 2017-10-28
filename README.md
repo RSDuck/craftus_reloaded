@@ -4,7 +4,7 @@ It's been a while since I started developing this version of Craftus. I started 
 
 ![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/15t.png)|![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/17t.png)|![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/16t.png)
 ----|----|----
-<center>![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/15b.png)</center>|<center>![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/17b.png)</center>|<center>![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/16b.png)</center>
+![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/15b.png)|![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/17b.png)|![](https://raw.githubusercontent.com/wiki/RSDuck/craftus_reloaded/screenshots/16b.png)
 
 
 ## Features
