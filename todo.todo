@@ -18,6 +18,10 @@ GUI:
         ✔ Gui Framework zum automatischen Positionieren @done (2017-9-22 18:38:04)
     ✔ Grundlage für Inventare schaffen @high @0.3 @done (2017-10-22 23:55:51)
     ☐ Mehr/bessere Informationen auf dem unteren Bildschirm @0.3
+    ☐ Inventar hübscher machen
+    ☐ Menü wenn man Start drückt, wärend das Spiel läuft
+    ☐ Optionen
+    ✔ Blockmodelle besser rendern(vlt. direkt projezieren) @done (2018-1-4 23:03:27)
 
 Alles mögliche:
     ✔ Ordentlichen Crashreport anzeigen @done (22.8.2017, 02:11:11)
@@ -28,6 +32,8 @@ Alles mögliche:
     ✔ Welt wechseln @low @0.3 @done (2017-10-24 16:05:18)
     ✔ "Neue Welt erstellen" implementieren @done (21.8.2017, 18:19:32)
     ✔ Block Metadaten @high @0.3 @done (2017-10-3 15:57:08)
+    ☐ Andere Blockmodelle
+    ☐ Funktion die für eine Seite Vertexdaten ausfüllt
 
 Weltgeneration:
     ✔ Nicht Superflach Welten @0.2 @done (23.8.2017, 13:12:11)
@@ -47,6 +53,7 @@ Rendering:
     ☐ Beleuchtung @low
     ✔ Seperaten Shader für Welt und UI, um partielle Blöcke zu unterstützen @low @done (2017-10-22 23:55:47)
     ✔ Cursor verbessern(nicht mehr hinter anderen Blöcken sichtbar sein, Farbe anpassen) @done (2017-9-16 15:13:26)
+    ☐ Texelkonstanten in Polygen.c und SpriteBatch.c entfernen
 
 PC Port:
     ☐ Rendering Code portabler machen
@@ -61,4 +68,4 @@ Bugs:
     ✔ Wenn man einen Namen eingibt der, bereinigt, identisch ist mit einer existierenden Welt, wird nichts dagegen unternommen @done (2017-9-16 15:11:07)
     ☐ Crash mit dem SuperChunk laden beheben
     ✔ Kameranahwert und 3D Parameter so einstellen dass man nicht mehr so oft schielen muss und das nichts weg geclippt wird @done (2017-9-13 18:18:48)
-    ☐ Crash beim bauen überhalb der oberen Grenze, der Welt, beheben
+    ✔ Crash beim bauen überhalb der oberen Grenze, der Welt, beheben @done (2017-11-12 17:44:56)

@@ -29,6 +29,8 @@ static C3D_Tex widgetsTex;
 static C3D_Tex iconsTex;
 static C3D_Tex menuBackgroundTex;
 
+static C3D_Mtx iconModelMtx;
+
 static int screenWidth = 0, screenHeight = 0;
 static int guiScale = 2;
 
@@ -36,7 +38,7 @@ void SpriteBatch_Init(int projUniform_) {
 	vec_init(&cmdList);
 
 	vertexList[0] = linearAlloc(sizeof(GuiVertex) * 256);
-	vertexList[1] = linearAlloc(sizeof(GuiVertex) *2 * (4096 + 1024));
+	vertexList[1] = linearAlloc(sizeof(GuiVertex) * 2 * (4096 + 1024));
 
 	projUniform = projUniform_;
 
@@ -50,6 +52,10 @@ void SpriteBatch_Init(int projUniform_) {
 	C3D_TexLoadImage(&whiteTex, data, GPU_TEXFACE_2D, 0);
 
 	Texture_Load(&menuBackgroundTex, "romfs:/textures/gui/options_background.png");
+
+	Mtx_Identity(&iconModelMtx);
+	Mtx_RotateY(&iconModelMtx, M_PI / 4.f, false);
+	Mtx_RotateX(&iconModelMtx, M_PI / 6.f, false);
 }
 void SpriteBatch_Deinit() {
 	vec_deinit(&cmdList);
@@ -98,35 +104,50 @@ void SpriteBatch_PushQuadColor(int x, int y, int z, int w, int h, int rx, int ry
 	vec_push(&cmdList, ((Sprite){z, currentTexture, x * guiScale, y * guiScale, (x + w) * guiScale, y * guiScale, x * guiScale,
 				     (y + h) * guiScale, (x + w) * guiScale, (y + h) * guiScale, rx, ry, rx + rw, ry + rh, color}));
 }
-void SpriteBatch_PushIcon(Block block, uint8_t metadata, int x, int y, int z) {
-	int16_t uvs[2];
-	uint8_t color[3];
-	C3D_Tex* texture = Block_GetTextureMap();
-	Block_GetTexture(block, Direction_Top, metadata, uvs);
-	Block_GetColor(block, metadata, Direction_Top, color);
-	int16_t u = uvs[0] / 256;
-	int16_t v = uvs[1] / 256;
-	vec_push(&cmdList,
-		 ((Sprite){z, texture, (2 + x) * guiScale, (7 + y) * guiScale, (16 + x) * guiScale, (1 + y) * guiScale, (16 + x) * guiScale,
-			   (14 + y) * guiScale, (30 + x) * guiScale, (7 + y) * guiScale, u, v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE, v,
-			   SHADER_RGB(color[0] >> 3, color[1] >> 3, color[2] >> 3)}));
-	Block_GetTexture(block, Direction_North, metadata, uvs);
-	Block_GetColor(block, metadata, Direction_North, color);
-	u = uvs[0] / 256;
-	v = uvs[1] / 256;
-	vec_push(&cmdList,
-		 ((Sprite){z, texture, (2 + x) * guiScale, (7 + y) * guiScale, (16 + x) * guiScale, (14 + y) * guiScale, (2 + x) * guiScale,
-			   (25 + y) * guiScale, (16 + x) * guiScale, (31 + y) * guiScale, u, v + TEXTURE_TILESIZE, u + TEXTURE_TILESIZE, v,
-			   SHADER_RGB_DARKEN(SHADER_RGB(color[0] >> 3, color[1] >> 3, color[2] >> 3), 11)}));
 
-	Block_GetTexture(block, Direction_East, metadata, uvs);
-	Block_GetColor(block, metadata, Direction_East, color);
-	u = uvs[0] / 256;
-	v = uvs[1] / 256;
-	vec_push(&cmdList,
-		 ((Sprite){z, texture, (16 + x) * guiScale, (14 + y) * guiScale, (30 + x) * guiScale, (7 + y) * guiScale,
-			   (16 + x) * guiScale, (31 + y) * guiScale, (30 + x) * guiScale, (25 + y) * guiScale, u, v + TEXTURE_TILESIZE,
-			   u + TEXTURE_TILESIZE, v, SHADER_RGB_DARKEN(SHADER_RGB(color[0] >> 3, color[1] >> 3, color[2] >> 3), 13)}));
+static float rot = 0.f;
+extern const WorldVertex cube_sides_lut[6 * 6];
+void SpriteBatch_PushIcon(Block block, uint8_t metadata, int x, int y, int z) {
+	WorldVertex vertices[6 * 6];
+	memcpy(vertices, cube_sides_lut, sizeof(cube_sides_lut));
+	for (int i = 0; i < 6; i++) {
+		if (i != Direction_Top && i != Direction_South && i != Direction_West) continue;
+		int16_t iconUV[2];
+		Block_GetTexture(block, i, metadata, iconUV);
+
+#define oneDivIconsPerRow (32768 / 8)
+#define halfTexel (6)
+
+		uint8_t color[3];
+		Block_GetColor(block, metadata, i, color);
+
+		for (int j = 0; j < 5; j++) {
+			int k = i * 6 + j;
+			C3D_FVec p =
+			    FVec3_New((float)vertices[k].xyz[0] - 0.5f, (float)vertices[k].xyz[1] - 0.5f, (float)vertices[k].xyz[2] - 0.5f);
+			C3D_FVec v = Mtx_MultiplyFVec3(&iconModelMtx, p);
+			vertices[k].xyz[0] = FastFloor(v.x * 20.f * guiScale) + (x + 16) * guiScale;
+			vertices[k].xyz[1] = -FastFloor(v.y * 20.f * guiScale) + (y + 16) * guiScale;  // invertieren auf der Y-Achse
+		}
+
+		WorldVertex bottomLeft = vertices[i * 6 + 0];
+		WorldVertex bottomRight = vertices[i * 6 + 1];
+		WorldVertex topRight = vertices[i * 6 + 2];
+		WorldVertex topLeft = vertices[i * 6 + 4];
+
+		C3D_Tex* texture = Block_GetTextureMap();
+
+		int16_t color16 = SHADER_RGB(color[0] >> 3, color[1] >> 3, color[2] >> 3);
+		if(i == Direction_South) color16 = SHADER_RGB_DARKEN(color16, 14);
+		else if(i == Direction_West) color16 = SHADER_RGB_DARKEN(color16, 10);
+
+#define unpackP(x) (x).xyz[0], (x).xyz[1]
+		vec_push(&cmdList, ((Sprite){z, texture, unpackP(topLeft), unpackP(topRight), unpackP(bottomLeft), unpackP(bottomRight),
+					     iconUV[0] / 256, iconUV[1] / 256 + TEXTURE_TILESIZE, iconUV[0] / 256 + TEXTURE_TILESIZE,
+					     iconUV[1] / 256, color16}));
+
+#undef unpackP
+	}
 }
 
 int SpriteBatch_PushText(int x, int y, int z, int16_t color, bool shadow, int wrap, int* ySize, const char* fmt, ...) {
@@ -230,6 +251,7 @@ void SpriteBatch_StartFrame(int width, int height) {
 }
 
 void SpriteBatch_Render(gfxScreen_t screen) {
+	rot += M_PI / 60.f;
 	vec_sort(&cmdList, &compareDrawCommands);
 
 	C3D_Mtx projMtx;
