@@ -64,16 +64,16 @@ _The controls can be changed by editing the file which can be found at `sdmc://c
 * R - Break Block.
 
 ### Camera
-* C-Stick (Up) - Forward.
-* C-Stick (Down) - Backward.
+* C-Stick (Up) - Up.
+* C-Stick (Down) - Down.
 * C-Stick (Left) - Left.
 * C-Stick (Right) - Right.
 
 ### Move
 * Circle Pad (Left) - Left.
 * Circle Pad (Right) - Right.
-* Circle Pad (Down) - Down.
-* Circle Pad (Up) - Up.
+* Circle Pad (Down) - Backward.
+* Circle Pad (Up) - Forward.
 * ZL - Jump.
 * ZR - Shift.
 
