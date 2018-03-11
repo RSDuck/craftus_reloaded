@@ -20,7 +20,8 @@ It's been a while since I started developing this version of Craftus. I started 
 * Clouds and menus
 * Sneaking and Flying
 
-## Controls
+## Default Controls
+The controls can be changed by editing the file which can be found at `sdmc://craftus/options.ini`(instructions can be found there too).
 
 ### Blocks
 * L - Place Block. 
