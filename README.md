@@ -21,11 +21,15 @@ It's been a while since I started developing this version of Craftus. I started 
 * Sneaking and Flying
 
 ## Default Controls
-The controls can be changed by editing the file which can be found at `sdmc://craftus/options.ini`(instructions can be found there too).
+_The controls can be changed by editing the file which can be found at `sdmc://craftus/options.ini`(instructions can be found there too)._
+
+
+## OLD 3DS
+
 
 ### Blocks
 * L - Place Block. 
-* R - Remove Block.
+* R - Break Block.
 
 ### Move
 * X - Forward.
@@ -48,6 +52,40 @@ The controls can be changed by editing the file which can be found at `sdmc://cr
 ### Commands
 * Select - Open Console.
 
+### Menu
+* Start - Back.
+
+
+## NEW 3DS
+
+
+### Blocks
+* L - Place Block. 
+* R - Break Block.
+
+### Camera
+* C-Stick (Up) - Forward.
+* C-Stick (Down) - Backward.
+* C-Stick (Left) - Left.
+* C-Stick (Right) - Right.
+
+### Move
+* Circle Pad (Left) - Left.
+* Circle Pad (Right) - Right.
+* Circle Pad (Down) - Down.
+* Circle Pad (Up) - Up.
+* ZL - Jump.
+* ZR - Shift.
+
+### Inventory
+* DPad (Left) - Switch Block.
+* DPad (Right) - Switch Block.
+
+### Commands
+* Select - Open Console.
+
+### Menu
+* Start - Back.
 
 ## Known bugs
 
