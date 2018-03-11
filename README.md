@@ -20,6 +20,33 @@ It's been a while since I started developing this version of Craftus. I started 
 * Clouds and menus
 * Sneaking and Flying
 
+## Controls
+
+### Blocks:
+* L - Place Block. 
+* R - Remove Block.
+
+### Move:
+* X - Forward.
+* B - Backward.
+* Y - Left.
+* A - Right.
+* DPad (Up) - Jump.
+* DPad (Down) - Shift.
+
+### Camera:
+* Circle Pad (Left) - Left.
+* Circle Pad (Right) - Right.
+* Circle Pad (Down) - Down.
+* Circle Pad (Up) - Up.
+
+### Inventory:
+* DPad (Left) - Switch Block.
+* DPad (Right) - Switch Block.
+
+### Commands:
+* Select - Open Console.
+
 ## Known bugs
 
 * ~~I experienced once, that blocks, which are newly placed in a specific chunk weren't rendered anymore, but blocks placed in another chunk were, but I couldn't reproduce this bug. Maybe it's related to old savefiles~~ I hope I fixed this bug, because I couldn't find a way to reproduce it.
