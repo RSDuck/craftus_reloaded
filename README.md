@@ -22,11 +22,11 @@ It's been a while since I started developing this version of Craftus. I started 
 
 ## Controls
 
-### Blocks:
+### Blocks
 * L - Place Block. 
 * R - Remove Block.
 
-### Move:
+### Move
 * X - Forward.
 * B - Backward.
 * Y - Left.
@@ -34,18 +34,19 @@ It's been a while since I started developing this version of Craftus. I started 
 * DPad (Up) - Jump.
 * DPad (Down) - Shift.
 
-### Camera:
+### Camera
 * Circle Pad (Left) - Left.
 * Circle Pad (Right) - Right.
 * Circle Pad (Down) - Down.
 * Circle Pad (Up) - Up.
 
-### Inventory:
+### Inventory
 * DPad (Left) - Switch Block.
 * DPad (Right) - Switch Block.
 
-### Commands:
+### Commands
 * Select - Open Console.
+
 
 ## Known bugs
 
