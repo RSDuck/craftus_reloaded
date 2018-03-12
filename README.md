@@ -23,69 +23,30 @@ It's been a while since I started developing this version of Craftus. I started 
 ## Default Controls
 _The controls can be changed by editing the file which can be found at `sdmc://craftus/options.ini`(instructions can be found there too)._
 
+| Category | Action | OLD 3DS | NEW 3DS |
+| ------------- | ------------- | ------------- | ------------- |
+| Blocks | Place Block | L | L |
+| Blocks | Break Block | R | R |
+|  |  |  |  |
+| Move | Forward | X | Circle Pad (Up) |
+| Move | Backward | B | Circle Pad (Down) |
+| Move | Left | Y | Circle Pad (Left) |
+| Move | Right | A | Circle Pad (Right) |
+| Move | Jump | DPad (Up) | ZL |
+| Move | Shift | DPad (Down) | ZR |
+|  |  |  |  |
+| Camera | Up | Circle Pad (Up) | C-Stick (Up) |
+| Camera | Down | Circle Pad (Down) | C-Stick (Down) |
+| Camera | Left | Circle Pad (Left) | C-Stick (Left) |
+| Camera | Right | Circle Pad (Right) | C-Stick (Right) |
+|  |  |  |  |
+| Inventory | Switch Block | DPad (Left) | DPad (Left) |
+| Inventory | Switch Block | DPad (Right) | DPad (Right) |
+|  |  |  |  |
+| Commands | Open Console | Select | Select |
+|  |  |  |  |
+| Menu | Back | Start | Start |
 
-## OLD 3DS
-
-
-### Blocks
-* L - Place Block. 
-* R - Break Block.
-
-### Move
-* X - Forward.
-* B - Backward.
-* Y - Left.
-* A - Right.
-* DPad (Up) - Jump.
-* DPad (Down) - Shift.
-
-### Camera
-* Circle Pad (Left) - Left.
-* Circle Pad (Right) - Right.
-* Circle Pad (Down) - Down.
-* Circle Pad (Up) - Up.
-
-### Inventory
-* DPad (Left) - Switch Block.
-* DPad (Right) - Switch Block.
-
-### Commands
-* Select - Open Console.
-
-### Menu
-* Start - Back.
-
-
-## NEW 3DS
-
-
-### Blocks
-* L - Place Block. 
-* R - Break Block.
-
-### Camera
-* C-Stick (Up) - Up.
-* C-Stick (Down) - Down.
-* C-Stick (Left) - Left.
-* C-Stick (Right) - Right.
-
-### Move
-* Circle Pad (Left) - Left.
-* Circle Pad (Right) - Right.
-* Circle Pad (Down) - Backward.
-* Circle Pad (Up) - Forward.
-* ZL - Jump.
-* ZR - Shift.
-
-### Inventory
-* DPad (Left) - Switch Block.
-* DPad (Right) - Switch Block.
-
-### Commands
-* Select - Open Console.
-
-### Menu
-* Start - Back.
 
 ## Known bugs
 
