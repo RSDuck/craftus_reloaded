@@ -20,6 +20,34 @@ It's been a while since I started developing this version of Craftus. I started 
 * Clouds and menus
 * Sneaking and Flying
 
+## Default Controls
+_The controls can be changed by editing the file which can be found at `sdmc://craftus/options.ini`(instructions can be found there too)._
+
+| Category | Action | OLD 3DS | NEW 3DS |
+| ------------- | ------------- | ------------- | ------------- |
+| Blocks | Place Block | L | L |
+| Blocks | Break Block | R | R |
+|  |  |  |  |
+| Move | Forward | X | Circle Pad (Up) |
+| Move | Backward | B | Circle Pad (Down) |
+| Move | Left | Y | Circle Pad (Left) |
+| Move | Right | A | Circle Pad (Right) |
+| Move | Jump | DPad (Up) | ZL |
+| Move | Shift | DPad (Down) | ZR |
+|  |  |  |  |
+| Camera | Up | Circle Pad (Up) | C-Stick (Up) |
+| Camera | Down | Circle Pad (Down) | C-Stick (Down) |
+| Camera | Left | Circle Pad (Left) | C-Stick (Left) |
+| Camera | Right | Circle Pad (Right) | C-Stick (Right) |
+|  |  |  |  |
+| Inventory | Switch Block | DPad (Left) | DPad (Left) |
+| Inventory | Switch Block | DPad (Right) | DPad (Right) |
+|  |  |  |  |
+| Commands | Open Console | Select | Select |
+|  |  |  |  |
+| Menu | Back | Start | Start |
+
+
 ## Known bugs
 
 * ~~I experienced once, that blocks, which are newly placed in a specific chunk weren't rendered anymore, but blocks placed in another chunk were, but I couldn't reproduce this bug. Maybe it's related to old savefiles~~ I hope I fixed this bug, because I couldn't find a way to reproduce it.
