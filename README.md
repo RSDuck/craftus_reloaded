@@ -22,7 +22,7 @@ It's been a while since I started developing this version of Craftus. I started 
 
 ## Default Controls
 
-_The controls can be changed by editing the file which can be found at `sd: / craftus / options.ini` (instructions can be found there too)._
+_The controls can be changed by editing the file which can be found at `sd:/craftus/options.ini` (instructions can be found there too)._
 
 | Category | Action | OLD 3DS | NEW 3DS |
 | ------------- | ------------- | ------------- | ------------- |
@@ -50,7 +50,7 @@ _The controls can be changed by editing the file which can be found at `sd: / cr
 
 ## Options
 
-_The options are changed in `sd: / craftus / options.ini`._
+_The options are changed in `sd:/craftus/options.ini`._
 
 | Option | Meaning | Default | Values to Change |
 | ------------- | ---------------- | ------------- | ------------- |
