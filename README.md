@@ -21,7 +21,8 @@ It's been a while since I started developing this version of Craftus. I started 
 * Sneaking and Flying
 
 ## Default Controls
-_The controls can be changed by editing the file which can be found at `sdmc://craftus/options.ini`(instructions can be found there too)._
+
+_The controls can be changed by editing the file which can be found at `sd: / craftus / options.ini` (instructions can be found there too)._
 
 | Category | Action | OLD 3DS | NEW 3DS |
 | ------------- | ------------- | ------------- | ------------- |
@@ -46,6 +47,14 @@ _The controls can be changed by editing the file which can be found at `sdmc://c
 | Commands | Open Console | Select | Select |
 |  |  |  |  |
 | Menu | Back | Start | Start |
+
+## Options
+
+_The options are changed in `sd: / craftus / options.ini`._
+
+| Option | Meaning | Default | Values to Change |
+| ------------- | ---------------- | ------------- | ------------- |
+| Autojump | Jump automatically, being close to a block | 1 (True) | 0 (False) and 1 (True) |
 
 
 ## Known bugs
