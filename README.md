@@ -52,10 +52,9 @@ _The controls can be changed by editing the file which can be found at `sd:/craf
 
 _The options are changed in `sd:/craftus/options.ini`._
 
-| Option | Meaning | Default | Values to Change |
-| ------------- | ---------------- | ------------- | ------------- |
-| Autojump | Jump automatically, being close to a block | 1 (True) | 0 (False) and 1 (True) |
-
+| Option | Meaning | Default (OLD 3DS) | Default (NEW 3DS) | Values to Change |
+| ------------- | ------------- | ------------- | ------------- | ------------- |
+| Autojump | Jump automatically, being close to a block | 1 (True) | 0 (False) | 0 (False) and 1 (True) |
 
 ## Known bugs
 
