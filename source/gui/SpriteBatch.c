@@ -262,8 +262,8 @@ void SpriteBatch_Render(gfxScreen_t screen) {
 	C3D_DepthTest(false, GPU_GREATER, GPU_WRITE_ALL);
 
 	C3D_TexEnv* env = C3D_GetTexEnv(0);
+	C3D_TexEnvInit(env);
 	C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, 0);
-	C3D_TexEnvOp(env, C3D_Both, 0, 0, 0);
 	C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
 
 	GuiVertex* usedVertexList = vertexList[screen];

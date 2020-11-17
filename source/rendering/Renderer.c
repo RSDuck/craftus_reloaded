@@ -23,6 +23,9 @@
 	 GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGB8) | \
 GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO))
 
+#define CLEAR_COLOR_SKY 0x90d9ffff
+#define CLEAR_COLOR_BLACK 0x000000ff
+
 static C3D_RenderTarget* renderTargets[2];
 static C3D_RenderTarget* lowerScreen;
 
@@ -52,13 +55,10 @@ void Renderer_Init(World* world_, Player* player_, WorkQueue* queue, GameState* 
 
 	renderTargets[0] = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH16);
 	renderTargets[1] = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH16);
-	C3D_RenderTargetSetClear(renderTargets[0], C3D_CLEAR_ALL, 0x90d9ffff, 0);
-	C3D_RenderTargetSetClear(renderTargets[1], C3D_CLEAR_ALL, 0x90d9ffff, 0);
 	C3D_RenderTargetSetOutput(renderTargets[0], GFX_TOP, GFX_LEFT, DISPLAY_TRANSFER_FLAGS);
 	C3D_RenderTargetSetOutput(renderTargets[1], GFX_TOP, GFX_RIGHT, DISPLAY_TRANSFER_FLAGS);
 
 	lowerScreen = C3D_RenderTargetCreate(240, 320, GPU_RB_RGBA8, GPU_RB_DEPTH16);
-	C3D_RenderTargetSetClear(lowerScreen, C3D_CLEAR_ALL, 0x000000ff, 0);
 	C3D_RenderTargetSetOutput(lowerScreen, GFX_BOTTOM, GFX_LEFT, DISPLAY_TRANSFER_FLAGS);
 
 	world_dvlb = DVLB_ParseFile((u32*)world_shbin, world_shbin_size);
@@ -124,13 +124,14 @@ void Renderer_Render() {
 	if (*gamestate == GameState_Playing) PolyGen_Harvest();
 
 	for (int i = 0; i < 2; i++) {
+		C3D_RenderTargetClear(renderTargets[i], C3D_CLEAR_ALL, CLEAR_COLOR_SKY, 0);
 		C3D_FrameDrawOn(renderTargets[i]);
 
 		SpriteBatch_StartFrame(400, 240);
 
 		C3D_TexEnv* env = C3D_GetTexEnv(0);
+		C3D_TexEnvInit(env);
 		C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, 0);
-		C3D_TexEnvOp(env, C3D_Both, 0, 0, 0);
 		C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
 
 		C3D_BindProgram(&world_shader);
@@ -175,6 +176,7 @@ void Renderer_Render() {
 		if (iod <= 0.f) break;
 	}
 
+	C3D_RenderTargetClear(lowerScreen, C3D_CLEAR_ALL, CLEAR_COLOR_BLACK, 0);
 	C3D_FrameDrawOn(lowerScreen);
 
 	SpriteBatch_StartFrame(320, 240);

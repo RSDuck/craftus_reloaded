@@ -24,17 +24,6 @@
 
 #include <citro3d.h>
 
-void exitHandler() {
-	printf("\n\nFatal error, press start to exit\n");
-	while (aptMainLoop()) {
-		gspWaitForVBlank();
-
-		hidScanInput();
-
-		if (hidKeysDown() & KEY_START) break;
-	}
-}
-
 bool showDebugInfo = false;  // muss noch besser gemacht werden, vlt. über eine Options Struktur wo auch andere Einstellungen drinne sind
 
 void releaseWorld(ChunkWorker* chunkWorker, SaveManager* savemgr, World* world) {
@@ -57,8 +46,6 @@ int main() {
 	gfxSet3D(true);
 
 	romfsInit();
-
-	atexit(&exitHandler);
 
 	SuperFlatGen flatGen;
 	SmeaGen smeaGen;
@@ -212,7 +199,6 @@ int main() {
 
 	if (gamestate == GameState_Playing) releaseWorld(&chunkWorker, &savemgr, world);
 
-	ChunkWorker_Deinit(&chunkWorker);
 
 	SaveManager_Deinit(&savemgr);
 
@@ -225,6 +211,8 @@ int main() {
 	WorldSelect_Deinit();
 
 	DebugUI_Deinit();
+
+	ChunkWorker_Deinit(&chunkWorker);
 
 	Renderer_Deinit();
 

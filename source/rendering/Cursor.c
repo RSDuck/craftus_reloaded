@@ -53,8 +53,8 @@ void Cursor_Draw(int projUniform, C3D_Mtx* projectionview, World* world, int x, 
 	C3D_DepthMap(true, -1.f, 0.001f);
 
 	C3D_TexEnv* env = C3D_GetTexEnv(0);
+	C3D_TexEnvInit(env);
 	C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, 0, 0);
-	C3D_TexEnvOp(env, C3D_Both, 0, 0, 0);
 	C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
 
 	C3D_BufInfo* bufInfo = C3D_GetBufInfo();

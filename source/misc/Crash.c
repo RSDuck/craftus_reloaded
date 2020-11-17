@@ -19,5 +19,14 @@ void Crash(const char* reason, ...) {
 
 	va_end(vl);
 
+	printf("\n\nFatal error, press start to exit\n");
+	while (aptMainLoop()) {
+		gspWaitForVBlank();
+
+		hidScanInput();
+
+		if (hidKeysDown() & KEY_START) break;
+	}
+
 	exit(EXIT_FAILURE);
 }

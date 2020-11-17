@@ -51,15 +51,14 @@ void Texture_Load(C3D_Tex* result, char* filename) {
 		free(image);
 
 		if (width < 64 || height < 64) {
-			C3D_SafeTextureCopy(imgInLinRam, 0, result->data, 0, width * height * sizeof(uint32_t), 8);
+			C3D_SyncTextureCopy(imgInLinRam, 0, result->data, 0, width * height * sizeof(uint32_t), 8);
 		} else {
-			C3D_SafeDisplayTransfer(
+			C3D_SyncDisplayTransfer(
 			    (uint32_t*)imgInLinRam, GX_BUFFER_DIM(width, height), result->data, GX_BUFFER_DIM(width, height),
 			    (GX_TRANSFER_FLIP_VERT(1) | GX_TRANSFER_OUT_TILED(1) | GX_TRANSFER_RAW_COPY(0) |
 			     GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGBA8) |
 			     GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO)));
 		}
-		gspWaitForPPF();
 
 		linearFree(imgInLinRam);
 	} else {
@@ -178,11 +177,10 @@ void Texture_MapInit(Texture_Map* map, const char** files, int num_files) {
 		printf("Couldn't alloc texture memory\n");
 	C3D_TexSetFilter(&map->texture, GPU_NEAREST, GPU_NEAREST);
 
-	C3D_SafeDisplayTransfer(
+	C3D_SyncDisplayTransfer(
 	    buffer, GX_BUFFER_DIM(TEXTURE_MAPSIZE, TEXTURE_MAPSIZE), map->texture.data, GX_BUFFER_DIM(TEXTURE_MAPSIZE, TEXTURE_MAPSIZE),
 	    (GX_TRANSFER_FLIP_VERT(1) | GX_TRANSFER_OUT_TILED(1) | GX_TRANSFER_RAW_COPY(0) | GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) |
 	     GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO)));
-	gspWaitForPPF();
 
 	int size = TEXTURE_MAPSIZE / 2;
 	ptrdiff_t offset = TEXTURE_MAPSIZE * TEXTURE_MAPSIZE;
