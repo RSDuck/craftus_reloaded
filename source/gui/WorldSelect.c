@@ -29,7 +29,7 @@ void WorldSelect_ScanWorlds() {
 
 	DIR* directory = opendir("sdmc:/craftus/saves");
 
-	char buffer[256];
+	char buffer[512];
 
 	struct dirent* entry;
 
@@ -270,7 +270,7 @@ bool WorldSelect_Update(char* out_worldpath, char* out_name, WorldGenType* world
 	}
 	if (confirmed_deletion) {
 		confirmed_deletion = false;
-		char buffer[256];
+		char buffer[512];
 		sprintf(buffer, "sdmc:/craftus/saves/%s", worlds.data[selectedWorld].path);
 		delete_folder(buffer);
 

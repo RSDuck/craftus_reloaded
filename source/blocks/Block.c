@@ -48,7 +48,7 @@ void Block_Deinit() { C3D_TexDelete(&textureMap.texture); }
 void* Block_GetTextureMap() { return &textureMap.texture; }
 
 void Block_GetTexture(Block block, Direction direction, uint8_t metadata, int16_t* out_uv) {
-	Texture_MapIcon i;
+	Texture_MapIcon i = {0, 0, 0};
 	switch (block) {
 		case Block_Air:
 			return;
@@ -109,6 +109,7 @@ void Block_GetTexture(Block block, Direction direction, uint8_t metadata, int16_
 		case Block_Bedrock:
 			i = icon.bedrock;
 			break;
+		default: break;
 	}
 	out_uv[0] = i.u;
 	out_uv[1] = i.v;

@@ -19,8 +19,6 @@ static WorldVertex vertices[] = {{{-1, 0, -1}, {0, 0}, {255, 255, 255}, {0, 0, 0
 static C3D_Tex texture;
 static WorldVertex* cloudVBO;
 
-static int wrap = 0;
-
 #define TEXTURE_SIZE 64
 
 void Clouds_Init() {

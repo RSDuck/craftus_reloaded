@@ -12,12 +12,12 @@ bool Collision_BoxIntersect(Box a, Box b, int ignore_faces,
 {
 	// the normal of each face.
 	static const float3 faces[6] = {
-	    {-1, 0, 0},  // 'left' face normal (-x direction)
-	    {1, 0, 0},   // 'right' face normal (+x direction)
-	    {0, -1, 0},  // 'bottom' face normal (-y direction)
-	    {0, 1, 0},   // 'top' face normal (+y direction)
-	    {0, 0, -1},  // 'far' face normal (-z direction)
-	    {0, 0, 1},   // 'near' face normal (+z direction)
+	    {{-1, 0, 0}},  // 'left' face normal (-x direction)
+	    {{1, 0, 0}},   // 'right' face normal (+x direction)
+	    {{0, -1, 0}},  // 'bottom' face normal (-y direction)
+	    {{0, 1, 0}},   // 'top' face normal (+y direction)
+	    {{0, 0, -1}},  // 'far' face normal (-z direction)
+	    {{0, 0, 1}},   // 'near' face normal (+z direction)
 	};
 
 	// distance of collided box to the face.

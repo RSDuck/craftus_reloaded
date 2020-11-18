@@ -13,7 +13,7 @@ void ChunkWorker_Init(ChunkWorker* chunkworker) {
 
 	for (int i = 0; i < WorkerItemTypes_Count; i++) vec_init(&chunkworker->handler[i]);
 
-	int prio;
+	s32 prio;
 	bool isNew3ds = false;
 	APT_CheckNew3DS(&isNew3ds);
 	svcGetThreadPriority(&prio, CUR_THREAD_HANDLE);

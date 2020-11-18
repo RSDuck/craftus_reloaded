@@ -138,7 +138,7 @@ void Texture_MapInit(Texture_Map* map, const char** files, int num_files) {
 	for (int i = 0; i < maxSize; i++) buffer[i] = 0x000000FF;
 
 	int filei = 0;
-	char* filename = files[filei];
+	const char* filename = files[filei];
 	int c = 0;
 	while (filename != NULL && c < (TEXTURE_MAPTILES * TEXTURE_MAPTILES) && filei < num_files) {
 		uint32_t *image, w, h;
